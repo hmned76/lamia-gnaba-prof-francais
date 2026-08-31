@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LamiAI</string>
+    <string name="title_activity_main">LamiAI</string>
+    <string name="package_name">com.lamia.gnaba.ai</string>
+    <string name="custom_url_scheme">com.lamia.gnaba.ai</string>
+</resources>

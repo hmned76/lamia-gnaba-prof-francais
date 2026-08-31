@@ -1,0 +1,28 @@
+function moveSharePopUp(){
+    $("#fb-root div.fb_dialog.fb_dialog_advanced").eq(1).css('top','140px');
+}
+
+$(document).ready(function(){
+    $(".lecteur_masque").width($(".participation").width());
+    $(".lecteur_masque").height($(".participation").height());
+
+    var not_working = true;
+
+    $('.vote_action').on('click',function(e){
+        e.preventDefault();
+        if(not_working){
+            not_working = false;
+            $(this).parent('div .vote').slideUp();
+            $(this).parent('div .vote').load(
+                $(this).attr('href')+"?ajax=1",
+                function(){
+                    not_working = true;
+                    $(this).slideDown();
+                })
+        }
+        return false;
+    })
+});
+
+
+

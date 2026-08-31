@@ -1,0 +1,8 @@
+<!DOCTYPE HTML>
+<HTML>
+	<head>
+	<title><?php echo "hallo"; ?></title>
+	</head>
+	<body>
+		test from HTML
+	</body>

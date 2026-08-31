@@ -1,0 +1,202 @@
+$(document).ready(function() {
+    $("a.ajax_switch").click(function(e) {
+        e.preventDefault();
+        _this = $(this);
+        var send_ajax = true;
+        var img = $(this).children('img');
+        var img_src = img.attr('src');
+        var with_confirm = false;
+        if (img_src.toString().match("Croix.png$"))
+            with_confirm = true;
+        var data_send = {sf_method: "put", ajax: true};
+        var confirm_param = $(this).data("confirm-param");
+
+
+
+        fc_send_ajax = function(_this, data) {
+            img.attr('src', img_src + '/../Loading.gif');
+            $.ajax({
+                type: "PUT",
+                data: data,
+                url: _this.attr('href'),
+                success: function(retour) {
+                    if (eval(retour)) {
+                        img.attr('src', img_src + '/../OK.png');
+                    }
+                    else {
+                        img.attr('src', img_src + '/../Croix.png');
+                    }
+                },
+                error: function(e) {
+                    img.attr('src', img_src);
+                }
+            });
+        }
+
+        if ($(this).hasClass("with_confirm") && with_confirm) {
+            send_ajax = true;
+
+            if (confirm(confirm_param.mess)) {
+                data_send[confirm_param.attr] = 1;
+            } else {
+                data_send[confirm_param.attr] = 0;
+            }
+        }
+
+        if ($(this).hasClass("with_confirm_choices") && with_confirm) {
+            send_ajax = false;
+            $("#ui-dialog").html(confirm_param.mess);
+            var buttons = {};
+            for (var key in confirm_param.buttons) {
+
+                buttons[key] = function(event) {
+                    data_send[confirm_param.attr] = confirm_param.buttons[$(event.target).text()];
+                    if(document.getElementById("checkbox-ajouter-vitrine-part")){
+                        data_send['checkbox-ajouter-vitrine-part']= document.getElementById("checkbox-ajouter-vitrine-part").checked;
+                    }
+                    fc_send_ajax(_this, data_send);
+                    $("#ui-dialog").dialog("close");
+                };
+            }
+            $("#ui-dialog").dialog({
+                autoOpen: true,
+                buttons: buttons
+            })
+        }
+
+        if (send_ajax)
+            fc_send_ajax(_this, data_send);
+
+    });
+
+
+
+    $("a.ajax_switch2").click(function(e) {
+        e.preventDefault();
+        to_change = $(this).parent().children('.to_change');
+        $.ajax({
+            type: "PUT",
+            data: {
+                sf_method: "put",
+                ajax: true
+            },
+            url: $(this).attr('href'),
+            success: function(retour) {
+                to_change.text(retour);
+            },
+            error: function(e) {
+                to_change.text('erreur');
+            }
+        });
+    });
+    $("a.ajax_switch3").click(function(e) {
+        e.preventDefault();
+        var _this = $(this);
+        var img = _this.children('img');
+        var img_src = img.attr('src');
+        img.attr('src', img_src + '/../Loading.gif');
+        $.ajax({
+            type: "PUT",
+            data: {
+                sf_method: "put",
+                ajax: true
+            },
+            url: _this.attr('href'),
+            success: function(retour) {
+                if (eval(retour)) {
+                    img.attr('src', img_src.replace('_Off.png', '_On.png'));
+                    _this.attr('title', "Ne plus suivre les commentaires");
+                }
+                else {
+                    img.attr('src', img_src.replace('_On.png', '_Off.png'));
+                    _this.attr('title', "Suivre les commentaires");
+                }
+            },
+            error: function(e) {
+                img.attr('src', img_src);
+            }
+        });
+    });
+
+    $("a.scroll").attr('href', '#display_comment');
+
+    $("#display_comment").click(function(e) {
+        e.preventDefault();
+        $("#display_comment span").toggle();
+        $("#comment").slideToggle(500);
+    });
+
+    $(".scroll").click(function(event) {
+        if (top.location == self.document.location) {
+            event.preventDefault();
+            var vtop = $("#display_comment").offset().top;
+            $('html, body').animate({
+                scrollTop: vtop
+            }, "slow", function() {
+                $("#display_comment span").eq(0).hide();
+                $("#display_comment span").eq(1).show();
+                $("#comment").slideDown(500);
+            });
+        } else {
+            $("#display_comment span").eq(0).hide();
+            $("#display_comment span").eq(1).show();
+            $("#comment").slideDown(500);
+        }
+    });
+
+
+    $('#comment').load(
+            $('#display_comment').attr('href'),
+            function() {
+                $("#comment form textarea").on('keyup', function(e) {
+                    $("#comment form textarea").val($("#comment form textarea").val().replace(/([^0-9w\.])\1{2,}/ig, "$1$1"));
+                    $("#comment form textarea").val($("#comment form textarea").val().replace(/([\.w])\1{3,}/ig, "..."));
+                });
+
+                $("#comment form").on('submit', function() {
+                    var vconfirm = ($("#comment form").hasClass('admin-confirm')) ? confirm('Attention ce commentaire va être publié avec un compte admin') : true;
+                    if (vconfirm) {
+                        $("#comment td.submit").hide();
+                        $("#comment td.loading").show();
+                        $("#comment form textarea").val($("#comment form textarea").val().replace(/([^0-9w\.])\1{2,}/ig, "$1$1"));
+                        $("#comment form textarea").val($("#comment form textarea").val().replace(/([\.w])\1{3,}/ig, "..."));
+                        s = $(this).serialize();
+                        $.ajax({
+                            type: "POST",
+                            data: s,
+                            url: $(this).attr("action"),
+                            success: function(retour) {
+                                $('#commentaires').html(retour);
+                                $('#comment form textarea').val("");
+                                $('#display_comment .nb_comment').text($('#display_comment .nb_comment').text() + 1);
+                                $("#comment td.submit").fadeIn();
+                                $("#comment td.loading").hide();
+                            }
+                        });
+                    }
+                    return false;
+                });
+
+                $("#commentaires").on('click', "a.commentaire_delete", function() {
+                    if (confirm("Etes vous sûr ?")) {
+                        url = $(this).attr("href");
+                        $(this).parent().html('<img src="/images/designs/v2/Loading.gif" alt="Suppression Commentaire" title="Suppression du commentaire en cours">');
+                        $.ajax({
+                            type: "POST",
+                            data: {
+                                sf_method: "delete"
+                            },
+                            url: url,
+                            success: function(retour) {
+                                $('#commentaires').html(retour);
+                                $('#display_comment .nb_comment').text($('#display_comment .nb_comment').text() - 1);
+                            }
+                        });
+                    }
+                    return false;
+                });
+
+            });
+
+
+});

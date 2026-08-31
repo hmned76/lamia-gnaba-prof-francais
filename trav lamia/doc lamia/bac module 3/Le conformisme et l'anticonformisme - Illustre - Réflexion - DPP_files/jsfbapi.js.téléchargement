@@ -1,0 +1,92 @@
+function streamPublish(message, name, caption, description, hrefTitle, hrefLink){
+
+    FB.ui(
+    {
+        method: 'stream.publish',
+        message: message,
+        attachment: {
+            name: name,
+            caption: caption,
+            description: (description),
+            href: hrefLink
+        },
+        action_links: [
+            {
+                text: hrefTitle,
+                href: hrefLink
+            }
+        ],
+        user_prompt_message: "De Plume en Plume"
+    },
+    function(response) {
+
+    });
+}
+
+function shareThis(){
+    FB.ui(
+   {
+     method: 'feed',
+     link: self.document.location.toString()
+   },
+   function(response) {
+     if (response && response.post_id) {
+     } else {
+     }
+   }
+ );
+}
+function shareThisWithMess(mess){
+    FB.ui(
+   {
+     method: 'feed',
+     message: mess,
+     link: self.document.location.toString()
+   },
+   function(response) {
+     if (response && response.post_id) {
+     } else {
+     }
+   }
+ );
+}
+
+function publishStream(mess){
+   setTimeout(function(){shareThisWithMess(mess);},2000);
+}
+
+function publishStreamNew(story_name,link){
+    setTimeout(function(){
+        streamPublish("Venez écrire la suite de «"+story_name+"»  sur De Plume En Plume elle vient juste d\u2019être publiée.",
+        "Venez écrire la suite de «"+story_name+"»  sur De Plume En Plume","Venez me lire et si l\u2019envie vous titille, sortez votre plume.",
+        story_name+' est une histoire participative dont la destinée est entre les mains des facebookers. Chacun peut imaginer la suite à donner, au fil du temps et des pages qui s\u2019écrivent.',
+        'De Plume en Plume', link)
+    },2000);
+}
+
+function publishStreamNewMono(story_author,story_name,link){
+    setTimeout(function(){
+        streamPublish("Venez lire «"+story_name+"»  sur De Plume En Plume elle vient juste d\u2019être publiée.",
+        "Venez lire «"+story_name+"»","et m\u2019encourager sur De Plume En Plume»",
+        story_name+' est mis en ligne par '+story_author+'. Rejoignez la communauté de "De Plume En Plume"',
+        'De Plume en Plume', link)
+    },2000);
+}
+
+function publishStreamSuite(story_name,link){
+    setTimeout(function(){
+        streamPublish("Je participe à l\u2019écriture d\u2019une histoire sur De Plume en Plume. ",
+        "Je viens de continuer « "+story_name+" »","à toi de prendre la plume",
+        story_name+' est une histoire participative dont la destinée est entre les mains des facebookers. Chacun peut imaginer la suite à donner, au fil du temps et des pages qui s\u2019écrivent.Rejoignez la communauté de "De Plume En Plume"',
+        'De Plume en Plume', link)}
+    ,2000);
+}
+
+function publishStreamSuiteMono(story_author,story_name,link){
+    setTimeout(function(){
+        streamPublish("Venez lire la suite de « "+story_name+" » sur de plume en plume",
+        "Venez lire la suite de « "+story_name+" »","elle vient juste d\u2019être publiée.",
+        story_name+' est mis en ligne par '+story_author+'. Rejoignez la communauté de "De Plume En Plume"',
+        'De Plume en Plume', link)}
+    ,2000);
+}

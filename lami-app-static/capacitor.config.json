@@ -1,0 +1,8 @@
+{
+  "appId": "com.lamia.gnaba.ai",
+  "appName": "LamiAI",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "file"
+  }
+}

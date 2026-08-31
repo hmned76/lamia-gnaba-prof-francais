@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html> 
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="premier travail">
+        <title>premier travail</title>
+        <link rel="stylesheet" href="style.css">
+        <script></script>
+        <style>
+            body {background:#EFEFEF;font-family:inherit,serif}
+            fieldset 
+            {
+                background:#FFF;
+                border:1px solid #CCC;
+                padding:20px;
+                width: 500px;
+                margin:20px auto
+            }
+            legend
+            {
+                background:#FFF;
+                border:1px solid #CCC;
+                padding:10px
+            }
+            label,input,select{}
+            label {margin-bottom: 10px;display: block}
+            input {margin-bottom: 10px}
+            input[type="text"],input[type="password"], textarea
+            {
+                padding:8px;
+                width:300px;
+                display:block
+            }
+            hr{border: 1px solid#EEE}
+            textarea {
+                height: 150px;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <from name="register">
+        <fieldset>
+        <legend>Information Personnel</legend>
+            <label>Nom Utilisateur</label>
+            <input type="text" name="Nom Utilisateur">
+            <label> Mot de passe</label>
+            <input type="password" name="Mot de passe">
+            <label>E-mail</label>
+            <input type="text" name="email">
+            <label>Genre</label>
+            <select name="Genre">
+                <option value="homme">homme</option>
+                <option value="femme">femme</option>
+            </select>
+           </fieldset>
+        <fieldset>
+            <legend>Mes Favoris</legend>
+            <label>Mes favoris editeur</label>
+            <input type="radio"name="editeur">KomodoEditor<br>
+            <input type="radio"name="editeur">Brackets<br>
+            <input type="radio"name="editeur">Netbeans
+            <hr>
+            <label>Mes favoris navigateur</label>
+            <input type="radio"name="browser">Google<br>
+            <input type="radio"name="browser">Opera<br>
+            <input type="radio"name="browser">Explorer
+            <hr>
+            <label>Mes favoris system</label>
+            <input type="checkbox">Windows<br>
+            <input type="checkbox">Macintoch<br>
+            <input type="checkbox">linux
+        </fieldset>
+        <fieldset>
+            <legend>Votre Message</legend>
+            <textarea></textarea>
+            <input type="submit"value="Envoyer ton message">
+        </fieldset>
+        </from>
+    </body>
+    </html>

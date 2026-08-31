@@ -1,0 +1,28 @@
+{
+  "short_name": "LamiAI",
+  "name": "LamiAI - Assistant Pédagogique Lamia Gnaba",
+  "description": "Application d'assistance pédagogique pour le Professeur Lamia Gnaba",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#1e40af",
+  "background_color": "#f0f4f8",
+  "categories": ["education", "productivity"],
+  "scope": "/",
+  "lang": "fr",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
