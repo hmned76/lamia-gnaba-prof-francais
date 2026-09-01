@@ -1,5 +1,23 @@
 # Historique des versions — LamiAI
 
+## v1.0.14 — 1 Septembre 2026
+- Synchronisation GitHub : sauvegarde/récupération entre téléphone et PC
+- Page "☁️ Synchronisation" dans le menu
+- Boutons : Sauvegarder sur GitHub, Récupérer de GitHub, Sync complète
+- Auto-save toutes les 5 minutes
+- Historique des syncs
+- Scripts PC : sync-pc.bat et start-server.bat
+
+## v1.0.13 — 1 Septembre 2026
+- 2ème Année : 6 modules (Pages d'amour, Toi mon semblable, Femme et société, Travail et bien être, Images d'ici images d'ailleurs, La reine de beauté)
+- 3ème Année : fusionnée en une seule section (plus Science/Lettre séparées)
+  - Modules : Récits de voyage, Droit à la différence, Mythes d'hier Mythes d'aujourd'hui, Portraits comiques, Le pouvoir de l'image, Écrits autobiographiques
+- Menu simplifié : 1ère, 2ème, 3ème, Bac Science, Bac Lettre
+
+## v1.0.12 — 1 Septembre 2026
+- Icône APK personnalisée (photo de profil)
+- Correction icône adaptive Android
+
 ## v1.0.11 — 1 Septembre 2026
 - Emploi du temps : Lunedi au Samedi (sans Dimanche), grille vierge par défaut
 - Page Devoirs restructurée par catégorie :

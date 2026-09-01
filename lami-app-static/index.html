@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
-<title>LamiAI v1.0.12 - Assistant Pédagogique</title>
+<title>LamiAI v1.0.15 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -61,6 +61,14 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
   .overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:190}
   .overlay.show{display:block}
 }
+@media print{
+  @page{size:A4 portrait;margin:20mm 25mm 25mm 25mm}
+  .sidebar,.topbar,.btn,.nav,.overlay{display:none!important}
+  .main{margin-left:0!important}
+  .content{padding:0!important;max-width:100%}
+  .card{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -75,16 +83,18 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
     <div class="nav">
       <a href="#" onclick="showPage('home')" class="nav-item active" data-page="home">🏠 Accueil</a>
       <a href="#" onclick="showPage('docs')" class="nav-item" data-page="docs">📄 Documents</a>
-      <a href="#" onclick="showPage('ai')" class="nav-item" data-page="ai">🤖 Assistant IA</a>
+      <a href="#" onclick="showPage('niv1')" class="nav-item" data-page="niv1">📖 1ère Année</a>
+      <a href="#" onclick="showPage('niv2')" class="nav-item" data-page="niv2">📚 2ème Année</a>
+      <a href="#" onclick="showPage('niv3')" class="nav-item" data-page="niv3">📚 3ème Année</a>
+      <a href="#" onclick="showPage('bacs')" class="nav-item" data-page="bacs">🧬 Bac Science</a>
+      <a href="#" onclick="showPage('bacl')" class="nav-item" data-page="bacl">🏆 Bac Lettre</a>
       <a href="#" onclick="showPage('cal')" class="nav-item" data-page="cal">📅 Emploi du Temps</a>
-      <a href="#" onclick="showPage('cours')" class="nav-item" data-page="cours">📚 Mes Cours</a>
-      <a href="#" onclick="showPage('niv')" class="nav-item" data-page="niv">🎯 Niveaux</a>
-      <a href="#" onclick="showPage('ex')" class="nav-item" data-page="ex">✏️ Exercices</a>
-      <a href="#" onclick="showPage('dev')" class="nav-item" data-page="dev">📝 Devoirs</a>
+      <a href="#" onclick="showPage('notes')" class="nav-item" data-page="notes">📊 Relevé de Notes</a>
+      <a href="#" onclick="showPage('sync')" class="nav-item" data-page="sync">☁️ Synchronisation</a>
       <a href="#" onclick="showPage('set')" class="nav-item" data-page="set">⚙️ Paramètres</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.0.12 • PWA</div>
+      <div>LamiAI v1.0.15 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -411,23 +421,38 @@ function showPage(id){
     </div>`;
   }
   else if(id==='docs'){
-    title='Documents'; sub='Explorateur de documents — Prof. Lamia Gnaba';
-    html=`
-    <div id="docBreadcrumb" style="font-size:12px;color:var(--tl);margin-bottom:12px;display:flex;align-items:center;gap:4px">
-      <span style="cursor:pointer;color:var(--p);font-weight:600" onclick="docNav('root')">📁 Tous les niveaux</span>
-    </div>
-    <div id="docCount" style="font-size:12px;color:var(--tl);margin-bottom:12px"></div>
-    <div id="docGrid" class="grid grid-2"></div>
-    <div class="card" style="margin-top:16px;background:linear-gradient(135deg,#1e40af,#7c3aed);color:#fff;">
-      <h3 style="font-size:14px;font-weight:700;margin-bottom:8px">📤 Générateur de Documents</h3>
-      <p style="font-size:11px;opacity:0.85;margin-bottom:10px">Créez des fichiers Word, Excel ou PDF en un clic.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="generateDoc('word','Devoir de Contrôle - Module Subordination','Contenu pédagogique pour 4ème Année','Lamia Gnaba')" class="btn" style="background:#fff;color:var(--p)">📘 Créer Word</button>
-        <button onclick="generateDoc('excel','Notes 2ème Année - Femme et Société','Liste des élèves et notes','Lamia Gnaba')" class="btn" style="background:#fff;color:var(--s)">📊 Créer Excel</button>
-        <button onclick="generateDoc('pdf','Fiche Pédagogique - Subordination 4ème Année','Exercices et corrigés - Prof. Gnaba','Lamia Gnaba')" class="btn" style="background:#fff;color:var(--d)">📕 Créer PDF</button>
-      </div>
-    </div>`;
-    setTimeout(()=>{ if(docPath.length===0) docNav('root'); else renderDocExplorer(); }, 50);
+    title='Documents'; sub='Tous les documents — Prof. Lamia Gnaba';
+    const levelMap={
+      '1ère Année':'1ère Année',
+      '2ème Année':'2ème Année',
+      '3ème Année':'3ème Année',
+      '3ème Année Lettres':'3ème Année Lettres',
+      '4ème Année Sciences':'Bac Scientifique',
+      '4ème Année Lettres':'Bac Lettres',
+      'Non classé':'Non classé'
+    };
+    const colors={'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année':'#8b5cf6','Bac Scientifique':'#0891b2','Bac Lettres':'#f59e0b','Non classé':'#6b7280'};
+    const icons={'1ère Année':'📖','2ème Année':'📚','3ème Année':'📚','Bac Scientifique':'🧬','Bac Lettres':'🏆','Non classé':'📁'};
+    const groups={};
+    DOCS.forEach(d=>{
+      const lv=levelMap[d.level]||'Non classé';
+      if(!groups[lv])groups[lv]=[];
+      groups[lv].push(d);
+    });
+    const order=['1ère Année','2ème Année','3ème Année','Bac Scientifique','Bac Lettres','Non classé'];
+    html=`<div id="docLevelContainer">`;
+    html+=`<div style="font-size:12px;color:var(--tl);margin-bottom:12px">${DOCS.length} documents au total</div>`;
+    order.forEach(lv=>{
+      if(!groups[lv]||groups[lv].length===0)return;
+      const docs=groups[lv];
+      const col=colors[lv]||'#6b7280';
+      html+=`<div class="card" style="border-left:4px solid ${col};cursor:pointer;margin-bottom:8px" onclick="showDocLevel('${lv.replace(/'/g,"\\'")}')">
+        <h3 style="font-size:16px;font-weight:700;color:${col}">${icons[lv]||'📁'} ${lv}</h3>
+        <p style="font-size:11px;color:var(--tl);margin:4px 0">${docs.length} document${docs.length>1?'s':''}</p>
+      </div>`;
+    });
+    html+=`</div>`;
+    setTimeout(()=>renderDocExplorer(),50);
   }
   else if(id==='ai'){
     title='Assistant IA'; sub='LamiAI - Votre assistant pédagogique';
@@ -475,7 +500,7 @@ function showPage(id){
     title='Mes Cours'; sub='Cours organisés par niveau';
     const levels={};
     DOCS.filter(d=>d.cat==='cours').forEach(d=>{if(!levels[d.level])levels[d.level]=[];levels[d.level].push(d)});
-    const colors={'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année Lettres':'#dc2626','3ème Année Sciences':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
+    const colors={'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
     html=`<div id="coursContainer">`;
     Object.keys(levels).sort().forEach(level=>{
       const docs=levels[level];
@@ -500,11 +525,87 @@ function showPage(id){
     ];
     html=`<div class="grid grid-4">${n.map(x=>`<div class="card" style="border-top:3px solid ${x.col}"><div style="font-size:28px">${x.ic}</div><h3 style="font-size:15px;font-weight:700;margin:8px 0">${x.name}</h3></div>`).join('')}</div>`;
   }
+  else if(id==='niv1'||id==='niv2'||id==='niv3'||id==='bacs'||id==='bacl'){
+    const levelConfig={
+      niv1:{name:'1ère Année',real:'1ère Année',col:'#3b82f6',ic:'📖'},
+      niv2:{name:'2ème Année',real:'2ème Année',col:'#059669',ic:'📚'},
+      niv3:{name:'3ème Année',real:'3ème Année',col:'#8b5cf6',ic:'📚'},
+      bacs:{name:'Bac Scientifique',real:'4ème Année Sciences',col:'#0891b2',ic:'🧬'},
+      bacl:{name:'Bac Lettres',real:'4ème Année Lettres',col:'#f59e0b',ic:'🏆'}
+    };
+    const cfg=levelConfig[id];
+    title=cfg.name; sub=`Modules du niveau`;
+    const modules={
+      niv1:['Rencontres','Scènes de la vie en France','Jeunesse sans frontières','Société de consommation','Sauvons la planète terre','Progrès et bonheur'],
+      niv2:["Pages d'amour","Toi, mon semblable","Femme et société","Travail et bien être","Images d'ici, images d'ailleurs","La reine de beauté"],
+      niv3:["Récits de voyage","Droit à la différence","Mythes d'hier Mythes d'aujourd'hui","Portraits comiques","Le pouvoir de l'image","Écrits autobiographiques"],
+      bacs:["Souvenirs et nostalgie","Histoires d'amour","Liberté j'écris ton nom","Guerre et paix","L'homme et la science"],
+      bacl:["Partage","Littérature engagée","L'appel de la modernité","A la lumière de la raison","Poésie"]
+    };
+    const mods=modules[id]||[];
+    if(mods.length>0){
+      html=`<div style="font-size:12px;color:var(--tl);margin-bottom:12px">${mods.length} modules</div>`;
+      const modColors=['#3b82f6','#059669','#dc2626','#f59e0b','#8b5cf6','#0891b2'];
+      const modIcons={niv1:['🤝','🏙️','🌍','🛒','🌿','🚀'],niv2:['❤️','👥','👩','💼','🌍','👑'],niv3:['✈️','🤝','🏛️','😄','🖼️','📖'],bacs:['🌅','💕','🕊️','⚔️','🔬'],bacl:['🤝','✊','🌅','💡','📜']}[id]||['📁'];
+      mods.forEach((m,i)=>{
+        const mc=modColors[i%modColors.length];
+        const mi=modIcons[i]||'📁';
+        const docs=DOCS.filter(d=>d.level===cfg.real&&(d.mod===m||(d.name.toLowerCase().includes(m.toLowerCase().split(' ')[0]))));
+        html+=`<div class="card" style="border-left:4px solid ${mc};cursor:pointer;margin-bottom:8px" onclick="showModule('${cfg.real.replace(/'/g,"\\'")}','${m.replace(/'/g,"\\'")}')">
+          <h3 style="font-size:15px;font-weight:700;color:${mc}">${mi} Module ${i+1}: ${m}</h3>
+          <p style="font-size:11px;color:var(--tl);margin:4px 0">${docs.length} document${docs.length>1?'s':''}</p>
+        </div>`;
+      });
+    }else{
+      const docs=DOCS.filter(d=>d.level===cfg.real);
+      const cats={};
+      docs.forEach(d=>{const c=d.cat||'Autre';if(!cats[c])cats[c]=[];cats[c].push(d)});
+      const catNames={cours:'📘 Cours',exercice:'✏️ Exercices',controle:'📋 Contrôles',synthese:'📝 Synthèses',fiche:'📄 Fiches',revision:'🔄 Révisions',evaluation:'📊 Évaluations',vocabulaire:'📖 Vocabulaire',Autre:'📁 Autre'};
+      const catColors={cours:'#3b82f6',exercice:'#059669',controle:'#dc2626',synthese:'#f59e0b',fiche:'#8b5cf6',revision:'#0891b2',evaluation:'#ec4899',vocabulaire:'#6366f1',Autre:'#6b7280'};
+      html=`<div style="font-size:12px;color:var(--tl);margin-bottom:12px">${docs.length} document${docs.length>1?'s':''}</div>`;
+      if(docs.length===0){
+        html+=`<div class="card"><p style="color:var(--tl)">Aucun document pour ce niveau. Modules à configurer.</p></div>`;
+      }
+      Object.keys(cats).sort().forEach(cat=>{
+        const cd=cats[cat];
+        const cc=catColors[cat]||'#6b7280';
+        html+=`<div style="margin-bottom:16px">`;
+        html+=`<div style="font-size:13px;font-weight:700;color:${cc};margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid ${cc}">${catNames[cat]||cat} (${cd.length})</div>`;
+        cd.forEach(d=>{
+          const saved=localStorage.getItem('lami-doc-'+d.id);
+          html+=`<div class="card" onclick="openDoc(${d.id})" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;margin-bottom:6px;border-left:3px solid ${cc}">
+            <span style="font-size:24px">${d.cat==='cours'?'📘':d.cat==='exercice'?'✏️':d.cat==='controle'?'📋':d.cat==='synthese'?'📝':d.cat==='fiche'?'📄':'📁'}</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700">${d.name}</div>
+            <div style="font-size:11px;color:var(--tl);margin-top:2px">${d.mod} • ${d.type} • ${d.size}</div>
+            ${saved?'<div style="font-size:10px;color:#d97706;margin-top:2px">✏️ Modifié</div>':''}</div>
+            <span style="font-size:16px;color:var(--tl)">→</span></div>`;
+        });
+        html+=`</div>`;
+      });
+    }
+  }
+  else if(id==='notes'){
+    title='Relevé de Notes'; sub='Gestion des notes élèves';
+    html=`
+    <div class="card">
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:12px">📊 Relevé de Notes</h3>
+      <p style="font-size:12px;color:var(--tl);margin-bottom:16px">Gérez les notes de vos élèves par niveau et par matière.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="addNote()" class="btn">➕ Ajouter une note</button>
+        <button onclick="exportNotes()" class="btn" style="background:var(--s)">📥 Exporter Excel</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h3 style="font-size:13px;font-weight:700;margin-bottom:8px">📋 Liste des notes</h3>
+      <div id="notesList"></div>
+    </div>`;
+    setTimeout(loadNotes,50);
+  }
   else if(id==='ex'){
     title='Exercices'; sub='Exercices par niveau';
     const levels={};
     DOCS.filter(d=>d.cat==='exercice').forEach(d=>{if(!levels[d.level])levels[d.level]=[];levels[d.level].push(d)});
-    const colors={'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année Lettres':'#dc2626','3ème Année Sciences':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
+    const colors={'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
     html=`<div id="exContainer">`;
     Object.keys(levels).sort().forEach(level=>{
       const docs=levels[level];
@@ -551,6 +652,35 @@ function showPage(id){
     });
     html+=`</div>`;
   }
+  else if(id==='sync'){
+    title='Synchronisation'; sub='GitHub Cloud';
+    html=`
+    <div class="card">
+      <h3>☁️ Synchronisation GitHub</h3>
+      <p style="font-size:12px;color:var(--tl);margin-bottom:12px">Sauvegarde et récupère ton travail depuis GitHub. Fonctionne entre ton téléphone et ton PC.</p>
+      <div id="syncStatus" style="padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:12px;font-size:12px">
+        <div>🔗 Statut : <span id="syncState" style="color:var(--tl)">Vérification...</span></div>
+        <div>📅 Dernière sync : <span id="lastSync">Jamais</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <button onclick="syncToGitHub()" class="btn" id="btnSyncUp">📤 Sauvegarder sur GitHub</button>
+        <button onclick="syncFromGitHub()" class="btn" style="background:var(--s)" id="btnSyncDown">📥 Récupérer de GitHub</button>
+        <button onclick="forceSyncAll()" class="btn" style="background:#8b5cf6">🔄 Sync complète</button>
+      </div>
+      <div style="font-size:12px;color:var(--tl)">
+        <div style="margin-bottom:8px"><b>📦 Données synchronisées :</b></div>
+        <div>• 📄 Documents édités (cours, devoirs)</div>
+        <div>• 💬 Discussions LamiAI</div>
+        <div>• 📅 Emploi du temps</div>
+        <div>• 📊 Relevé de notes</div>
+        <div>• 📝 Modèles de documents</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📋 Historique des syncs</h3>
+      <div id="syncHistory" style="font-size:12px;color:var(--tl)">Chargement...</div>
+    </div>`;
+  }
   else if(id==='set'){
     title='Paramètres'; sub='Configuration';
     html=`
@@ -562,11 +692,763 @@ function showPage(id){
   document.getElementById('pageTitle').textContent=title;
   document.getElementById('pageSub').textContent=sub;
   document.getElementById('content').innerHTML=html;
+  if(id==='sync')updateSyncStatus();
   window.scrollTo({top:0,behavior:'smooth'})
 }
 
-let docPath = [];
-let docCatFilter = null;
+function showDocLevel(level){
+  const levelMap={
+    '1ère Année':'1ère Année',
+    '2ème Année':'2ème Année',
+    '3ème Année Scientifique':'3ème Année',
+    '3ème Année Lettres':'3ème Année Lettres',
+    'Bac Scientifique':'4ème Année Sciences',
+    'Bac Lettres':'4ème Année Lettres',
+    'Non classé':'Non classé'
+  };
+  const realLevel=levelMap[level]||level;
+  const docs=DOCS.filter(d=>d.level===realLevel);
+  const colors={'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année Scientifique':'#8b5cf6','3ème Année':'#dc2626','Bac Scientifique':'#0891b2','Bac Lettres':'#f59e0b','Non classé':'#6b7280'};
+  const col=colors[level]||'#6b7280';
+  const cats={};
+  docs.forEach(d=>{const c=d.cat||'Autre';if(!cats[c])cats[c]=[];cats[c].push(d)});
+  const catNames={cours:'📘 Cours',exercice:'✏️ Exercices',controle:'📋 Contrôles',synthese:'📝 Synthèses',fiche:'📄 Fiches',revision:'🔄 Révisions',evaluation:'📊 Évaluations',vocabulaire:'📖 Vocabulaire',Autre:'📁 Autre'};
+  const catColors={cours:'#3b82f6',exercice:'#059669',controle:'#dc2626',synthese:'#f59e0b',fiche:'#8b5cf6',revision:'#0891b2',evaluation:'#ec4899',vocabulaire:'#6366f1',Autre:'#6b7280'};
+  let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showPage('docs')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:${col}">${level}</span></div>`;
+  h+=`<div style="font-size:12px;color:var(--tl);margin-bottom:12px">${docs.length} document${docs.length>1?'s':''}</div>`;
+  Object.keys(cats).sort().forEach(cat=>{
+    const cd=cats[cat];
+    const cc=catColors[cat]||'#6b7280';
+    h+=`<div style="margin-bottom:16px">`;
+    h+=`<div style="font-size:13px;font-weight:700;color:${cc};margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid ${cc}">${catNames[cat]||cat} (${cd.length})</div>`;
+    cd.forEach(d=>{
+      const saved=localStorage.getItem('lami-doc-'+d.id);
+      h+=`<div class="card" onclick="openDoc(${d.id})" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;margin-bottom:6px;border-left:3px solid ${cc}">
+        <span style="font-size:24px">${d.cat==='cours'?'📘':d.cat==='exercice'?'✏️':d.cat==='controle'?'📋':d.cat==='synthese'?'📝':d.cat==='fiche'?'📄':'📁'}</span>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700">${d.name}</div>
+        <div style="font-size:11px;color:var(--tl);margin-top:2px">${d.mod} • ${d.type} • ${d.size}</div>
+        ${saved?'<div style="font-size:10px;color:#d97706;margin-top:2px">✏️ Modifié</div>':''}</div>
+        <span style="font-size:16px;color:var(--tl)">→</span></div>`;
+    });
+    h+=`</div>`;
+  });
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('pageTitle').textContent=level;
+  document.getElementById('pageSub').textContent=`${docs.length} documents`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showModule(level,module){
+  const docs=DOCS.filter(d=>{
+    if(d.level!==level)return false;
+    if(d.mod===module)return true;
+    const mn=module.toLowerCase().split(' ')[0];
+    return d.name.toLowerCase().includes(mn)||d.mod.toLowerCase().includes(mn);
+  });
+  const cours=docs.filter(d=>d.cat==='cours');
+  const devoirs=docs.filter(d=>d.cat==='controle'||d.cat==='synthese'||d.cat==='exercice'||d.cat==='evaluation');
+  const autres=docs.filter(d=>d.cat!=='cours'&&d.cat!=='controle'&&d.cat!=='synthese'&&d.cat!=='exercice'&&d.cat!=='evaluation');
+  const levelPages={'1ère Année':'niv1','2ème Année':'niv2','3ème Année':'niv3','4ème Année Sciences':'bacs','4ème Année Lettres':'bacl'};
+  let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showPage('${levelPages[level]||'docs'}')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600">${module}</span></div>`;
+  h+=`<div style="display:flex;gap:12px;margin-bottom:16px">`;
+  h+=`<div class="card" style="flex:1;border-left:4px solid #3b82f6;cursor:pointer" onclick="showModuleCat('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','cours')">
+    <h3 style="font-size:15px;font-weight:700;color:#3b82f6">📘 Cours</h3>
+    <p style="font-size:11px;color:var(--tl);margin:4px 0">${cours.length} cours</p>
+  </div>`;
+  h+=`<div class="card" style="flex:1;border-left:4px solid #dc2626;cursor:pointer" onclick="showModuleCat('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','devoirs')">
+    <h3 style="font-size:15px;font-weight:700;color:#dc2626">📋 Devoirs</h3>
+    <p style="font-size:11px;color:var(--tl);margin:4px 0">${devoirs.length} devoirs</p>
+  </div>`;
+  h+=`</div>`;
+  const allDocs=[...cours,...devoirs,...autres];
+  if(allDocs.length===0){
+    h+=`<div class="card"><p style="color:var(--tl)">Aucun document dans ce module. Les documents seront classés ici.</p></div>`;
+  }
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('pageTitle').textContent=module;
+  document.getElementById('pageSub').textContent=level;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showModuleCat(level,module,cat){
+  if(cat==='cours'){
+  const levelPages={'1ère Année':'niv1','2ème Année':'niv2','3ème Année':'niv3','4ème Année Sciences':'bacs','4ème Année Lettres':'bacl'};
+    let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showModule('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:#3b82f6">📘 Cours</span></div>`;
+    const sousCours=[
+      {name:'Lecture',col:'#3b82f6',ic:'📖'},
+      {name:'Langue',col:'#059669',ic:'🔤'},
+      {name:'Production',col:'#f59e0b',ic:'✍️'}
+    ];
+    sousCours.forEach(sc=>{
+      const docs=DOCS.filter(d=>{
+        if(d.level!==level||d.cat!=='cours')return false;
+        if(d.mod===module)return true;
+        const mn=module.toLowerCase().split(' ')[0];
+        return d.name.toLowerCase().includes(mn)||d.mod.toLowerCase().includes(mn);
+      }).filter(d=>{
+        const n=d.name.toLowerCase();
+        const m=d.mod.toLowerCase();
+        if(sc.name==='Lecture')return n.includes('lecture')||n.includes('texte')||n.includes('compréhension')||m.includes('lecture');
+        if(sc.name==='Langue')return n.includes('grammaire')||n.includes('langue')||n.includes('conjugaison')||n.includes('syntaxe')||m.includes('langue')||m.includes('grammaire');
+        if(sc.name==='Production')return n.includes('production')||n.includes('écriture')||n.includes('expression')||m.includes('production');
+        return false;
+      });
+      h+=`<div class="card" style="border-left:4px solid ${sc.col};cursor:pointer;margin-bottom:8px" onclick="showSousCours('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','${sc.name}')">
+        <h3 style="font-size:15px;font-weight:700;color:${sc.col}">${sc.ic} ${sc.name}</h3>
+        <p style="font-size:11px;color:var(--tl);margin:4px 0">${docs.length} cours</p>
+      </div>`;
+    });
+    document.getElementById('content').innerHTML=h;
+    document.getElementById('pageTitle').textContent='Cours — '+module;
+    document.getElementById('pageSub').textContent=level;
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  if(cat==='devoirs'){
+    let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showModule('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:#dc2626">📋 Devoirs</span></div>`;
+    const devCats=[
+      {name:'Contrôle',col:'#dc2626',ic:'📝'},
+      {name:'Synthèse',col:'#8b5cf6',ic:'📋'}
+    ];
+    devCats.forEach(dc=>{
+      const docs=DOCS.filter(d=>{
+        if(d.level!==level||d.cat!=='cours')return false;
+        if(d.mod===module)return true;
+        const mn=module.toLowerCase().split(' ')[0];
+        return d.name.toLowerCase().includes(mn)||d.mod.toLowerCase().includes(mn);
+      }).filter(d=>{
+        const n=d.name.toLowerCase();
+        if(dc.name==='Contrôle')return n.includes('contrôle')||n.includes('controle')||n.includes('sujet');
+        if(dc.name==='Synthèse')return n.includes('synthèse')||n.includes('synthese');
+        return false;
+      });
+      h+=`<div class="card" style="border-left:4px solid ${dc.col};cursor:pointer;margin-bottom:8px" onclick="showDevCat('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','${dc.name}')">
+        <h3 style="font-size:15px;font-weight:700;color:${dc.col}">${dc.ic} ${dc.name}</h3>
+        <p style="font-size:11px;color:var(--tl);margin:4px 0">${docs.length} document${docs.length>1?'s':''}</p>
+      </div>`;
+    });
+    document.getElementById('content').innerHTML=h;
+    document.getElementById('pageTitle').textContent='Devoirs — '+module;
+    document.getElementById('pageSub').textContent=level;
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+}
+
+function showDevCat(level,module,catName){
+  const docs=DOCS.filter(d=>{
+    if(d.level!==level||d.cat!=='cours')return false;
+    if(d.mod===module)return true;
+    const mn=module.toLowerCase().split(' ')[0];
+    return d.name.toLowerCase().includes(mn)||d.mod.toLowerCase().includes(mn);
+  }).filter(d=>{
+    const n=d.name.toLowerCase();
+    if(catName==='Contrôle')return n.includes('contrôle')||n.includes('controle')||n.includes('sujet');
+    if(catName==='Synthèse')return n.includes('synthèse')||n.includes('synthese');
+    return false;
+  });
+  const catColor=catName==='Contrôle'?'#dc2626':'#8b5cf6';
+  const catIcon=catName==='Contrôle'?'📝':'📋';
+  let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showModuleCat('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','devoirs')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:${catColor}">${catIcon} ${catName}</span></div>`;
+  
+  h+=`<div style="margin-bottom:20px">`;
+  h+=`<div style="font-size:14px;font-weight:700;color:${catColor};margin-bottom:10px">📝 Créer un document</div>`;
+  const devTemplates={
+    Contrôle:[
+      {name:'Sujet de contrôle',desc:'Modèle de sujet d\'évaluation',icon:'📄'},
+      {name:'Corrigé type',desc:'Solution détaillée du contrôle',icon:'✅'},
+      {name:'Grille de correction',desc:'Barème et critères de notation',icon:'📊'}
+    ],
+    Synthèse:[
+      {name:'Sujet de synthèse',desc:'Modèle de sujet de synthèse',icon:'📄'},
+      {name:'Plan de synthèse',desc:'Structure et organisation',icon:'🗂️'},
+      {name:'Grille d\'évaluation',desc:'Critères et barème',icon:'📊'}
+    ]
+  };
+  (devTemplates[catName]||[]).forEach(t=>{
+    h+=`<div class="card" style="cursor:pointer;margin-bottom:6px;border-left:3px solid ${catColor}" onclick="createDevTemplate('${catName}','${t.name.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">${t.icon}</span>
+        <div><div style="font-size:13px;font-weight:700">${t.name}</div>
+        <div style="font-size:11px;color:var(--tl)">${t.desc}</div></div>
+        <span style="margin-left:auto;font-size:11px;color:${catColor};font-weight:600">Créer →</span>
+      </div>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  h+=`<div style="margin-bottom:20px">`;
+  h+=`<div style="font-size:14px;font-weight:700;color:${catColor};margin-bottom:10px">🤖 LamiAI — Assistant ${catName}</div>`;
+  h+=`<div class="card" style="background:linear-gradient(135deg,${catColor}15,${catColor}05);border:1px solid ${catColor}30">`;
+  h+=`<p style="font-size:12px;color:var(--tl);margin-bottom:10px">Pose tes questions sur ${catName.toLowerCase()} — LamiAI t'aide avec ${catName==='Contrôle'?'la préparation et la correction des contrôles':'la rédaction et l\'organisation des synthèses'}.</p>`;
+  h+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">`;
+  const devPrompts={
+    Contrôle:['Crée un sujet','Donne le barème','Corrige ce devoir','Explique la note'],
+    Synthèse:['Aide à organiser','Donne un plan','Corrige ma synthèse','Exemple type']
+  };
+  (devPrompts[catName]||[]).forEach(q=>{
+    h+=`<button onclick="startDevAI('${catName}','${q.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')" style="padding:5px 10px;border-radius:16px;border:1px solid ${catColor}40;background:#fff;cursor:pointer;font-size:11px;color:${catColor};font-weight:500">${q}</button>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="display:flex;gap:8px"><input type="text" id="devAI" placeholder="Ta question ${catName.toLowerCase()}..." onkeydown="if(event.key==='Enter')sendDevAI('${catName}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')" style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid ${catColor}40;font-size:13px"><button onclick="sendDevAI('${catName}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')" class="btn" style="background:${catColor}">📤</button></div>`;
+  h+=`</div></div>`;
+
+  if(docs.length>0){
+    h+=`<div style="margin-bottom:16px">`;
+    h+=`<div style="font-size:13px;font-weight:700;color:var(--tl);margin-bottom:8px">📚 Documents existants (${docs.length})</div>`;
+    docs.forEach(d=>{
+      const saved=localStorage.getItem('lami-doc-'+d.id);
+      h+=`<div class="card" onclick="openDoc(${d.id})" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;margin-bottom:6px;border-left:3px solid ${catColor}">
+        <span style="font-size:24px">${catIcon}</span>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700">${d.name}</div>
+        <div style="font-size:11px;color:var(--tl);margin-top:2px">${d.type} • ${d.size}</div>
+        ${saved?'<div style="font-size:10px;color:#d97706;margin-top:2px">✏️ Modifié</div>':''}</div>
+        <span style="font-size:16px;color:var(--tl)">→</span></div>`;
+    });
+    h+=`</div>`;
+  }
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('pageTitle').textContent=catName+' — '+module;
+  document.getElementById('pageSub').textContent=level;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function createDevTemplate(catName,templateName,level,module){
+  const templates={
+    'Sujet de contrôle':{title:'Sujet de Contrôle',placeholder:'<h2>Sujet de Contrôle</h2><p><b>Matière :</b> Français</p><p><b>Durée :</b> 1 heure</p><br><p><b>Exercice 1 : Compréhension (5 pts)</b></p><p></p><br><p><b>Exercice 2 : Langue (5 pts)</b></p><p></p><br><p><b>Exercice 3 : Production écrite (10 pts)</b></p><p></p><br><p><b>Note /20</b></p>'},
+    'Corrigé type':{title:'Corrigé Type',placeholder:'<h2>Corrigé Type</h2><p><b>Exercice 1 :</b></p><ol><li>...</li><li>...</li></ol><br><p><b>Exercice 2 :</b></p><ol><li>...</li><li>...</li></ol><br><p><b>Exercice 3 :</b></p><p>Corrigé détaillé...</p>'},
+    'Grille de correction':{title:'Grille de Correction',placeholder:'<h2>Grille de Correction</h2><p><b>Nom :</b> _______________</p><br><table style="width:100%;border-collapse:collapse"><tr><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Critère</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Note max</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Note</b></td></tr><tr><td style="border:1px solid #333;padding:8px">Contenu</td><td style="border:1px solid #333;padding:8px">/8</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Langue</td><td style="border:1px solid #333;padding:8px">/6</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Forme</td><td style="border:1px solid #333;padding:8px">/6</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Total</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>/20</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"></td></tr></table>'},
+    'Sujet de synthèse':{title:'Sujet de Synthèse',placeholder:'<h2>Sujet de Synthèse</h2><p><b>Thème :</b> </p><br><p><b>Texte source :</b></p><p></p><br><p><b>Consigne :</b></p><p>Rédigez une synthèse du texte en 250 à 300 lignes.</p><br><p><b>Barème :</b></p><ul><li>Compréhension : /10</li><li>Synthèse : /10</li><li>Langue : /5</li></ul>'},
+    'Plan de synthèse':{title:'Plan de Synthèse',placeholder:'<h2>Plan de Synthèse</h2><p><b>Introduction :</b></p><ul><li>Accroche</li><li>Présentation du thème</li></ul><br><p><b>I. Première partie</b></p><p></p><br><p><b>II. Deuxième partie</b></p><p></p><br><p><b>III. Troisième partie</b></p><p></p><br><p><b>Conclusion :</b></p><ul><li>Synthèse générale</li><li>Ouverture</li></ul>'},
+    'Grille d\'évaluation':{title:'Grille d\'Évaluation',placeholder:'<h2>Grille d\'Évaluation</h2><table style="width:100%;border-collapse:collapse"><tr><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Critère</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Note max</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Note</b></td></tr><tr><td style="border:1px solid #333;padding:8px">Compréhension</td><td style="border:1px solid #333;padding:8px">/10</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Organisation</td><td style="border:1px solid #333;padding:8px">/8</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Langue</td><td style="border:1px solid #333;padding:8px">/5</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Total</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>/25</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"></td></tr></table>'}
+  };
+  const tpl=templates[templateName]||{title:templateName,placeholder:'<p>Contenu à remplir...</p>'};
+  const savedKey='lami-devtpl-'+level+'-'+module+'-'+catName;
+  const saved=localStorage.getItem(savedKey)||'';
+  let html=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="saveRichEditor('devTplEditor','${savedKey}');showDevCat('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','${catName}')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600">${tpl.title}</span></div>`;
+  html+=`<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">`;
+  html+=`<button onclick="saveRichEditor('devTplEditor','${savedKey}');downloadDevHTML('${tpl.title.replace(/'/g,"\\'")}')" class="btn">📥 Télécharger HTML</button>`;
+  html+=`<button onclick="saveRichEditor('devTplEditor','${savedKey}');downloadDevTXT('${tpl.title.replace(/'/g,"\\'")}')" class="btn">📥 Télécharger TXT</button>`;
+  html+=`<button onclick="saveRichEditor('devTplEditor','${savedKey}');printDevRichDoc('${tpl.title.replace(/'/g,"\\'")}')" class="btn" style="background:var(--s)">🖨️ Imprimer</button>`;
+  html+=`<button onclick="saveRichEditor('devTplEditor','${savedKey}');copyDevHTML()" class="btn" style="background:#059669">📋 Copier</button>`;
+  html+=`</div>`;
+  html+=`<div class="card" style="padding:0;overflow:hidden">${richEditor('devTplEditor',tpl.placeholder,saved)}</div>`;
+  document.getElementById('content').innerHTML=html;
+  document.getElementById('pageTitle').textContent=tpl.title;
+  document.getElementById('pageSub').textContent=module+' — '+level;
+  const ed=document.getElementById('devTplEditor');
+  if(ed)ed.addEventListener('input',function(){saveRichEditor('devTplEditor',savedKey)});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function downloadDevHTML(title){
+  const content=getRichHTML('devTplEditor');
+  const full='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+title+'</title><style>@page{size:A4 portrait;margin:20mm 25mm 25mm 25mm}body{font-family:"Times New Roman",serif;font-size:13px;line-height:1.8;padding:0;margin:20mm;color:#000}table{width:100%;border-collapse:collapse;margin:10px 0}td,th{border:1px solid #333;padding:8px 10px;font-size:12px}th{background:#f0f0f0;font-weight:700}h1{font-size:22px;color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:8px}h2{font-size:18px;color:#1e3a5f}h3{font-size:15px;color:#1e3a5f}p{text-align:justify}</style></head><body><h1>'+title+'</h1>'+content+'</body></html>';
+  const blob=new Blob([full],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=title.replace(/\s+/g,'_')+'.html';a.click();
+  URL.revokeObjectURL(url);
+  alert('✅ Document HTML téléchargé !');
+}
+
+function downloadDevTXT(title){
+  const content=getRichHTML('devTplEditor');
+  const txt=content.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<\/h[1-6]>/gi,'\n\n').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=title.replace(/\s+/g,'_')+'.txt';a.click();
+  URL.revokeObjectURL(url);
+  alert('✅ Document TXT téléchargé !');
+}
+
+function printDevRichDoc(title){
+  const content=getRichHTML('devTplEditor');
+  const css='@page{size:A4 portrait;margin:20mm 25mm 25mm 25mm}body{font-family:"Times New Roman",serif;font-size:13px;line-height:1.8;padding:0;margin:0;color:#000}table{width:100%;border-collapse:collapse;margin:10px 0}td,th{border:1px solid #333;padding:8px 10px;font-size:12px}th{background:#f0f0f0;font-weight:700}h1{font-size:22px;color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:8px;margin-bottom:16px}h2{font-size:18px;color:#1e3a5f;margin-top:20px}h3{font-size:15px;color:#1e3a5f}p{margin:6px 0;text-align:justify}ul,ol{margin:8px 0 8px 20px}li{margin:4px 0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+  const w=window.open('','','width=900,height=700');
+  w.document.write('<html><head><title>'+title+'</title><style>'+css+'</style></head><body><h1>'+title+'</h1>'+content+'</body></html>');
+  w.document.close();
+  setTimeout(()=>{w.print()},500);
+}
+
+function copyDevHTML(){
+  const content=getRichHTML('devTplEditor');
+  const txt=content.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').trim();
+  navigator.clipboard.writeText(txt).then(()=>alert('✅ Copié !')).catch(()=>alert('Erreur'));
+}
+
+function startDevAI(type,prompt,level,module){
+  document.getElementById('content').innerHTML=`
+    <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showDevCat('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','${type}')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600">🤖 LamiAI ${type}</span></div>
+    <div style="display:flex;flex-direction:column;height:calc(100vh - 180px)">
+      <div id="chatBox" style="flex:1;overflow:auto;padding-bottom:8px"></div>
+      <div style="display:flex;gap:8px"><input type="text" id="aiInput" placeholder="Ta question ${type.toLowerCase()}..." onkeydown="if(event.key==='Enter')sendAI()" style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid var(--b);font-size:13px"><button onclick="sendAI()" class="btn">📤</button></div>
+    </div>`;
+  renderChat([{text:'Bonjour ! Je suis LamiAI, assistant spécialisé en '+type+'. Comment puis-je t\'aider ?',sender:'ai',t:Date.now()}]);
+  if(prompt)sendAIWith(prompt);
+}
+
+function sendDevAI(type,level,module){
+  const input=document.getElementById('devAI');
+  if(!input||!input.value.trim())return;
+  const q=input.value.trim();
+  startDevAI(type,q,level,module);
+}
+
+function showSousCours(level,module,sousCours){
+  const docs=DOCS.filter(d=>{
+    if(d.level!==level||d.cat!=='cours')return false;
+    if(d.mod===module){
+      const n=d.name.toLowerCase();
+      const m=d.mod.toLowerCase();
+      if(sousCours==='Lecture')return n.includes('lecture')||n.includes('texte')||n.includes('compréhension')||m.includes('lecture');
+      if(sousCours==='Langue')return n.includes('grammaire')||n.includes('langue')||n.includes('conjugaison')||n.includes('syntaxe')||m.includes('langue')||m.includes('grammaire');
+      if(sousCours==='Production')return n.includes('production')||n.includes('écriture')||n.includes('expression')||m.includes('production');
+    }
+    return false;
+  });
+  const scColors={Lecture:'#3b82f6',Langue:'#059669',Production:'#f59e0b'};
+  const scIcons={Lecture:'📖',Langue:'🔤',Production:'✍️'};
+  const templates={
+    Lecture:[
+      {name:'Fiche de lecture',desc:'Modèle pour analyse de texte',icon:'📄'},
+      {name:'Questionnaire de compréhension',desc:'Questions sur un texte',icon:'❓'},
+      {name:'Résumé de texte',desc:'Modèle de résumé structuré',icon:'📝'}
+    ],
+    Langue:[
+      {name:'Fiche de grammaire',desc:'Règles et exercices',icon:'📘'},
+      {name:'Fiche de conjugaison',desc:'Temps et formes verbales',icon:'📗'},
+      {name:'Exercices de syntaxe',desc:'Construction de phrases',icon:'✏️'}
+    ],
+    Production:[
+      {name:'Guide de rédaction',desc:'Structure et plan',icon:'✍️'},
+      {name:'Modèle de dissertation',desc:'Introduction, développement, conclusion',icon:'📄'},
+      {name:'Grille d\'auto-évaluation',desc:'Critères de notation',icon:'📊'}
+    ]
+  };
+  let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showModuleCat('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','cours')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:${scColors[sousCours]}">${scIcons[sousCours]} ${sousCours}</span></div>`;
+  
+  h+=`<div style="margin-bottom:20px">`;
+  h+=`<div style="font-size:14px;font-weight:700;color:${scColors[sousCours]};margin-bottom:10px">📝 Créer un document</div>`;
+  (templates[sousCours]||[]).forEach(t=>{
+    h+=`<div class="card" style="cursor:pointer;margin-bottom:6px;border-left:3px solid ${scColors[sousCours]}" onclick="createDocTemplate('${sousCours}','${t.name.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">${t.icon}</span>
+        <div><div style="font-size:13px;font-weight:700">${t.name}</div>
+        <div style="font-size:11px;color:var(--tl)">${t.desc}</div></div>
+        <span style="margin-left:auto;font-size:11px;color:${scColors[sousCours]};font-weight:600">Créer →</span>
+      </div>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  h+=`<div style="margin-bottom:20px">`;
+  h+=`<div style="font-size:14px;font-weight:700;color:${scColors[sousCours]};margin-bottom:10px">🤖 LamiAI — Assistant ${sousCours}</div>`;
+  h+=`<div class="card" style="background:linear-gradient(135deg,${scColors[sousCours]}15,${scColors[sousCours]}05);border:1px solid ${scColors[sousCours]}30">`;
+  h+=`<p style="font-size:12px;color:var(--tl);margin-bottom:10px">Pose tes questions sur ${sousCours.toLowerCase()} — LamiAI t'aide avec ${sousCours==='Lecture'?'la compréhension de texte et l\'analyse littéraire':sousCours==='Langue'?'la grammaire, la conjugaison et la syntaxe':'la rédaction et l\'expression écrite'}.</p>`;
+  h+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">`;
+  const prompts={
+    Lecture:['Explique ce texte','Résume ce passage','Quel est le thème ?','Analyse le personnage'],
+    Langue:['Conjugue ce verbe','Quel temps ?','Corrige cette phrase','Explique la règle'],
+    Production:['Aide-moi à rédiger','Donne un plan','Corrige mon texte','Exemple de dissertation']
+  };
+  (prompts[sousCours]||[]).forEach(q=>{
+    h+=`<button onclick="startLamiAI('${sousCours}','${q.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')" style="padding:5px 10px;border-radius:16px;border:1px solid ${scColors[sousCours]}40;background:#fff;cursor:pointer;font-size:11px;color:${scColors[sousCours]};font-weight:500">${q}</button>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="display:flex;gap:8px"><input type="text" id="sousCoursAI" placeholder="Ta question ${sousCours.toLowerCase()}..." onkeydown="if(event.key==='Enter')sendSousCoursAI('${sousCours}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')" style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid ${scColors[sousCours]}40;font-size:13px"><button onclick="sendSousCoursAI('${sousCours}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')" class="btn" style="background:${scColors[sousCours]}">📤</button></div>`;
+  h+=`</div></div>`;
+
+  if(docs.length>0){
+    h+=`<div style="margin-bottom:16px">`;
+    h+=`<div style="font-size:13px;font-weight:700;color:var(--tl);margin-bottom:8px">📚 Documents existants (${docs.length})</div>`;
+    docs.forEach(d=>{
+      const saved=localStorage.getItem('lami-doc-'+d.id);
+      h+=`<div class="card" onclick="openDoc(${d.id})" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;margin-bottom:6px;border-left:3px solid ${scColors[sousCours]}">
+        <span style="font-size:24px">📘</span>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700">${d.name}</div>
+        <div style="font-size:11px;color:var(--tl);margin-top:2px">${d.type} • ${d.size}</div>
+        ${saved?'<div style="font-size:10px;color:#d97706;margin-top:2px">✏️ Modifié</div>':''}</div>
+        <span style="font-size:16px;color:var(--tl)">→</span></div>`;
+    });
+    h+=`</div>`;
+  }
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('pageTitle').textContent=sousCours+' — '+module;
+  document.getElementById('pageSub').textContent=level;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function richEditor(id,placeholder,saved){
+  const savedHTML=saved||'<p>'+placeholder.replace(/\n/g,'</p><p>')+'</p>';
+  const btn='display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid transparent;border-radius:4px;background:none;cursor:pointer;font-size:13px;transition:all 0.15s';
+  const btnH=btn+'background:#e2e8f0;border-color:#cbd5e1';
+  const sep='width:1px;height:24px;background:#cbd5e1;margin:0 3px;flex-shrink:0';
+  const sel='height:30px;border:1px solid #d1d5db;border-radius:4px;font-size:11px;padding:0 4px;background:#fff;cursor:pointer';
+  const toolbar=`
+  <style>
+    .re-btn:hover{background:#e2e8f0!important;border-color:#cbd5e1!important}
+    .re-btn.active{background:#dbeafe!important;border-color:#93c5fd!important;color:#2563eb}
+    .re-sep{${sep}}
+    .re-sel{${sel}}
+    .re-toolbar{background:linear-gradient(to bottom,#fafbfc,#f1f5f9);border:1px solid #d1d5db;border-radius:8px 8px 0 0;padding:4px 6px;display:flex;flex-wrap:wrap;gap:1px;align-items:center;font-family:system-ui}
+    .re-editor{min-height:450px;padding:24px 28px;border:1px solid #d1d5db;border-top:none;border-radius:0 0 8px 8px;font-family:'Times New Roman',serif;font-size:14px;line-height:2;outline:none;background:#fff;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05)}
+    .re-editor:focus{border-color:#93c5fd;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05),0 0 0 2px rgba(59,130,246,0.15)}
+    .re-editor table{border-collapse:collapse;width:100%;margin:8px 0}
+    .re-editor td,.re-editor th{border:1px solid #333;padding:8px 10px;min-width:60px}
+    .re-editor th{background:#f0f4f8;font-weight:700}
+    .re-editor h1{font-size:24px;color:#1e3a5f;margin:12px 0 8px}
+    .re-editor h2{font-size:20px;color:#1e3a5f;margin:10px 0 6px}
+    .re-editor h3{font-size:17px;color:#1e3a5f;margin:8px 0 4px}
+    .re-editor hr{border:none;border-top:2px solid #d1d5db;margin:12px 0}
+    .re-editor blockquote{border-left:4px solid #3b82f6;padding:8px 16px;margin:8px 0;background:#f0f7ff;color:#1e40af;border-radius:0 4px 4px 0}
+    .re-status{display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:#f8fafc;border:1px solid #d1d5db;border-top:none;border-radius:0 0 8px 8px;font-size:11px;color:#6b7280}
+  </style>
+  <div class="re-toolbar">
+    <!-- Fichier -->
+    <button class="re-btn" onclick="execCmd('undo')" title="Annuler (Ctrl+Z)" style="${btn}">↶</button>
+    <button class="re-btn" onclick="execCmd('redo')" title="Rétablir (Ctrl+Y)" style="${btn}">↷</button>
+    <div class="re-sep"></div>
+    
+    <!-- Copier/Coller -->
+    <button class="re-btn" onclick="execCmd('cut')" title="Couper" style="${btn}">✂</button>
+    <button class="re-btn" onclick="execCmd('copy')" title="Copier" style="${btn}">📋</button>
+    <button class="re-btn" onclick="execCmd('paste')" title="Coller" style="${btn}">📄</button>
+    <div class="re-sep"></div>
+    
+    <!-- Texte -->
+    <button class="re-btn" onclick="execCmd('bold')" title="Gras (Ctrl+B)" style="${btn};font-weight:800"><b>B</b></button>
+    <button class="re-btn" onclick="execCmd('italic')" title="Italique (Ctrl+I)" style="${btn};font-style:italic"><i>I</i></button>
+    <button class="re-btn" onclick="execCmd('underline')" title="Souligné (Ctrl+U)" style="${btn};text-decoration:underline"><u>U</u></button>
+    <button class="re-btn" onclick="execCmd('strikeThrough')" title="Barré" style="${btn};text-decoration:line-through"><s>S</s></button>
+    <button class="re-btn" onclick="execCmd('superscript')" title="Exposant" style="${btn};font-size:11px"><sup>x²</sup></button>
+    <button class="re-btn" onclick="execCmd('subscript')" title="Indice" style="${btn};font-size:11px"><sub>x₂</sub></button>
+    <div class="re-sep"></div>
+    
+    <!-- Police -->
+    <select class="re-sel" onchange="execCmdArg('fontName',this.value)" style="width:120px" title="Police">
+      <option value="">Police...</option>
+      <option value="Arial">Arial</option>
+      <option value="Arial Black">Arial Black</option>
+      <option value="Calibri">Calibri</option>
+      <option value="Comic Sans MS">Comic Sans</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Impact">Impact</option>
+      <option value="Segoe UI">Segoe UI</option>
+      <option value="Tahoma">Tahoma</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Trebuchet MS">Trebuchet</option>
+      <option value="Verdana">Verdana</option>
+    </select>
+    <select class="re-sel" onchange="execCmdArg('fontSize',this.value)" style="width:55px" title="Taille">
+      <option value="">Taille</option>
+      <option value="1">8</option>
+      <option value="2">10</option>
+      <option value="3">12</option>
+      <option value="4">14</option>
+      <option value="5">18</option>
+      <option value="6">24</option>
+      <option value="7">36</option>
+    </select>
+    <div class="re-sep"></div>
+    
+    <!-- Couleurs -->
+    <div style="position:relative;display:inline-flex">
+      <button class="re-btn" title="Couleur" style="${btn};border-bottom:3px solid #000" onclick="document.getElementById('reColorPicker').click()">A</button>
+      <input type="color" id="reColorPicker" value="#000000" onchange="execCmdArg('foreColor',this.value);this.parentElement.querySelector('button').style.borderBottomColor=this.value" style="position:absolute;opacity:0;width:0;height:0">
+    </div>
+    <div style="position:relative;display:inline-flex">
+      <button class="re-btn" title="Surlignage" style="${btn};background:#ffff00;padding:2px" onclick="document.getElementById('reHiPicker').click()">ab</button>
+      <input type="color" id="reHiPicker" value="#ffff00" onchange="execCmdArg('hiliteColor',this.value)" style="position:absolute;opacity:0;width:0;height:0">
+    </div>
+    <div class="re-sep"></div>
+    
+    <!-- Titres -->
+    <select class="re-sel" onchange="if(this.value)execCmd('formatBlock',this.value);this.selectedIndex=0" style="width:110px" title="Style">
+      <option value="">Style...</option>
+      <option value="p">Normal</option>
+      <option value="h1">Titre 1</option>
+      <option value="h2">Titre 2</option>
+      <option value="h3">Titre 3</option>
+      <option value="h4">Titre 4</option>
+      <option value="blockquote">Citation</option>
+      <option value="pre">Code</option>
+    </select>
+    <div class="re-sep"></div>
+    
+    <!-- Paragraphe -->
+    <button class="re-btn" onclick="execCmd('justifyLeft')" title="Aligner à gauche" style="${btn}">⫷</button>
+    <button class="re-btn" onclick="execCmd('justifyCenter')" title="Centrer" style="${btn}">☰</button>
+    <button class="re-btn" onclick="execCmd('justifyRight')" title="Aligner à droite" style="${btn}">⫸</button>
+    <button class="re-btn" onclick="execCmd('justifyFull')" title="Justifier" style="${btn}">☰</button>
+    <div class="re-sep"></div>
+    
+    <!-- Listes -->
+    <button class="re-btn" onclick="execCmd('insertUnorderedList')" title="Liste à puces" style="${btn}">• ≡</button>
+    <button class="re-btn" onclick="execCmd('insertOrderedList')" title="Liste numérotée" style="${btn}">1. ≡</button>
+    <button class="re-btn" onclick="execCmd('indent')" title="Augmenter retrait" style="${btn}">→|</button>
+    <button class="re-btn" onclick="execCmd('outdent')" title="Diminuer retrait" style="${btn}">|←</button>
+    <div class="re-sep"></div>
+    
+    <!-- Insérer -->
+    <button class="re-btn" onclick="insertRichTable()" title="Insérer tableau" style="${btn}">⊞</button>
+    <button class="re-btn" onclick="insertRichHR()" title="Ligne horizontale" style="${btn}">―</button>
+    <button class="re-btn" onclick="insertRichLink()" title="Insérer lien" style="${btn}">🔗</button>
+    <button class="re-btn" onclick="insertRichImage()" title="Insérer image (URL)" style="${btn}">🖼</button>
+    <button class="re-btn" onclick="insertRichDate()" title="Insérer date" style="${btn}">📅</button>
+    <div class="re-sep"></div>
+    
+    <!-- Recherche -->
+    <button class="re-btn" onclick="richFindReplace()" title="Rechercher/Remplacer" style="${btn}">🔍</button>
+    <div class="re-sep"></div>
+    
+    <!-- Tableau outils -->
+    <button class="re-btn" onclick="execCmd('deleteTable')" title="Supprimer tableau" style="${btn};color:#dc2626">🗑</button>
+    <button class="re-btn" onclick="insertTableRow(true)" title="Ajouter ligne au-dessus" style="${btn}">↑</button>
+    <button class="re-btn" onclick="insertTableRow(false)" title="Ajouter ligne en dessous" style="${btn}">↓</button>
+    <button class="re-btn" onclick="insertTableCol(true)" title="Ajouter colonne gauche" style="${btn}">←</button>
+    <button class="re-btn" onclick="insertTableCol(false)" title="Ajouter colonne droite" style="${btn}">→</button>
+    <div class="re-sep"></div>
+    
+    <!-- Effacer -->
+    <button class="re-btn" onclick="execCmd('removeFormat')" title="Effacer format" style="${btn};color:#dc2626">✕</button>
+    <button class="re-btn" onclick="execCmd('selectAll');execCmd('delete')" title="Tout supprimer" style="${btn};color:#dc2626">🗑✕</button>
+  </div>`;
+  
+  const status=`<div class="re-status">
+    <span id="${id}WordCount">0 mots · 0 caractères</span>
+    <span>Éditeur LamiAI — Ctrl+S pour sauvegarder</span>
+  </div>`;
+  
+  const wrapper=document.createElement('div');
+  wrapper.innerHTML=toolbar+`<div id="${id}" contenteditable="true" class="re-editor" spellcheck="true">${savedHTML}</div>`+status;
+  
+  setTimeout(()=>{
+    const ed=document.getElementById(id);
+    if(ed){
+      ed.addEventListener('input',()=>updateWordCount(id));
+      ed.addEventListener('keyup',()=>updateWordCount(id));
+      updateWordCount(id);
+      ed.addEventListener('keydown',e=>{
+        if(e.ctrlKey&&e.key==='s'){e.preventDefault();if(typeof saveRichEditor==='function')saveRichEditor(id,'')}
+        if(e.ctrlKey&&e.key==='b'){e.preventDefault();execCmd('bold')}
+        if(e.ctrlKey&&e.key==='i'){e.preventDefault();execCmd('italic')}
+        if(e.ctrlKey&&e.key==='u'){e.preventDefault();execCmd('underline')}
+        if(e.ctrlKey&&e.key==='z'){e.preventDefault();execCmd('undo')}
+        if(e.ctrlKey&&e.key==='y'){e.preventDefault();execCmd('redo')}
+        if(e.ctrlKey&&e.key==='f'){e.preventDefault();richFindReplace()}
+      });
+    }
+  },100);
+  
+  return wrapper.innerHTML;
+}
+
+function updateWordCount(id){
+  const el=document.getElementById(id);
+  const counter=document.getElementById(id+'WordCount');
+  if(!el||!counter)return;
+  const txt=el.innerText||'';
+  const words=txt.trim()?txt.trim().split(/\s+/).length:0;
+  const chars=txt.length;
+  counter.textContent=words+' mot'+(words>1?'s':'')+' · '+chars+' caractère'+(chars>1?'s':'');
+}
+
+function execCmd(cmd,val){document.execCommand(cmd,false,val||null)}
+function execCmdArg(cmd,val){document.execCommand(cmd,false,val)}
+
+function insertRichTable(){
+  const r=prompt('Nombre de lignes ?','3');
+  const c=prompt('Nombre de colonnes ?','3');
+  if(!r||!c)return;
+  let t='<table style="width:100%;border-collapse:collapse;margin:12px 0"><thead><tr>';
+  for(let j=0;j<parseInt(c);j++)t+='<th style="border:1px solid #333;padding:10px 12px;background:#f0f4f8;font-weight:700">Titre '+(j+1)+'</th>';
+  t+='</tr></thead><tbody>';
+  for(let i=1;i<parseInt(r);i++){
+    t+='<tr>';
+    for(let j=0;j<parseInt(c);j++)t+='<td style="border:1px solid #333;padding:10px 12px">Cellule</td>';
+    t+='</tr>';
+  }
+  t+='</tbody></table><p></p>';
+  document.execCommand('insertHTML',false,t);
+}
+
+function insertRichHR(){document.execCommand('insertHTML',false,'<hr style="border:none;border-top:2px solid #d1d5db;margin:16px 0"><p></p>')}
+
+function insertRichLink(){
+  const url=prompt('URL du lien :','https://');
+  const text=prompt('Texte du lien :','Cliquez ici');
+  if(url&&text){
+    document.execCommand('insertHTML',false,'<a href="'+url+'" target="_blank" style="color:#2563eb;text-decoration:underline">'+text+'</a>');
+  }
+}
+
+function insertRichImage(){
+  const url=prompt('URL de l\'image :','https://');
+  if(url){
+    const w=prompt('Largeur (px) :','400');
+    document.execCommand('insertHTML',false,'<img src="'+url+'" style="max-width:'+(w||400)+'px;border-radius:4px;margin:8px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><p></p>');
+  }
+}
+
+function insertRichDate(){
+  const d=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  document.execCommand('insertHTML',false,'<b>'+d+'</b>');
+}
+
+function richFindReplace(){
+  const find=prompt('Rechercher :');
+  if(!find)return;
+  const replace=prompt('Remplacer par (laisser vide pour juste chercher) :','');
+  const sel=window.getSelection();
+  const ed=sel.anchorNode?sel.anchorNode.parentElement.closest('[contenteditable]'):null;
+  if(!ed)return;
+  const html=ed.innerHTML;
+  if(replace!==null&&replace!==''){
+    ed.innerHTML=html.split(find).join(replace);
+    alert('✅ '+html.split(find).length-1+' occurrence(s) remplacée(s)');
+  }else{
+    const idx=ed.innerHTML.indexOf(find);
+    if(idx>=0)alert('Trouvé à la position '+idx);
+    else alert('Pas trouvé');
+  }
+}
+
+function insertTableRow(after){
+  const sel=window.getSelection();
+  const tr=sel.anchorNode?sel.anchorNode.parentElement.closest('tr'):null;
+  if(!tr)return;
+  const cols=tr.cells.length;
+  const newRow=tr.parentNode.insertRow(after?tr.rowIndex+1:tr.rowIndex);
+  for(let i=0;i<cols;i++){const td=newRow.insertCell();td.innerHTML='&nbsp;';td.style.cssText=tr.cells[0].style.cssText}
+}
+
+function insertTableCol(after){
+  const sel=window.getSelection();
+  const td=sel.anchorNode?sel.anchorNode.parentElement.closest('td,th'):null;
+  if(!td)return;
+  const table=td.closest('table');
+  const colIdx=Array.from(td.parentNode.cells).indexOf(td);
+  Array.from(table.rows).forEach(row=>{
+    const newCell=row.insertCell(after?colIdx+1:colIdx);
+    newCell.innerHTML='&nbsp;';
+    newCell.style.cssText='border:1px solid #333;padding:8px';
+  });
+}
+
+function deleteTable(){
+  const sel=window.getSelection();
+  const table=sel.anchorNode?sel.anchorNode.parentElement.closest('table'):null;
+  if(table&&confirm('Supprimer ce tableau ?'))table.remove();
+}
+
+function saveRichEditor(id,key){localStorage.setItem(key,document.getElementById(id)?.innerHTML||'')}
+function getRichHTML(id){return document.getElementById(id)?.innerHTML||''}
+
+function createDocTemplate(type,templateName,level,module){
+  const templates={
+    'Fiche de lecture':{title:'Fiche de Lecture',placeholder:'<h2>Fiche de Lecture</h2><p><b>Titre du texte :</b> </p><p><b>Auteur :</b> </p><p><b>Genre :</b> </p><br><p><b>Résumé :</b></p><p></p><br><p><b>Thème principal :</b></p><p></p><br><p><b>Personnages :</b></p><p></p><br><p><b>Analyse :</b></p><p></p>'},
+    'Questionnaire de compréhension':{title:'Questionnaire de Compréhension',placeholder:'<h2>Questionnaire de Compréhension</h2><p><b>Texte :</b> </p><br><ol><li>Qui sont les personnages principaux ?</li><li>Où se déroule l\'histoire ?</li><li>Quel est le problème rencontré ?</li><li>Comment se termine le texte ?</li><li>Quel est le thème abordé ?</li></ol>'},
+    'Résumé de texte':{title:'Résumé du Texte',placeholder:'<h2>Résumé du Texte</h2><p><b>Texte original :</b></p><p></p><br><p><b>Résumé (5 lignes max) :</b></p><p></p><br><p><b>Mots-clés :</b></p><p></p><br><p><b>Avis personnel :</b></p><p></p>'},
+    'Fiche de grammaire':{title:'Fiche de Grammaire',placeholder:'<h2>Fiche de Grammaire</h2><p><b>Thème :</b> </p><br><p><b>Règle :</b></p><p></p><br><p><b>Exemples :</b></p><ul><li></li><li></li></ul><br><p><b>Exercices :</b></p><ol><li></li><li></li></ol><br><p><b>Corrigé :</b></p><p></p>'},
+    'Fiche de conjugaison':{title:'Fiche de Conjugaison',placeholder:'<h2>Fiche de Conjugaison</h2><p><b>Verbe :</b> </p><br><table style="width:100%;border-collapse:collapse"><tr><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Temps</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Forme</b></td></tr><tr><td style="border:1px solid #333;padding:8px">Présent</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Passé composé</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Imparfait</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Futur</td><td style="border:1px solid #333;padding:8px"></td></tr></table>'},
+    'Exercices de syntaxe':{title:'Exercices de Syntaxe',placeholder:'<h2>Exercices de Syntaxe</h2><p><b>Consigne :</b></p><br><ol><li><b>Complétez :</b><br><br></li><li><b>Mettez à la forme négative :</b><br><br></li><li><b>Changez au discours indirect :</b><br><br></li></ol><br><p><b>Corrigé :</b></p><p></p>'},
+    'Guide de rédaction':{title:'Guide de Rédaction',placeholder:'<h2>Guide de Rédaction</h2><p><b>Sujet :</b> </p><br><p><b>Plan :</b></p><p>I. Introduction</p><p>II. Développement</p><p>III. Conclusion</p><br><p><b>Brouillon :</b></p><p></p><br><p><b>Version finale :</b></p><p></p>'},
+    'Modèle de dissertation':{title:'Modèle de Dissertation',placeholder:'<h2>Modèle de Dissertation</h2><p><b>Sujet :</b> </p><br><p><b>Introduction :</b></p><ul><li>Accroche</li><li>Problématique</li><li>Plan</li></ul><br><p><b>I. ...</b></p><p></p><p><b>II. ...</b></p><p></p><p><b>III. ...</b></p><p></p><br><p><b>Conclusion :</b></p><p></p><br><p><b>Bibliographie :</b></p><p></p>'},
+    'Grille d\'auto-évaluation':{title:'Grille d\'Auto-évaluation',placeholder:'<h2>Grille d\'Auto-évaluation</h2><p><b>Travail évalué :</b> </p><br><table style="width:100%;border-collapse:collapse"><tr><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Critère</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Note max</b></td><td style="border:1px solid #333;padding:8px;background:#f0f0f0"><b>Note</b></td></tr><tr><td style="border:1px solid #333;padding:8px">Contenu</td><td style="border:1px solid #333;padding:8px">/10</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Langue</td><td style="border:1px solid #333;padding:8px">/10</td><td style="border:1px solid #333;padding:8px"></td></tr><tr><td style="border:1px solid #333;padding:8px">Organisation</td><td style="border:1px solid #333;padding:8px">/10</td><td style="border:1px solid #333;padding:8px"></td></tr></table>'}
+  };
+  const tpl=templates[templateName]||{title:templateName,placeholder:'<p>Contenu à remplir...</p>'};
+  const savedKey='lami-tpl-'+level+'-'+module+'-'+type;
+  const saved=localStorage.getItem(savedKey)||'';
+  let html=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="saveRichEditor('tplEditor','${savedKey}');showSousCours('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','${type}')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600">${tpl.title}</span></div>`;
+  html+=`<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">`;
+  html+=`<button onclick="saveRichEditor('tplEditor','${savedKey}');downloadDocHTML('${tpl.title.replace(/'/g,"\\'")}')" class="btn">📥 Télécharger HTML</button>`;
+  html+=`<button onclick="saveRichEditor('tplEditor','${savedKey}');downloadDocTXT('${tpl.title.replace(/'/g,"\\'")}')" class="btn">📥 Télécharger TXT</button>`;
+  html+=`<button onclick="saveRichEditor('tplEditor','${savedKey}');printRichDoc('${tpl.title.replace(/'/g,"\\'")}')" class="btn" style="background:var(--s)">🖨️ Imprimer</button>`;
+  html+=`<button onclick="saveRichEditor('tplEditor','${savedKey}');copyDocHTML()" class="btn" style="background:#059669">📋 Copier</button>`;
+  html+=`</div>`;
+  html+=`<div class="card" style="padding:0;overflow:hidden">${richEditor('tplEditor',tpl.placeholder,saved)}</div>`;
+  document.getElementById('content').innerHTML=html;
+  document.getElementById('pageTitle').textContent=tpl.title;
+  document.getElementById('pageSub').textContent=module+' — '+level;
+  const ed=document.getElementById('tplEditor');
+  if(ed)ed.addEventListener('input',function(){saveRichEditor('tplEditor',savedKey)});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function downloadDocHTML(title){
+  const content=getRichHTML('tplEditor');
+  const full='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+title+'</title><style>@page{size:A4 portrait;margin:20mm 25mm 25mm 25mm}body{font-family:"Times New Roman",serif;font-size:13px;line-height:1.8;padding:0;margin:20mm;color:#000}table{width:100%;border-collapse:collapse;margin:10px 0}td,th{border:1px solid #333;padding:8px 10px;font-size:12px}th{background:#f0f0f0;font-weight:700}h1{font-size:22px;color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:8px}h2{font-size:18px;color:#1e3a5f}h3{font-size:15px;color:#1e3a5f}p{text-align:justify}</style></head><body><h1>'+title+'</h1>'+content+'</body></html>';
+  const blob=new Blob([full],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=title.replace(/\s+/g,'_')+'.html';a.click();
+  URL.revokeObjectURL(url);
+  alert('✅ Document HTML téléchargé !');
+}
+
+function downloadDocTXT(title){
+  const content=getRichHTML('tplEditor');
+  const txt=content.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<\/h[1-6]>/gi,'\n\n').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=title.replace(/\s+/g,'_')+'.txt';a.click();
+  URL.revokeObjectURL(url);
+  alert('✅ Document TXT téléchargé !');
+}
+
+function printRichDoc(title){
+  const content=getRichHTML('tplEditor');
+  const css='@page{size:A4 portrait;margin:20mm 25mm 25mm 25mm}body{font-family:"Times New Roman",serif;font-size:13px;line-height:1.8;padding:0;margin:0;color:#000}table{width:100%;border-collapse:collapse;margin:10px 0}td,th{border:1px solid #333;padding:8px 10px;font-size:12px}th{background:#f0f0f0;font-weight:700}h1{font-size:22px;color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:8px;margin-bottom:16px}h2{font-size:18px;color:#1e3a5f;margin-top:20px}h3{font-size:15px;color:#1e3a5f}p{margin:6px 0;text-align:justify}ul,ol{margin:8px 0 8px 20px}li{margin:4px 0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+  const w=window.open('','','width=900,height=700');
+  w.document.write('<html><head><title>'+title+'</title><style>'+css+'</style></head><body><h1>'+title+'</h1>'+content+'</body></html>');
+  w.document.close();
+  setTimeout(()=>{w.print()},500);
+}
+
+function copyDocHTML(){
+  const content=getRichHTML('tplEditor');
+  const txt=content.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').trim();
+  navigator.clipboard.writeText(txt).then(()=>alert('✅ Copié !')).catch(()=>alert('Erreur'));
+}
+
+function startLamiAI(type,prompt,level,module){
+  document.getElementById('content').innerHTML=`
+    <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showSousCours('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','${type}')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600">🤖 LamiAI ${type}</span></div>
+    <div style="display:flex;flex-direction:column;height:calc(100vh - 180px)">
+      <div id="chatBox" style="flex:1;overflow:auto;padding-bottom:8px"></div>
+      <div style="display:flex;gap:8px"><input type="text" id="aiInput" placeholder="Ta question ${type.toLowerCase()}..." onkeydown="if(event.key==='Enter')sendAI()" style="flex:1;padding:10px 14px;border-radius:8px;border:1px solid var(--b);font-size:13px"><button onclick="sendAI()" class="btn">📤</button></div>
+    </div>`;
+  renderChat([{text:'Bonjour ! Je suis LamiAI, assistant spécialisé en '+type+'. Comment puis-je t\'aider ?',sender:'ai',t:Date.now()}]);
+  if(prompt)sendAIWith(prompt);
+}
+
+function sendSousCoursAI(type,level,module){
+  const input=document.getElementById('sousCoursAI');
+  if(!input||!input.value.trim())return;
+  const q=input.value.trim();
+  startLamiAI(type,q,level,module);
+}
+
+function sendAIWith(msg){
+  const box=document.getElementById('chatBox');
+  if(!box)return;
+  box.innerHTML+=`<div style="text-align:right;margin-bottom:8px"><div style="display:inline-block;background:var(--p);color:#fff;padding:8px 12px;border-radius:12px 12px 2px 12px;font-size:13px;max-width:80%">${msg}</div></div>`;
+  box.scrollTop=box.scrollHeight;
+  setTimeout(()=>{
+    const responses={
+      Lecture:'En tant que prof de français, je te conseille de lire attentivement le texte, de souligner les mots inconnus, puis de répondre aux questions en te basant sur les indices du texte.',
+      Langue:'Pour la grammaire, rappelle-toi les règles de base : sujet-verb-complément. Pour la conjugaison, identifie d\'abord le sujet puis le temps du verbe.',
+      Production:'Pour la rédaction, commence par un plan en 3 parties, puis rédige chaque partie avec des arguments et des exemples. N\'oublie pas l\'introduction et la conclusion.'
+    };
+    const aiMsg=responses[type]||'Je suis LamiAI. Explique-moi ta question plus en détail pour que je puisse t\'aider.';
+    box.innerHTML+=`<div style="text-align:left;margin-bottom:8px"><div style="display:inline-block;background:#f1f5f9;padding:8px 12px;border-radius:12px 12px 12px 2px;font-size:13px;max-width:80%">${aiMsg}</div></div>`;
+    box.scrollTop=box.scrollHeight;
+  },800);
+}
 
 function docNav(target) {
   if (target === 'root') { docPath = []; docCatFilter = null; }
@@ -585,7 +1467,7 @@ function showCoursLevel(level) {
   const docs = DOCS.filter(d => d.cat === 'cours' && d.level === level);
   const container = document.getElementById('coursContainer');
   if (!container) return;
-  const colors = {'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année Lettres':'#dc2626','3ème Année Sciences':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
+  const colors = {'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année':'#dc2626','3ème Année':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
   const col = colors[level] || '#6b7280';
   let h = `<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showPage('cours')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:${col}">${level}</span></div>`;
   h += `<div style="font-size:12px;color:var(--tl);margin-bottom:12px">${docs.length} cours</div>`;
@@ -605,7 +1487,7 @@ function showExLevel(level) {
   const docs = DOCS.filter(d => d.cat === 'exercice' && d.level === level);
   const container = document.getElementById('exContainer');
   if (!container) return;
-  const colors = {'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année Lettres':'#dc2626','3ème Année Sciences':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
+  const colors = {'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année':'#dc2626','3ème Année':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
   const col = colors[level] || '#6b7280';
   let h = `<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showPage('ex')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:${col}">${level}</span></div>`;
   h += `<div style="font-size:12px;color:var(--tl);margin-bottom:12px">${docs.length} exercice${docs.length>1?'s':''}</div>`;
@@ -674,8 +1556,8 @@ function renderDocExplorer() {
   if (docPath.length === 0) {
     const levels = {};
     noCours.forEach(d => { levels[d.level] = (levels[d.level] || 0) + 1; });
-    const icons = {'1ère Année':'📗','2ème Année':'📘','3ème Année Lettres':'📕','3ème Année Sciences':'🔬','4ème Année Lettres':'📗','4ème Année Sciences':'🔬','Non classé':'❓'};
-    const colors = {'1ère Année':'#059669','2ème Année':'#2563eb','3ème Année Lettres':'#dc2626','3ème Année Sciences':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
+    const icons = {'1ère Année':'📗','2ème Année':'📘','3ème Année':'📚','4ème Année Lettres':'📗','4ème Année Sciences':'🔬','Non classé':'❓'};
+    const colors = {'1ère Année':'#059669','2ème Année':'#2563eb','3ème Année':'#dc2626','3ème Année':'#8b5cf6','4ème Année Lettres':'#f59e0b','4ème Année Sciences':'#0891b2','Non classé':'#6b7280'};
     count.textContent = Object.keys(levels).length + ' niveaux — ' + noCours.length + ' documents (hors cours)';
     grid.className = 'grid grid-2';
     grid.innerHTML = Object.entries(levels).sort().map(([l, n]) =>
@@ -812,6 +1694,60 @@ function generateDoc(type, title, content, author) {
   alert('✅ Fichier ' + ext[type].toUpperCase() + ' créé avec succès !\nTitre : ' + title + '\nTéléchargé : ' + name);
 }
 
+function loadNotes(){
+  const list=document.getElementById('notesList');
+  if(!list)return;
+  let notes=JSON.parse(localStorage.getItem('lami-notes')||'[]');
+  if(notes.length===0){
+    list.innerHTML=`<p style="color:var(--tl);font-size:12px">Aucune note enregistrée. Cliquez sur "Ajouter une note" pour commencer.</p>`;
+    return;
+  }
+  list.innerHTML=notes.map((n,i)=>`<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);gap:8px">
+    <div style="flex:1"><div style="font-size:13px;font-weight:700">${n.eleve}</div>
+    <div style="font-size:11px;color:var(--tl)">${n.niveau} • ${n.matiere} • ${n.date}</div></div>
+    <div style="font-size:16px;font-weight:800;color:${n.note>=10?'#16a34a':n.note>=8?'#f59e0b':'#dc2626'}">${n.note}/20</div>
+    <button onclick="deleteNote(${i})" style="background:none;border:none;cursor:pointer;color:var(--d);font-size:14px">🗑️</button>
+  </div>`).join('');
+}
+
+function addNote(){
+  const eleve=prompt('Nom de l\'élève :');
+  if(!eleve)return;
+  const niveau=prompt('Niveau (ex: 1ère Année, 2ème Année, Bac Lettres...) :');
+  if(!niveau)return;
+  const matiere=prompt('Matière :');
+  if(!matiere)return;
+  const noteVal=prompt('Note /20 :');
+  if(!noteVal||isNaN(noteVal))return;
+  const date=new Date().toLocaleDateString('fr-FR');
+  let notes=JSON.parse(localStorage.getItem('lami-notes')||'[]');
+  notes.push({eleve,niveau,matiere,note:parseFloat(noteVal),date});
+  localStorage.setItem('lami-notes',JSON.stringify(notes));
+  alert('✅ Note ajoutée !');
+  loadNotes();
+}
+
+function deleteNote(i){
+  if(!confirm('Supprimer cette note ?'))return;
+  let notes=JSON.parse(localStorage.getItem('lami-notes')||'[]');
+  notes.splice(i,1);
+  localStorage.setItem('lami-notes',JSON.stringify(notes));
+  loadNotes();
+}
+
+function exportNotes(){
+  let notes=JSON.parse(localStorage.getItem('lami-notes')||'[]');
+  if(notes.length===0){alert('Aucune note à exporter.');return;}
+  let csv='Élève;Niveau;Matière;Note;Date\n';
+  notes.forEach(n=>{csv+=`"${n.eleve}";"${n.niveau}";"${n.matiere}";${n.note};${n.date}\n`});
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Releve_de_Notes_Lamia_Gnaba.csv';a.click();
+  URL.revokeObjectURL(url);
+  alert('✅ Fichier CSV exporté !');
+}
+
 function loadEmploi(){
   const body=document.getElementById('emploiBody');
   const stats=document.getElementById('emploiStats');
@@ -915,6 +1851,176 @@ function exportEmploi(){
   URL.revokeObjectURL(url);
   alert('✅ Fichier CSV exporté !\nOuvrez avec Excel pour un rendu parfait.');
 }
+
+// ===== SYNCHRONISATION GITHUB =====
+const GITHUB_USER='hmned76';
+const GITHUB_REPO='lamia-gnaba-prof-francais';
+const GITHUB_TOKEN_KEY='lami-gh-token';
+
+function getGithubToken(){return localStorage.getItem(GITHUB_TOKEN_KEY)||''}
+function setGithubToken(t){localStorage.setItem(GITHUB_TOKEN_KEY,t)}
+
+async function githubAPI(method,path,body){
+  const token=getGithubToken();
+  const url='https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+path;
+  const opts={method,headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);
+  if(!r.ok)throw new Error('GitHub API error: '+r.status+' '+await r.text());
+  return r.json();
+}
+
+async function getFileSHA(path){
+  try{const r=await githubAPI('GET','contents/'+path);return r.sha}catch(e){return null}
+}
+
+async function uploadFile(path,content,message){
+  const sha=await getFileSHA(path);
+  const body={message,content:btoa(unescape(encodeURIComponent(content))),branch:'main'};
+  if(sha)body.sha=sha;
+  return githubAPI('PUT','contents/'+path,body);
+}
+
+async function downloadFile(path){
+  try{
+    const r=await githubAPI('GET','contents/'+path);
+    return decodeURIComponent(escape(atob(r.content)));
+  }catch(e){return null}
+}
+
+function collectSyncData(){
+  const data={
+    version:'v1.0.14',
+    date:new Date().toISOString(),
+    device:/Android|iPhone|iPad/.test(navigator.userAgent)?'phone':'pc',
+    editorDocs:{},
+    editorDevDocs:{},
+    templates:{},
+    devTemplates:{},
+    chatHistory:{},
+    emploi:localStorage.getItem('lami-emploi')||'',
+    notes:localStorage.getItem('lami-notes')||'',
+    settings:{}
+  };
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k.startsWith('lami-tpl-'))data.templates[k]=localStorage.getItem(k);
+    if(k.startsWith('lami-devtpl-'))data.devTemplates[k]=localStorage.getItem(k);
+    if(k.startsWith('lami-chat-'))data.chatHistory[k]=localStorage.getItem(k);
+    if(k.startsWith('lami-doc-'))data.editorDocs[k]=localStorage.getItem(k);
+    if(k.startsWith('lami-devdoc-'))data.editorDevDocs[k]=localStorage.getItem(k);
+    if(k.startsWith('lami-setting-'))data.settings[k]=localStorage.getItem(k);
+  }
+  return data;
+}
+
+function restoreSyncData(data){
+  if(!data)return false;
+  Object.entries(data.templates||{}).forEach(([k,v])=>localStorage.setItem(k,v));
+  Object.entries(data.devTemplates||{}).forEach(([k,v])=>localStorage.setItem(k,v));
+  Object.entries(data.chatHistory||{}).forEach(([k,v])=>localStorage.setItem(k,v));
+  Object.entries(data.editorDocs||{}).forEach(([k,v])=>localStorage.setItem(k,v));
+  Object.entries(data.editorDevDocs||{}).forEach(([k,v])=>localStorage.setItem(k,v));
+  Object.entries(data.settings||{}).forEach(([k,v])=>localStorage.setItem(k,v));
+  if(data.emploi)localStorage.setItem('lami-emploi',data.emploi);
+  if(data.notes)localStorage.setItem('lami-notes',data.notes);
+  return true;
+}
+
+async function syncToGitHub(){
+  const token=getGithubToken();
+  if(!token){
+    const t=prompt('Token GitHub (ghp_...):\n\nCrée un token sur github.com → Settings → Developer settings → Personal access tokens → Generate new token (scope: repo)');
+    if(!t)return;
+    setGithubToken(t.trim());
+  }
+  const btn=document.getElementById('btnSyncUp');
+  if(btn)btn.textContent='⏳ Sauvegarde en cours...';
+  try{
+    const data=collectSyncData();
+    const json=JSON.stringify(data,null,2);
+    const device=data.device;
+    await uploadFile('sync/data-'+device+'.json',json,'[LamiAI] Sync '+device+' → '+new Date().toLocaleString('fr'));
+    await uploadFile('sync/last-sync.json',JSON.stringify({date:data.date,device,version:data.version}),'[LamiAI] Update last sync');
+    const history=JSON.parse(localStorage.getItem('lami-sync-history')||'[]');
+    history.unshift({date:data.date,device,action:'upload',version:data.version});
+    if(history.length>20)history.pop();
+    localStorage.setItem('lami-sync-history',JSON.stringify(history));
+    localStorage.setItem('lami-last-sync',data.date);
+    if(btn)btn.textContent='✅ Sauvegardé !';
+    setTimeout(()=>{if(btn)btn.textContent='📤 Sauvegarder sur GitHub'},2000);
+    if(document.getElementById('lastSync'))document.getElementById('lastSync').textContent=new Date(data.date).toLocaleString('fr');
+  }catch(e){
+    if(btn)btn.textContent='❌ Erreur';
+    alert('Erreur: '+e.message);
+    setTimeout(()=>{if(btn)btn.textContent='📤 Sauvegarder sur GitHub'},2000);
+  }
+}
+
+async function syncFromGitHub(){
+  const token=getGithubToken();
+  if(!token){alert('Configure d\'abord le token GitHub en cliquant sur "Sauvegarder sur GitHub"');return}
+  const btn=document.getElementById('btnSyncDown');
+  if(btn)btn.textContent='⏳ Récupération en cours...';
+  try{
+    const device=/Android|iPhone|iPad/.test(navigator.userAgent)?'phone':'pc';
+    const otherDevice=device==='phone'?'pc':'phone';
+    const content=await downloadFile('sync/data-'+otherDevice+'.json');
+    if(!content){if(btn)btn.textContent='📭 Aucune donnée';setTimeout(()=>{if(btn)btn.textContent='📥 Récupérer de GitHub'},2000);return}
+    const data=JSON.parse(content);
+    restoreSyncData(data);
+    const history=JSON.parse(localStorage.getItem('lami-sync-history')||'[]');
+    history.unshift({date:new Date().toISOString(),device,action:'download',from:otherDevice,version:data.version});
+    if(history.length>20)history.pop();
+    localStorage.setItem('lami-sync-history',JSON.stringify(history));
+    localStorage.setItem('lami-last-sync',new Date().toISOString());
+    if(btn)btn.textContent='✅ Récupéré !';
+    setTimeout(()=>{if(btn)btn.textContent='📥 Récupérer de GitHub'},2000);
+    alert('✅ Données récupérées depuis '+otherDevice+' !\n Rafraîchis la page.');
+  }catch(e){
+    if(btn)btn.textContent='❌ Erreur';
+    alert('Erreur: '+e.message);
+    setTimeout(()=>{if(btn)btn.textContent='📥 Récupérer de GitHub'},2000);
+  }
+}
+
+async function forceSyncAll(){
+  if(confirm('Sync complète : sauvegarde puis récupère ?')){
+    await syncToGitHub();
+    setTimeout(()=>syncFromGitHub(),2000);
+  }
+}
+
+function loadSyncHistory(){
+  const el=document.getElementById('syncHistory');
+  if(!el)return;
+  const history=JSON.parse(localStorage.getItem('lami-sync-history')||'[]');
+  if(history.length===0){el.innerHTML='<p>Aucune synchronisation pour l\'instant.</p>';return}
+  let h='';
+  history.forEach(s=>{
+    const d=new Date(s.date).toLocaleString('fr');
+    const icon=s.action==='upload'?'📤':'📥';
+    h+=`<div style="padding:6px 0;border-bottom:1px solid #f1f5f9">${icon} ${d} — ${s.action==='upload'?'Sauvegardé':'Récupéré'}${s.from?' depuis '+s.from:''} (${s.version||'?'})</div>`;
+  });
+  el.innerHTML=h;
+}
+
+function updateSyncStatus(){
+  const last=localStorage.getItem('lami-last-sync');
+  const state=document.getElementById('syncState');
+  const lastSync=document.getElementById('lastSync');
+  if(state)state.textContent=getGithubToken()?'✅ Connecté':'❌ Non connecté';
+  if(lastSync)lastSync.textContent=last?new Date(last).toLocaleString('fr'):'Jamais';
+  loadSyncHistory();
+}
+
+// Auto-save toutes les 5 minutes
+setInterval(()=>{
+  if(getGithubToken()){
+    const data=collectSyncData();
+    localStorage.setItem('lami-autosync',JSON.stringify(data));
+  }
+},300000);
 
 // Init
 showPage('home');
