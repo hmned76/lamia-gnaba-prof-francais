@@ -3,6 +3,14 @@
   "appName": "LamiAI",
   "webDir": "www",
   "server": {
-    "androidScheme": "file"
-  }
+    "url": "http://localhost:8080",
+    "cleartext": true,
+    "allowNavigation": ["localhost", "127.0.0.1", "*.github.com", "api.github.com", "fonts.googleapis.com", "fonts.gstatic.com"],
+    "androidScheme": "http"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "backgroundColor": "#f0f4f8"
 }
