@@ -1,21 +1,37 @@
 @echo off
+setlocal
+set "ROOT=%~dp0.."
+set "APP=%ROOT%\lami-app-static"
+
 echo ============================================
-echo  LamiAI - Build APK (PC + Android)
+echo  LamiAI - Build APK depuis la version web
 echo ============================================
 echo.
-echo [1/4] Installation Capacitor...
-npm install -g @capacitor/core @capacitor/cli
+if not exist "%APP%\package.json" (
+  echo ERREUR : projet Capacitor introuvable : %APP%
+  exit /b 1
+)
+if not exist "%APP%\www" mkdir "%APP%\www"
+
+echo [1/4] Copie de la version web validee...
+copy /Y "%APP%\index.html" "%APP%\www\index.html" >nul
+if exist "%APP%\livres" robocopy "%APP%\livres" "%APP%\www\livres" /E /NFL /NDL /NJH /NJS /NP >nul
+
+echo [2/4] Installation des dependances Capacitor...
+pushd "%APP%"
+if not exist "node_modules\@capacitor\cli" call npm install
+if errorlevel 1 (popd & exit /b 1)
+
+echo [3/4] Synchronisation Android...
+call npx cap sync android
+if errorlevel 1 (popd & exit /b 1)
+
+echo [4/4] Compilation APK debug...
+call android\gradlew.bat :app:assembleDebug
+set "RESULT=%ERRORLEVEL%"
+popd
+if not "%RESULT%"=="0" exit /b %RESULT%
+
 echo.
-echo [2/4] Ajout Android...
-npx cap add android
-echo.
-echo [3/4] Copie des fichiers web...
-cp -r public/* www/
-necho.
-echo [4/4] Synchronisation...
-npx cap sync android
-echo.
-echo ============================================
-echo  APK créé dans : android/app/build/outputs/apk/
-echo ============================================
-pause
+echo APK cree : %APP%\android\app\build\outputs\apk\debug\app-debug.apk
+exit /b 0

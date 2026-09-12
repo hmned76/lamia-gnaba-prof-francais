@@ -6,6 +6,9 @@ lami-app-static/android/build/
 lami-app-static/android/capacitor-android/build/
 lami-app-static/android/capacitor-cordova-android-plugins/build/
 lami-app-static/www/
+lami-app-static/oo_store/
+lami-app-static/local-config.json
+config/local-config.json
 lami-app-static/test_*.js
 lami-app-static/fix_*.js
 lami-app-static/make_*.js

@@ -1,5 +1,97 @@
 # Historique des versions — LamiAI
 
+## v1.5.1 — 12 Septembre 2026
+- **Réponses affichées proprement** : le Markdown de l'IA (`#`, `**`, `*`, `-`) est transformé en vraie mise en forme (titres, gras, listes à puces) au lieu d'afficher les symboles
+- **Lecture vocale propre** : 🔊 ne lit plus les symboles (`#`, `*`, `-`) — le texte est nettoyé avant d'être prononcé
+- **Lecture vocale arrêtable** : appuyer sur 🔊 (ou le bouton de lecture) pendant la lecture **arrête** la voix ; lancer la dictée 🎤 arrête aussi la lecture en cours
+- **Dictée vocale fiabilisée** : ne coupe plus les phrases (mode continu + reprise automatique), accumulation correcte du texte
+- **Documents Word de l'IA bien mis en page** : la réponse enregistrée dans OnlyOffice est convertie en titres, paragraphes, **listes à puces** et citations (fini le texte brut), grâce à `mdToBlocks()`
+
+## v1.5.0 — 11 Septembre 2026
+- **Plusieurs moteurs d'IA gratuits en même temps** : Groq **et** Google Gemini **et** OpenRouter **et** Ollama peuvent coexister
+  - Nouveau menu **🧩 Moteur** dans l'Assistant IA (à côté du menu Modèle) ; le menu **Modèle** s'adapte au moteur choisi
+  - **Repli automatique** : si le moteur cloud échoue (internet coupé, quota), l'app bascule sur Ollama sans erreur
+  - Réglages dans `lami-app-static/local-config.json` (exclu de Git — les clés restent privées) : `providers` + `provider_order`
+  - `serve_all.py` : `/ai/status` liste tous les moteurs (`{id,label,models,online}`) ; `/ai/chat` accepte l'option `provider` et dispatche (compatible OpenAI)
+  - Correction Cloudflare (Groq/OpenRouter) : envoi d'un **User-Agent navigateur** (sans lui : erreur 403 « 1010 ») ; modèles cloud filtrés (audio/image/embeddings retirés) et **modèle conseillé en tête de liste**
+  - Modèles vérifiés en conditions réelles : **Groq `openai/gpt-oss-120b`** (~1 s) et **Google `gemini-3.6-flash`** (~3-7 s), réponses détaillées en français
+- **Conseil performance** : sur ce PC (i7-7500U, 2 cœurs, GPU 920M), l'IA locale reste lente ; les moteurs cloud gratuits (Groq ~1-2 s) donnent des réponses bien plus rapides et détaillées
+
+## v1.4.0 — 11 Septembre 2026
+- **Bouton de parler 🎤 dans l'Assistant IA** : dictée vocale en français (Web Speech API) — on parle, le texte s'écrit dans la barre de recherche
+  - Bouton **🔊** pour écouter la dernière réponse à voix haute, et bouton **🔊 Écouter** sous chaque réponse de l'IA locale (voix française)
+- **Prise en charge d'autres moteurs d'IA locaux gratuits** (en plus d'Ollama) : tout moteur **compatible OpenAI** peut être branché sans changer l'app
+  - LM Studio, Jan, LocalAI, llama.cpp-server… via les variables `LAMIAI_OPENAI_BASE` (ex. `http://127.0.0.1:1234/v1`) et `LAMIAI_OPENAI_KEY`
+  - `/ai/status` indique le moteur et ses modèles ; `/ai/chat` s'y connecte automatiquement (Ollama par défaut)
+
+## v1.3.0 — 11 Septembre 2026
+- **Choix du modèle d'IA locale** : un menu déroulant « 🤖 Modèle » dans la page 🤖 Assistant IA permet de choisir entre les modèles installés
+  - `qwen2.5:3b` (par défaut, recommandé — meilleures réponses) ou `qwen2.5:1.5b` (plus rapide, plus léger)
+  - Le choix est mémorisé (PC) et appliqué à toutes les réponses ; repli automatique si le modèle choisi n'est pas présent sur la machine
+  - `serve_all.py` : `POST /ai/chat` accepte désormais le modèle dans le corps de la requête (option `model`)
+- **Stabilité web et préparation APK** : correction de l'indentation serveur, persistance de l'historique IA entre changements de page, et script Windows de build APK basé sur le projet Capacitor réel (`lami-app-static`)
+
+## v1.2.0 — 11 Septembre 2026
+- **Enregistrer les réponses de l'assistant IA en document** : chaque réponse de la « 🧠 Conversation IA locale » a maintenant un bouton **« 💾 Enregistrer la réponse dans OnlyOffice »**
+  - Un clic → la question + la réponse deviennent un document Word (DOCX) créé dans OnlyOffice puis archivé automatiquement dans `<Niveau>/<Module>/cours|travail|.../` selon le contexte en cours (niveau/module/notion), liaison de sauvegarde activée (Ctrl+S)
+  - Le document est aussi ajouté aux travaux : on le retrouve dans la bibliothèque et dans l'historique
+- **Historique de recherche enrichi** : l'onglet « 📚 Mes recherches » de l'Assistant IA liste désormais **les recherches internet (🌐) ET les conversations IA enregistrées (🧠)**, avec bouton 🗑️ pour supprimer une trace
+
+## v1.1.0 — 11 Septembre 2026
+- **Assistant IA intelligent ET gratuit sur n'importe quel PC** : intégration d'Ollama (IA locale) — aucune clé API, aucun compte, aucune dépense
+  - La question est envoyée à l'IA installée sur la machine (`http://127.0.0.1:11434`) : réponses pédagogiques en français, adaptées au niveau (1ère à 4ème année) et au contexte (niveau/module/notion actuellement sélectionné)
+  - L'app garde la mémoire de la conversation (historique des derniers messages)
+  - **Modèles disponibles sur ce PC** : `qwen2.5:1.5b` et `qwen2.5:3b` (défaut) — modifiables via `local-config.json` (`ollama_model`) ou variable d'environnement `LAMIAI_MODEL`
+  - Barre de mode dans l'onglet 🤖 Assistant IA : bascule « 🔍 Recherche documents » / « 🧠 Conversation IA locale (gratuite) » + pastille de statut (IA active ou absente)
+- **Sécurité du budget** : sans clé OpenRouter, aucune dépense possible — l'assistant IA locale tourne 100 % sur le PC. Le mode « recherche documentaire » (documents + internet) reste le mode par défaut et le repli automatique si Ollama est indisponible
+- `serve_all.py` : nouveaux `GET /ai/status` (présence d'Ollama + modèles) et `POST /ai/chat` (dialogue avec l'IA locale, prompt pédagogique de la Prof. Lamia en français, timeout 180 s)
+
+## v1.0.66 — 11 Septembre 2026
+- **L'ancien « traitement de texte » intégré est remplacé par OnlyOffice** : ouvrir un document de la bibliothèque (📚), un travail (🤖) **ou un modèle (« 📝 Créer un document » — Fiche de lecture, Sujet de contrôle, Grille, etc.)** lance maintenant le vrai éditeur OnlyOffice (Word / Excel / PowerPoint / PDF) — demandé par le Prof. Lamia
+  - `Ouvrir un document` → génère le fichier (formats détectés : DOCX, XLSX, PPTX, PDF) et l'ouvre directement dans OnlyOffice
+  - `Ouvrir un travail` / recherche internet / nouvelles créations → choix du format puis ouverture OnlyOffice (mémorisation du format et de l'activité)
+  - **Modèles « Fiche de lecture » / « Sujet de contrôle » etc.** (vues Cours/Lecture et Devoirs d'un module) → ouverture directe du modèle dans OnlyOffice, renseigné puis enregistré dans `<Niveau>/<Module>/cours/<activité>/` (ou `controle/`)
+  - L'ancien éditeur interne reste dans le code (fonctions intactes) mais n'est plus utilisé pour ouvrir quoi que ce soit
+- **Sauvegarde bidirectionnelle** : quand vous enregistrez dans OnlyOffice (Ctrl+S), la version modifiée est réécrite automatiquement dans le dossier du PC (`<Niveau>/<Module>/<type>/<activité>/`) via le callback du serveur
+  - `serve_all.py` : nouveau `POST /oo/bind` (liaison clé OnlyOffice → chemin d'archivage) et vrai traitement du `POST /oo/callback` (statuts 2/6 → téléchargement + écriture du fichier modifié)
+
+## v1.0.65 — 11 Septembre 2026
+- **Correction du « Échec du téléchargement » (erreur -4) dans OnlyOffice** : le DocumentServer bloquait toute adresse privée (`localhost` / `127.0.0.1`) par sécurité anti-SSRF
+  - Activé `services.CoAuthoring.request-filtering-agent.allowPrivateIPAddress` (et `allowMetaIPAddress`) dans `C:\Program Files\ONLYOFFICE\DocumentServer\config\local.json` → usage 100 % local autorisé (sauvegardes faites avant chaque modification : `.bak`, `.bak_before_fix`)
+- **Jeton de sécurité (JWT) désactivé** : serveur local accessible sans token (`token.enable.* = false`) ; un PC local n'a pas besoin de signature
+- **Correctif IPv4** : toutes les adresses serveur renvoyées à OnlyOffice passent par `127.0.0.1` (l'"localhost" du moteur se résolvait en `::1` et échouait)
+- **Diagnostic dans l'app** : statut « ✅ Document ouvert dans OnlyOffice » et messages d'erreur OnlyOffice affichés en direct ; correction du double lancement de l'éditeur
+- Vérification automatisée : les 4 formats (DOCX / XLSX / PPTX / PDF) s'ouvrent réellement, aucun retour `onError`
+
+## v1.0.64 — 11 Septembre 2026
+- **Enregistrement automatique des travaux dans l'arborescence du PC** :
+  - À l'ouverture d'un travail dans OnlyOffice, le document est automatiquement rangé dans `D:\lamia_gnaba_prof_francais\<Niveau>\<Module>\<type>\<activité>\`
+  - Nom de fichier codé : `1e_La_reine_de_beaute_crs_lec.docx` (niveau + module + type + activité)
+  - Codes : niveaux `1e/2e/3eL/3eS/4eL/4eS` · types `crs/ctr/syn/ex/fch/pdt/trv` · activités `lec/ecr/lnq/edt/voc/poe/div`
+  - Nouveau champ « 📂 Activité » (Lecture, Écriture, Langue, Étude de texte, Vocabulaire, Poésie, Autre) choisi à l'ouverture et mémorisé par travail
+- `serve_all.py` : nouveau `POST /oo/archive` (stocke + crée les sous-dossiers manquants, anti-écrasement automatique)
+
+## v1.0.63 — 11 Septembre 2026
+- **OnlyOffice Docs installé sur le PC (version Windows officielle, open source)** : DocumentServer actif sur `http://localhost` (port 80), services `ds-docservice`/`ds-converter`
+- Installateurs pré-téléchargés dans le projet : `onlyoffice-documentserver.exe` (995 Mo) + `onlyoffice-documentserver-prerequisites.exe` (595 Mo) → installation en 1 clic sur un autre PC
+- **Ouvrir un travail = toute la page devient l'éditeur OnlyOffice** :
+  - Liste des travaux : « ✏️ Ouvrir → OnlyOffice » (mémorise le format choisi : Word / Excel / PowerPoint / PDF)
+  - Nouveaux boutons « ➕ Nouveau travail » (nom → niveau → format → ouverture directe dans OnlyOffice)
+  - Onglet 🅾️ OnlyOffice : interface simplifiée, zone « Mes travaux » avec ouverture directe
+  - Éditeur OnlyOffice plein écran (le vrai ruban Word/Excel/PPT/PDF), bouton flottant « ✖ Retour LamiAI », fermeture propre de l'éditeur
+- Serveur `serve_all.py` : ajout de `POST /oo/callback` (retour de sauvegarde OnlyOffice)
+
+## v1.0.62 — 10 Septembre 2026 (suite)
+- **Installer le vrai OnlyOffice SANS Docker** : nouvelle option A recommandée — `onlyoffice-install.bat` télécharge l'installeur Windows officiel d'ONLYOFFICE Docs Community (open source, gratuit)
+- Onglet 🅾️ OnlyOffice : boutons rapides d'adresse 🏠 `http://localhost` (installateur Windows) / 🐳 `http://localhost:8083` (Docker), consignes de préparation mises à jour
+- Recherche internet avec vraie API **Google Custom Search** (bouton ⚙️ dans l'Assistant IA : clé API + ID moteur, moteur FR). Sans clé : retour automatique aux 5 sources Wiki
+- Éditeur enrichi + **export Excel (XLSX)** — bouton 📗 XLSX (version DOCX/PPTX/PDF existantes conservées)
+- Intégration **OnlyOffice** (open source, GitHub) : nouvel onglet 🅾️ OnlyOffice
+  - Ouvre chaque travail dans le vrai éditeur : Word · Excel · PowerPoint · PDF
+  - Nouveau serveur local `serve_all.py` (port 8080) : application + stockage `/oo/save` pour OnlyOffice
+  - `onlyoffice-start.bat` : démarrage du DocumentServer OnlyOffice via Docker (port 8083, autorisation adresses privées)
+  - Bouton 🅾️ OnlyOffice dans la barre de l'éditeur : conversion + édition du document courant
+
 ## v1.0.14 — 1 Septembre 2026
 - Synchronisation GitHub : sauvegarde/récupération entre téléphone et PC
 - Page "☁️ Synchronisation" dans le menu

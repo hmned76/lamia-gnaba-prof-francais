@@ -13,7 +13,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:apk": "react-scripts build && npx cap add android && npx cap sync"
+    "build:apk": "build-apk.bat"
   },
   "browserslist": {
     "production": [">0.2%", "not dead", "not op_mini all"],
