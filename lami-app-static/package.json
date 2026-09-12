@@ -1,7 +1,7 @@
 {
   "name": "lami-app-static",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.5.1",
+  "description": "LamiAI v1.5.1 - Assistant Pédagogique Prof. Lamia Gnaba",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
