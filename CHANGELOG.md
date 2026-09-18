@@ -1,5 +1,11 @@
 # Historique des versions — LamiAI
 
+## v1.5.8 — 18 Septembre 2026
+- **📱 Le téléphone peut se connecter au PC en WiFi** : le serveur écoute désormais sur **tous les adaptateurs** (`--host 0.0.0.0` dans `serveur-guardien.bat`) au lieu de 127.0.0.1 seulement — l'APK pointe vers `http://192.168.100.29:8080` et travaille **directement sur les fichiers du PC** (continuité téléphone→PC immédiate). Règle pare-feu « LamiAI 8080 » ajoutée (réseau privé)
+- **☁️ Colonne GitHub automatique** : `sync-pc.bat` (démarrage automatique Windows) fait `pull + push` GitHub **toutes les 60 s** → chaque PC (et le principal) reste synchronisé sans coupure ; le git-pull ajoute les fichiers partout et le scanner les voit aussitôt
+- **La sync GitHub transporte tout le travail** : la sauvegarde `sync/data-phone.json` / `data-pc.json` inclut maintenant **les travaux IA** (registre + contenus), la **roulette** (niveau/module/cours-devoirs mémorisés) — reprise de travail complète entre téléphone et PC
+- Testé : accès réseau WiFi `http://192.168.100.29:8080` → 200 OK ✓
+
 ## v1.5.7 — 18 Septembre 2026
 - **🧠 Le bouton 🔍 respecte le mode choisi** : en « Conversation IA locale », il lance la **conversation** avec la cible de la roulette (invite « Fais-moi un cours sur Niveau › Module… ») au lieu de basculer en « Recherche documents ». En « Recherche documents » : recherche directe dans la bibliothèque (comme avant)
 - **La conversation IA est contextualisée par la roulette** : `aiContext()` envoie niveau + module + cours/devoir de la cible à l'IA (prioritaire sur `LAST_CLASS`) → les réponses sont adaptées au module et au niveau choisis sans rien reformuler

@@ -1,27 +1,14 @@
 @echo off
-echo ========================================
-echo  LamiAI - Synchronisation PC
-echo ========================================
-echo.
-
+title LamiAI - Colonne GitHub (pull+push auto)
 cd /d D:\lamia_gnaba_prof_francais
-
-echo [1/3] Récupération depuis GitHub...
-git pull origin main
-
-echo.
-echo [2/3] Vérification des données...
-if exist "sync\data-phone.json" (
-    echo    ✓ Données téléphone trouvées
-    echo    Dernière modification :
-    for %%A in (sync\data-phone.json) do echo    %%~tA
-) else (
-    echo    ✗ Aucune donnée téléphone
+echo [%date% %time%] Colonne GitHub demarree >> lami-server.log
+:loop
+git pull --rebase --quiet >> lami-server.log 2>&1
+git add -A --quiet
+git diff --cached --quiet
+if errorlevel 1 (
+  git commit -m "sync auto %date% %time%" --quiet >> lami-server.log 2>&1
+  git push origin --quiet >> lami-server.log 2>&1
 )
-
-echo.
-echo [3/3] Terminé !
-echo.
-echo Pour ouvrir l'app : http://localhost:8080
-echo.
-pause
+timeout /t 60 /nobreak >nul
+goto loop
