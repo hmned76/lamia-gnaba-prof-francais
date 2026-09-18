@@ -1,5 +1,11 @@
 # Historique des versions — LamiAI
 
+## v1.6.2 — 19 Septembre 2026 (téléphone)
+- **📄 OnlyOffice s'ouvre maintenant sur le téléphone** : l'app cherchait le DocumentServer sur « localhost » (= le téléphone lui-même → page vide). Corrigé dans `ooDsUrl()` : quand l'app est ouverte depuis le PC via Tailscale (`100.104.240.32`) ou tout autre hôte non local, OnlyOffice pointe **automatiquement sur l'hôte du PC** (port 80) — plus rien à configurer sur le téléphone
+- **CSP étendu** : `script-src`/`frame-src` acceptent `http://100.104.240.32:*` et `lamiai:*` (l'iframe OnlyOffice pouvait être barrée par le filtre de sécurité)
+- **Chaîne téléphone → PC vérifiée EN TEST RÉEL** : document créé sur le téléphone (4G, Tailscale) → sauvegardé **directement dans le dossier du module sur le PC** (`3ème Année/Le pouvoir de l'image/cours/…docx`) ✓ ; APK v1.6.2 reconstruit et redelivré sur le téléphone (transfert par câble USB/MTP)
+- Rappel infra : règle pare-feu 8080 (tous profils), serveur via `serveur-guardien.bat` + raccourcisses bureau `lamiai:8080` et Tailscale
+
 ## v1.6.1 — 18 Septembre 2026 (app + APK)
 - **🛡Correctif critique du « bibliothèque vide »** : le filtre de sécurité (CSP) du PC n'acceptait que `localhost/127.0.0.1` — les pages ouvertes via le nouveau nom **`http://lamiai:8080`** ou l'IP Tailscale `100.104.240.32:8080` avaient toutes les/API bloquées → bibliothèque vide Bill. CSP mis à jour : `'self'` + `lamiai:8080` + IP Tailscale (connect + frame)
 - **📱 APK v1.6.1 (versionCode 3)** reconstruit : le WebView ouvre désormais **directement le PC** (`http://192.168.100.29:8080` au lieu de `localhost` qui restait vide sur le téléphone) ; navigation autorisée pour `192.168.100.29`, `100.104.240.32` (Tailscale) et `lamiai` ; versionName 1.6.1 ; APK publié en téléchargement sur le serveur : `/apk/LamiAI-v1.6.1.apk` (installation possible directement sur le téléphone via WiFi, sans câble)

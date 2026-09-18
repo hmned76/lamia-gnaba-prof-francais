@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http://localhost:* http://127.0.0.1:* http://lamiai:8080 http://100.104.240.32:8080; frame-src 'self' http://127.0.0.1:* http://localhost:* http://lamiai:8080 http://100.104.240.32:8080; object-src 'none';" />
-  <title>LamiAI v1.6.1 - Assistant Pédagogique</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* http://100.104.240.32:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http://localhost:* http://127.0.0.1:* http://lamiai:* http://100.104.240.32:*; frame-src 'self' http://127.0.0.1:* http://localhost:* http://lamiai:* http://100.104.240.32:*; object-src 'none';" />
+  <title>LamiAI v1.6.2 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.6.1 • PWA</div>
+      <div>LamiAI v1.6.2 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -4281,7 +4281,24 @@ function configureSearch(){
   box.scrollTop=box.scrollHeight;
 }
 // ===== OnlyOffice =====
-function ooDsUrl(){ return (localStorage.getItem('lami-oo-ds')||'http://localhost').replace(/\/+$/,''); }
+function ooDsUrl(){
+  const saved=localStorage.getItem('lami-oo-ds');
+  if(saved) return saved.replace(/\/+$/,'');
+  // 📱 Par défaut : le DocumentServer tourne sur le PC QUI SERVE l'app.
+  // Si on ouvre l'app depuis le téléphone (ypse 100.104.240.32 / lamiai…), l'hôte de la page EST le PC :
+  // on utilise donc le même hôte (DocumentServer, port 80) au lieu de 'localhost' qui pointerait
+  // vers le téléphone lui-même (plus rien ne s'ouvre).
+  try{
+    const h=location.hostname||'';
+    const isLocal=h==='localhost'||h==='127.0.0.1'||h==='lamiai'||h==='0.0.0.0';
+    if(h&&!isLocal){
+      const sameProto=(location.protocol||'http:');
+      if(location.port==='8080') return location.protocol+'//'+h;   // DS = :80 sur le PC
+      return location.origin;
+    }
+  }catch(e){}
+  return 'http://localhost';
+}
 function ooDocType(ext){ if(ext==='pdf')return 'pdf'; if(ext==='xlsx'||ext==='xls')return 'cell'; if(ext==='pptx'||ext==='ppt')return 'slide'; return 'word'; }
 function saveToOO(u8,ext,name){
   return fetch('/oo/save?ext='+encodeURIComponent(ext)+'&name='+encodeURIComponent(name),{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:u8})
