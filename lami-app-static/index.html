@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src http://localhost:8080 http://127.0.0.1:8080 http://127.0.0.1:11434 http://localhost:* http://127.0.0.1:*; frame-src http://127.0.0.1:* http://localhost:*; object-src 'none';" />
-  <title>LamiAI v1.5.6 - Assistant Pédagogique</title>
+  <title>LamiAI v1.5.7 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.5.6 • PWA</div>
+      <div>LamiAI v1.5.7 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -3497,7 +3497,15 @@ function rlRender(){
    choisie (niveau + module + cours/devoir + programme) — sans taper de question. */
 function rlSearch(){
   if(!LAMI_ROULETTE.level){ aiAsk('🎡 <b>Choisis d\'abord le niveau dans la roulette</b>, puis clique 🔍 Rechercher.'); return; }
-  if(AI_MODE!=='search'){ AI_MODE='search'; try{ refreshAIModeUI(); }catch(e){} }
+  // 🧠 Conversation IA locale : le bouton lance la CONVERSATION avec la cible
+  // (niveau + module + cours/devoir) — il ne bascule PAS en recherche documents.
+  if(AI_MODE==='llm'){
+    const kindTxt=LAMI_ROULETTE.kind==='devoir'?'devoir':'cours';
+    const base=[LAMI_ROULETTE.mod,LAMI_ROULETTE.level].filter(Boolean).join(' ');
+    aiAsk('🧠 <b>Conversation IA</b> — cible : '+escH(LAMI_ROULETTE.level+(LAMI_ROULETTE.mod?' › '+LAMI_ROULETTE.mod:'')+' › '+(LAMI_ROULETTE.kind==='devoir'?'📋 Devoir':'📘 Cours')));
+    aiLLM('Fais-moi un '+kindTxt+(base?' sur « '+base+' »':'')+' (bien préparé, conforme au programme tunisien, en excluant présentation)');
+    return;
+  }
   const cat=LAMI_ROULETTE.kind==='devoir'?'controle':(LAMI_ROULETTE.kind==='cours'?'cours':'');
   const modLabel=cat?(CAT_LABEL[cat]||''):'';
   const base=[LAMI_ROULETTE.mod,modLabel,LAMI_ROULETTE.level].filter(Boolean).join(' ');
@@ -3757,7 +3765,12 @@ function toggleVoiceInput(){
 }
 function aiContext(){
   const parts=[];
-  if(LAST_CLASS){
+  // 🎡 La roulette a la priorité comme contexte de conversation
+  if(typeof LAMI_ROULETTE!=='undefined'&&LAMI_ROULETTE.level){
+    parts.push('niveau='+LAMI_ROULETTE.level);
+    if(LAMI_ROULETTE.kind) parts.push('type='+(LAMI_ROULETTE.kind==='devoir'?'devoir':'cours'));
+    if(LAMI_ROULETTE.mod) parts.push('module : '+LAMI_ROULETTE.mod);
+  } else if(LAST_CLASS){
     if(LAST_CLASS.level) parts.push('niveau='+LAST_CLASS.level);
     if(LAST_CLASS.cat) parts.push('type de document='+(CAT_LABEL[LAST_CLASS.cat]||LAST_CLASS.cat));
     if(LAST_CLASS.mod) parts.push('notion : '+LAST_CLASS.mod);

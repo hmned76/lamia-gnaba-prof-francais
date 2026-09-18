@@ -1,5 +1,10 @@
 # Historique des versions — LamiAI
 
+## v1.5.7 — 18 Septembre 2026
+- **🧠 Le bouton 🔍 respecte le mode choisi** : en « Conversation IA locale », il lance la **conversation** avec la cible de la roulette (invite « Fais-moi un cours sur Niveau › Module… ») au lieu de basculer en « Recherche documents ». En « Recherche documents » : recherche directe dans la bibliothèque (comme avant)
+- **La conversation IA est contextualisée par la roulette** : `aiContext()` envoie niveau + module + cours/devoir de la cible à l'IA (prioritaire sur `LAST_CLASS`) → les réponses sont adaptées au module et au niveau choisis sans rien reformuler
+- Testé en direct (CDP) : contexte roulette ✓, reste en mode conversation ✓, message cible affiché ✓
+
 ## v1.5.6 — 18 Septembre 2026
 - **🛠 L'enregistrement IA respecte la roulette** : « 💾 Enregistrer la réponse dans OnlyOffice » rangeait le document dans « Non classé » (il passait par `LAST_CLASS` et ignorait la roulette). Corrigé : la cible (niveau + module + Cours/Devoir) est prioritaire et le fichier atterrit dans `<Niveau>/<Module>/cours|devoirs/<nom>.docx`
 - **🔍 Bouton « Rechercher » direct dans la roulette** : pas besoin de taper une question — la recherche part immédiatement avec la cible choisie (niveau + module + cours/devoir)
