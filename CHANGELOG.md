@@ -1,5 +1,16 @@
 # Historique des versions — LamiAI
 
+## v1.5.5 — 18 Septembre 2026
+- **🎡 Roulette dans l'Assistant IA** : une barre « Cible » à 3 étages en cascade
+  1. **Niveau scolaire** (les 6 niveaux réels)
+  2. **Module** → la liste affiche UNIQUEMENT les modules du niveau choisi (issues des dossiers du disque + modules officiels, hors entrées parasites comme « livre scolaire », « Contrôle », « Général »)
+  3. **Cours / Devoir** (2 choix) + bouton ↺ pour effacer + badge 🎓 › 📚 › 📘 rappelant la sélection
+- La sélection est **mémorisée** (localStorage) et automatiquement ré-appliquée
+- **Elle guide la recherche** de l'assistant : la roulette est PRIORAIRE (niveau, module et Cours/Devoir choisis). **Quand niveau + Cours/Devoir sont choisis → l'assistant ne pose PLUS AUCUNE question** : recherche immédiate (le module de la roulette prime sur les mots de la question). Si un info manque quand même, les questions proposent les bons niveaux (plus de « 3ème Année Lettres/Sciences »)
+- **Elle fixe la destination de l'enregistrement automatique** : un travail IA enregistré via OnlyOffice atterrit physiquement dans `<Niveau>/<Module>/cours|devoirs/<nom>.<ext>` (visible aussitôt dans la bibliothèque, avec le registre du travail mis à jour)
+- Serveur : `TYPE_MAP` ajoute **« Devoir » → dossier `devoirs`** ; `LVL_CODE` ajoute **« 3ème Année »**
+- Testé en direct (CDP) : cascade des modules par niveau ✓, recherche dirigée par la roulette (`2ème Année / controle / Femme et société`) ✓, chemin de destination correct (`1ère Année/Rencontres/cours/…`) ✓
+
 ## v1.5.4 — 18 Septembre 2026
 - **Nettoyage du disque (audit P3)** — rien supprimé, tout déplacé vers `_copies_anciennes/audit-2026-09-18/` :
   - dossiers niveaux fantômes `1ère_Année`, `2ème_Année`, `4ème_Année_Lettres`, `Non_classé`, `LamiAI-data/1ère_Année`, `home/Poésie`

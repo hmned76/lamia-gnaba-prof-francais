@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.5.4)
+serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.5.5)
 =======================================================================
 - Sert l'application (lami-app-static) sur http://localhost:8080
 - Stocke les fichiers générés par l'app pour l'éditeur OnlyOffice :
@@ -38,12 +38,14 @@ OO_DIR = os.path.join(APP_DIR, "oo_store")
 #               <codeNiveau>_<Module>_<codeType>_<codeActivite>.<ext>
 LVL_CODE = {
     "1ère Année": "1e", "2ème Année": "2e",
-    "3ème Année Lettres": "3eL", "3ème Année Sciences": "3eS",
+    "3ème Année": "3e",
+    "3ème Année Sciences": "3eS", "3ème Année Lettres": "3eL",  # anciens alias
     "4ème Année Lettres": "4eL", "4ème Année Sciences": "4eS",
     "Non classé": "nc",
 }
 TYPE_MAP = {
     "Cours": ("crs", "cours"),
+    "Devoir": ("dvg", "devoirs"),
     "Contrôle": ("ctr", "controle"),
     "Synthèse": ("syn", "synthese"),
     "Exercice": ("ex", "exercice"),
@@ -639,7 +641,7 @@ MIME = {
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "LamiAI_serve/1.5.4"
+    server_version = "LamiAI_serve/1.5.5"
 
     # ---------- Utilitaires ----------
     def _cors(self):
@@ -1133,7 +1135,7 @@ def main():
     args = ap.parse_args()
     os.makedirs(OO_DIR, exist_ok=True)
     print("=" * 56)
-    print(" LamiAI v1.5.4 — serveur local + stockage OnlyOffice")
+    print(" LamiAI v1.5.5 — serveur local + stockage OnlyOffice")
     print(" Application : http://localhost:%d" % args.port)
     print(" Stockage OO : http://localhost:%d/oo/list" % args.port)
     print(" Archive     : http://localhost:%d/oo/archive" % args.port)

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src http://localhost:8080 http://127.0.0.1:8080 http://127.0.0.1:11434 http://localhost:* http://127.0.0.1:*; frame-src http://127.0.0.1:* http://localhost:*; object-src 'none';" />
-  <title>LamiAI v1.5.4 - Assistant Pédagogique</title>
+  <title>LamiAI v1.5.5 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.5.4 • PWA</div>
+      <div>LamiAI v1.5.5 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -1441,6 +1441,16 @@ function showPage(id){
         <button type="button" onclick="speakLastAnswer(this)" title="Écouter la dernière réponse à voix haute" style="padding:6px 10px;border-radius:16px;border:1px solid var(--b);background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:var(--p)">🔊 Lire la réponse</button>
         <span id="aiOllamaPill" style="font-size:10px;color:var(--tl)">IA locale : vérification…</span>
       </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;margin-bottom:8px;background:#f8fafc;border:1px solid var(--b);border-radius:10px">
+        <span style="font-size:11px;font-weight:800;color:var(--tl)">🎡 Cible de la recherche & de l'enregistrement :</span>
+        <select id="rlNiveau" onchange="rlPick('level',this.value)" style="padding:5px 8px;border-radius:10px;border:1px solid var(--b);font-size:11px;font-weight:600;background:#fff;color:var(--p)">
+          <option value="">— Niveau —</option>${_rlLevelOpts().map(l=>'<option value="'+escH(l)+'">'+l+'</option>').join('')}</select>
+        <select id="rlModule" onchange="rlPick('mod',this.value)" style="padding:5px 8px;border-radius:10px;border:1px solid var(--b);font-size:11px;font-weight:600;background:#fff;color:var(--s)"><option value="">— Module (selon niveau) —</option></select>
+        <select id="rlKind" onchange="rlPick('kind',this.value)" style="padding:5px 8px;border-radius:10px;border:1px solid var(--b);font-size:11px;font-weight:600;background:#fff;color:var(--a)">
+          <option value="">— Cours / Devoir —</option><option value="cours">📘 Cours</option><option value="devoir">📋 Devoir</option></select>
+        <button type="button" onclick="rlClear()" title="Effacer la sélection" style="padding:4px 9px;border-radius:10px;border:1px solid var(--b);background:#fff;cursor:pointer;font-size:11px;font-weight:800;color:var(--d)">↺</button>
+        <span id="rlBadge" style="display:none;font-size:10px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;padding:2px 8px;border-radius:12px"></span>
+      </div>
       <div id="aiChatPanel" style="flex:1;overflow:auto;padding-bottom:8px;display:flex;flex-direction:column">
         <div id="chatBox" style="flex:1;overflow:auto;padding-bottom:8px"></div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${['Contrôle 3ème','Synthèse 4ème Lettres','Exercice langue 2ème','Dissertation Bac','Poésie 4ème Lettres','Méthodologie','Subordination 1ère','Vocabulaire','Aide'].map(q=>`<button onclick="quickAI('${q}')" style="padding:5px 10px;border-radius:16px;border:1px solid var(--b);background:#fff;cursor:pointer;font-size:11px;color:var(--p);font-weight:500">${q}</button>`).join('')}</div>
@@ -1448,7 +1458,7 @@ function showPage(id){
       </div>
       <div id="aiHistoryPanel" style="flex:1;overflow:auto;padding:8px;display:none">${worksList}</div>
     </div>`;
-    setTimeout(()=>{ document.getElementById('aiInput')?.focus(); checkAIStatus(); renderChat([{text:'Bonjour ! 👋 Je suis l\'assistant de recherche documentaire de Prof. Lamia Gnaba (année scolaire '+getAnnee()+').\n\nJe cherche directement dans votre bibliothèque, sans rien inventer.\n\nDites-moi ce dont vous avez besoin, par exemple :\n• « contrôle subordination »\n• « synthèse poésie 4ème »\n• « exercice langue »\n\nSi une information manque (année, type, notion), je vous pose quelques questions rapides pour être précis(e).\n\n💡 Nouveau : basculez sur « 🧠 Conversation IA locale » pour poser directement vos questions pédagogiques — c\'est gratuit et sans clé !',sender:'ai',t:Date.now()}]); }, 50);
+    setTimeout(()=>{ document.getElementById('aiInput')?.focus(); rlInit(); checkAIStatus(); renderChat([{text:'Bonjour ! 👋 Je suis l\'assistant de recherche documentaire de Prof. Lamia Gnaba (année scolaire '+getAnnee()+').\n\nJe cherche directement dans votre bibliothèque, sans rien inventer.\n\nDites-moi ce dont vous avez besoin, par exemple :\n• « contrôle subordination »\n• « synthèse poésie 4ème »\n• « exercice langue »\n\nSi une information manque (année, type, notion), je vous pose quelques questions rapides pour être précis(e).\n\n🎡 La roulette « Cible » ci-dessus applique automatiquement le niveau, le module et Cours/Devoir à la recherche — et place l\'enregistrement automatique directement dans le bon dossier.\n\n💡 Nouveau : basculez sur « 🧠 Conversation IA locale » pour poser directement vos questions pédagogiques — c\'est gratuit et sans clé !',sender:'ai',t:Date.now()}]); }, 50);
   }
   else if(id==='cal'){
     title='Emploi du Temps'; sub='Emploi du temps — Prof. Lamia Gnaba';
@@ -3431,6 +3441,52 @@ function deleteLamiWork(id){
 const LAMI_LEVEL_ORDER=['1ère Année','2ème Année','3ème Année','4ème Année Sciences','4ème Année Lettres','Non classé'];
 const LAMI_LEVEL_ALIAS={'3ème Année Sciences':'3ème Année','3ème Année Scientifique':'3ème Année','3ème Année Lettres':'3ème Année'};
 function _lvlNorm(l){ return LAMI_LEVEL_ALIAS[String(l||'')]||l; }
+
+/* 🎡 ROULETTE ASSISTANT IA : Niveau → Module (selon le niveau) → Cours/Devoir.
+   Sélection mémorisée (localStorage) ; guide la RECHERCHE de l'assistant et la
+   DESTINATION de l'enregistrement automatique des travaux IA. */
+const LAMI_ROULETTE={level:'',mod:'',kind:''};
+function _rlLevelOpts(){ return LAMI_LEVEL_ORDER.slice(); }
+function _rlModOpts(){
+  if(!LAMI_ROULETTE.level) return [];
+  const lv=LAMI_ROULETTE.level;
+  const fromAI=AI_MODULES[lv]?Object.keys(AI_MODULES[lv]):[];
+  const fromDisk=[...new Set(getDocs().filter(d=>d.level===lv&&d.mod).map(d=>d.mod))];
+  const NONMODS=new Set(['livre scolaire','contrôle','controle','synthèse','synthese','général','general','divers','autre','documents','evaluation']);
+  const all=[...new Set([...fromAI,...fromDisk])].filter(m=>m&&!NONMODS.has(String(m).toLowerCase()));
+  return all;
+}
+function rlPick(k,v){
+  if(k==='level'){ LAMI_ROULETTE.level=v; LAMI_ROULETTE.mod=''; }
+  else if(k==='mod'){ LAMI_ROULETTE.mod=v; }
+  else { LAMI_ROULETTE.kind=v; }
+  rlRender();
+}
+function rlClear(){ LAMI_ROULETTE.level=''; LAMI_ROULETTE.mod=''; LAMI_ROULETTE.kind=''; rlRender(); }
+function rlInit(){
+  try{ const s=JSON.parse(localStorage.getItem('lami-roulette')||'null');
+    if(s&&typeof s==='object'){ LAMI_ROULETTE.level=_lvlNorm(s.level||''); LAMI_ROULETTE.mod=''; LAMI_ROULETTE.kind=s.kind||''; }
+  }catch(e){}
+  rlRender();
+}
+function rlRender(){
+  const selLv=document.getElementById('rlNiveau'), selMod=document.getElementById('rlModule'), selKind=document.getElementById('rlKind');
+  if(selLv) selLv.value=LAMI_ROULETTE.level;
+  if(selMod){
+    const cur=LAMI_ROULETTE.mod;
+    selMod.innerHTML='<option value="">— Module (selon niveau) —</option>'+_rlModOpts().map(m=>'<option value="'+escH(String(m))+'">'+escH(String(m))+'</option>').join('');
+    selMod.value=cur; if(selMod.selectedIndex<0) selMod.value='';
+    LAMI_ROULETTE.mod=selMod.value;
+  }
+  if(selKind) selKind.value=LAMI_ROULETTE.kind;
+  const b=document.getElementById('rlBadge');
+  if(b){
+    const has=LAMI_ROULETTE.level||LAMI_ROULETTE.kind;
+    b.style.display=has?'inline-flex':'none';
+    b.innerHTML=(LAMI_ROULETTE.level?'🎓 '+LAMI_ROULETTE.level:'')+(LAMI_ROULETTE.mod?' › 📚 '+LAMI_ROULETTE.mod:'')+(LAMI_ROULETTE.kind?' › '+(LAMI_ROULETTE.kind==='cours'?'📘 Cours':'📋 Devoir'):'');
+  }
+  try{ localStorage.setItem('lami-roulette',JSON.stringify(LAMI_ROULETTE)); }catch(e2){}
+}
 function renderLamiWorkList(){
   const el=document.getElementById('lamiWorkList');
   if(!el)return;
@@ -3865,11 +3921,10 @@ function parseLevel(s){
   const sc=/scienc|matte|physique|chimie/.test(s);
   if(/1\s?(er|ere|eme|re)|premier|premiere/.test(s)) return '1ère Année';
   if(/2\s?(eme|nde)|deuxieme/.test(s)) return '2ème Année';
-  if(/3eme/.test(s)) return sc?'3ème Année Sciences':'3ème Année Lettres';
-  if(/4eme/.test(s)) return sc?'4ème Année Sciences':'4ème Année Lettres';
-  if(/terminal|bac/.test(s)) return sc?'4ème Année Sciences':'4ème Année Lettres';
-  if(/scienc|matte|physique|chimie/.test(s)) return /3/.test(s)?'3ème Année Sciences':(/4/.test(s)?'4ème Année Sciences':'');
-  if(/lettre/.test(s)) return /3/.test(s)?'3ème Année Lettres':(/4/.test(s)?'4ème Année Lettres':'');
+  if(/3\s?(er|ere|eme|re)|troisieme/.test(s)) return '3ème Année';
+  if(/4eme|terminal|bac/.test(s)) return sc?'4ème Année Sciences':'4ème Année Lettres';
+  if(/scienc|matte|physique|chimie/.test(s)) return /4/.test(s)?'4ème Année Sciences':'';
+  if(/lettre/.test(s)) return /4/.test(s)?'4ème Année Lettres':'';
   return '';
 }
 function parseCat(s){
@@ -3888,12 +3943,16 @@ function extractNotion(msg){
   const lvlT=new Set(normFr(lvl||'').split(/[^a-z0-9]+/).filter(Boolean));
   return tokQ(msg).filter(t=>!lvlT.has(t) && !typeKw.has(t)).slice(0,3).join(' ');
 }
-function askLevel(){ AIQ.asked='level'; aiAsk('<b>📌 Pour une recherche précise : quelle année ?</b>',['1ère Année','2ème Année','3ème Année Lettres','3ème Année Sciences','4ème Année Lettres','4ème Année Sciences']); }
+function askLevel(){ AIQ.asked='level'; aiAsk('<b>📌 Pour une recherche précise : quelle année ?</b>',LAMI_LEVEL_ORDER.slice()); }
 function askCat(){ AIQ.asked='cat'; aiAsk('<b>📌 Quel type de document cherchez-vous ?</b>',['Cours','Contrôle','Synthèse','Exercice','Fiche']); }
 function askMod(){ AIQ.asked='mod'; aiAsk('<b>📚 Quelle notion ou quel module ?</b><div style="font-size:11px;color:var(--tl);margin-top:4px">Exemples : subordination, poésie, argumentation, la raison, l\'appel de la modernité…<br>(tapez « tout » pour chercher sans notion précise)</div>'); }
 function guideAI(msg){
   if(AIQ===null){
-    const lvl=parseLevel(msg), cat=parseCat(msg), notion=extractNotion(msg);
+    let lvl=parseLevel(msg);
+    if(!lvl&&LAMI_ROULETTE.level) lvl=LAMI_ROULETTE.level;
+    let cat=parseCat(msg);
+    if(!cat&&LAMI_ROULETTE.kind) cat=(LAMI_ROULETTE.kind==='devoir'?'controle':'cours');
+    let notion=LAMI_ROULETTE.mod||extractNotion(msg);
     AIQ={level:lvl,cat,mod:notion,asked:''};
     if(!lvl){ askLevel(); return; }
     if(!cat){ askCat(); return; }
@@ -3902,8 +3961,10 @@ function guideAI(msg){
   }
   if(AIQ.asked==='level'){
     const lvl=parseLevel(msg);
-    if(!lvl){ AIQ.asked='level'; aiAsk('<b>Je n\'ai pas reconnu l\'année.</b> Choisissez parmi :',['1ère Année','2ème Année','3ème Année Lettres','3ème Année Sciences','4ème Année Lettres','4ème Année Sciences']); return; }
+    if(!lvl){ AIQ.asked='level'; aiAsk('<b>Je n\'ai pas reconnu l\'année.</b> Choisissez parmi :',LAMI_LEVEL_ORDER.slice()); return; }
     AIQ.level=lvl; AIQ.asked='';
+    if(!AIQ.cat&&LAMI_ROULETTE.kind){ AIQ.cat=(LAMI_ROULETTE.kind==='devoir'?'controle':'cours'); }
+    if(!AIQ.mod&&LAMI_ROULETTE.mod){ AIQ.mod=LAMI_ROULETTE.mod; }
     if(!AIQ.cat){ askCat(); return; }
     if(!AIQ.mod){ askMod(); return; }
     doSearch(); return;
@@ -3984,6 +4045,13 @@ function sendAI(){
     return;
   }
   if(AI_MODE==='llm'){ aiLLM(msg); return; }
+  // 🎡 Roulette complète (niveau + cours/devoir) → AUCUNE question : recherche directe.
+  // Le module vient de la roulette ; si vide, on tente la notion de la question elle-même.
+  if(AIQ===null && typeof LAMI_ROULETTE!=='undefined' && LAMI_ROULETTE.level && LAMI_ROULETTE.kind){
+    AIQ={level:LAMI_ROULETTE.level,cat:(LAMI_ROULETTE.kind==='devoir'?'controle':'cours'),mod:(LAMI_ROULETTE.mod||extractNotion(msg)||''),asked:''};
+    doSearch();
+    return;
+  }
   if(AIQ===null && /^(bonjour|bonsoir|salut|salam|aide)/i.test(msg)){ askStart(); return; }
   guideAI(msg);
   return;
@@ -4338,8 +4406,10 @@ function ooChooser(id){
   _setOOHost('')
   testOODs();
 }
-function archiveTarget(level,module,tp,act,ext,u8){
-  return fetch('/oo/archive?level='+encodeURIComponent(level||'Non classé')+'&module='+encodeURIComponent(module||'')+'&type='+encodeURIComponent(tp||'Travail')+'&activity='+encodeURIComponent(act||'')+'&ext='+encodeURIComponent(ext),{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:u8})
+function archiveTarget(level,module,tp,act,ext,u8,to){
+  let q='/oo/archive?level='+encodeURIComponent(level||'Non classé')+'&module='+encodeURIComponent(module||'')+'&type='+encodeURIComponent(tp||'Travail')+'&activity='+encodeURIComponent(act||'')+'&ext='+encodeURIComponent(ext);
+  if(to) q+='&to='+encodeURIComponent(to);
+  return fetch(q,{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:u8})
     .then(r=>r.json())
     .then(j=>{
       const h=document.getElementById('ooHostStatus');
@@ -4351,7 +4421,20 @@ function archiveTarget(level,module,tp,act,ext,u8){
 }
 function archiveOOWork(id,u8,ext,act){
   const w=lamiWorkMeta(id);
-  return archiveTarget(w.level||'Non classé',w.mod||'',w.tp||'Travail',act||'',ext,u8);
+  const rl=(typeof LAMI_ROULETTE!=='undefined'&&LAMI_ROULETTE.level)?LAMI_ROULETTE:null;
+  const lv=rl?rl.level:(w.level||'Non classé');
+  const md=rl?(rl.mod||''):(w.mod||'');
+  const tp=rl?(rl.kind==='devoir'?'Devoir':'Cours'):(w.tp||'Travail');
+  // Met a jour le registre du travail pour que les listes reflechent la destination
+  try{
+    localStorage.setItem('lami-work-level-'+id,lv);
+    if(md) localStorage.setItem('lami-work-mod-'+id,md);
+    localStorage.setItem('lami-work-type-'+id,tp);
+  }catch(e8){}
+  // Destination exacte : <Niveau>/<Module>/cours|devoirs/<nom>.<ext>
+  let to='';
+  if(rl){ const sub=(rl.kind==='devoir'?'devoirs':'cours'); to=lv+(md?('/'+md):'')+'/'+sub+'/'+fsSafeName(w.name)+'.'+ext; }
+  return archiveTarget(lv,md,tp,act||'',ext,u8,to);
 }
 function bindOOKey(key,archive,store,old){
   return fetch('/oo/bind',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,archive:archive||'',store:store||'',old:old||''})}).catch(()=>{});
