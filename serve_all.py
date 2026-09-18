@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.5.9)
+serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.6.0)
 =======================================================================
 - Sert l'application (lami-app-static) sur http://localhost:8080
 - Stocke les fichiers générés par l'app pour l'éditeur OnlyOffice :
@@ -349,6 +349,10 @@ def _cat_from_folder(name):
     n = (_norm_name(name) or "").strip()
     if n in CAT_FOLDERS:
         return CAT_FOLDERS[n]
+    # Comparaison normalisée (espaces/majuscules enlevés) — ex : 'livre scolaire' -> 'livrescolaire' -> 'livre'
+    for key, cat2 in CAT_FOLDERS.items():
+        if _norm_name(key) == n:
+            return cat2
     # cas 'controles'/'contrôle' -> raccourcis tronqués
     for key, cat in CAT_FOLDERS.items():
         if n.startswith(key) and len(n) - len(key) <= 3:
@@ -641,7 +645,7 @@ MIME = {
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "LamiAI_serve/1.5.9"
+    server_version = "LamiAI_serve/1.6.0"
 
     # ---------- Utilitaires ----------
     def _cors(self):
@@ -1135,7 +1139,7 @@ def main():
     args = ap.parse_args()
     os.makedirs(OO_DIR, exist_ok=True)
     print("=" * 56)
-    print(" LamiAI v1.5.9 — serveur local + stockage OnlyOffice")
+    print(" LamiAI v1.6.0 — serveur local + stockage OnlyOffice")
     print(" Application : http://localhost:%d" % args.port)
     print(" Stockage OO : http://localhost:%d/oo/list" % args.port)
     print(" Archive     : http://localhost:%d/oo/archive" % args.port)

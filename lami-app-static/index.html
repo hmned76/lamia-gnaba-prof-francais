@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src http://localhost:8080 http://127.0.0.1:8080 http://127.0.0.1:11434 http://localhost:* http://127.0.0.1:*; frame-src http://127.0.0.1:* http://localhost:*; object-src 'none';" />
-  <title>LamiAI v1.5.9 - Assistant Pédagogique</title>
+  <title>LamiAI v1.6.0 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.5.9 • PWA</div>
+      <div>LamiAI v1.6.0 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -1364,7 +1364,7 @@ function showPage(id){
               </div>
             </div>
             <div style="padding:0 12px 12px">
-              ${LIVRES[lv]?`<div onclick="event.stopPropagation();openLivre('${lv.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:8px;padding:9px 10px;margin-bottom:6px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;cursor:pointer;touch-action:manipulation" onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#fffbeb'">
+              ${(LIVRES[lv]||getDocs().some(x=>x.level===lv&&x.cat==='livre'))?`<div onclick="event.stopPropagation();openLivreOrLevel('${lv.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:8px;padding:9px 10px;margin-bottom:6px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;cursor:pointer;touch-action:manipulation" onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#fffbeb'">
                 <span style="font-size:18px">📕</span>
                 <div><div style="font-size:12px;font-weight:700;color:#92400e">Livre scolaire</div><div style="font-size:10px;color:#a16207">${lv} — PDF</div></div>
                 <span style="font-size:14px;color:#b45309;margin-left:auto">→</span>
@@ -1775,11 +1775,24 @@ function showDocLevel(level){
   const colors={'1ère Année':'#3b82f6','2ème Année':'#059669','3ème Année Scientifique':'#8b5cf6','3ème Année':'#dc2626','Bac Scientifique':'#0891b2','Bac Lettres':'#f59e0b','Non classé':'#6b7280'};
   const col=colors[level]||'#6b7280';
   const cats={};
-  docs.forEach(d=>{const c=d.cat||'Autre';if(!cats[c])cats[c]=[];cats[c].push(d)});
+  docs.forEach(d=>{const c=d.cat||'Autre';if(c==='livre')return;if(!cats[c])cats[c]=[];cats[c].push(d)});
   const catNames={cours:'📘 Cours',exercice:'✏️ Exercices',controle:'📋 Contrôles',synthese:'📝 Synthèses',fiche:'📄 Fiches',revision:'🔄 Révisions',evaluation:'📊 Évaluations',vocabulaire:'📖 Vocabulaire',documents:'📐 Documents officiels',Autre:'📁 Autre'};
   const catColors={cours:'#3b82f6',exercice:'#059669',controle:'#dc2626',synthese:'#f59e0b',fiche:'#8b5cf6',revision:'#0891b2',evaluation:'#ec4899',vocabulaire:'#6366f1',documents:'#7c3aed',Autre:'#6b7280'};
   let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showPage('docs')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:${col}">${level}</span></div>`;
-  if(LIVRES[realLevel]||LIVRES[level]){
+  // 📕 SECTION LIVRE SCOLAIRE : TOUS les livres réels du dossier <Niveau>/livre scolaire/
+  const livres=docs.filter(d=>d.cat==='livre');
+  if(livres.length){
+    h+=`<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:700;color:#b45309;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #f59e0b">📕 Livre scolaire (${livres.length})</div>`;
+    livres.forEach(d=>{
+      h+=`<div class="card" onclick="openDoc(${d.id})" style="display:flex;gap:12px;align-items:center;cursor:pointer;margin-bottom:6px;border-left:3px solid #f59e0b;background:#fffbeb">
+        <span style="font-size:24px">📕</span>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700" ${lamiTipOn(d.path||d.name)}>${escH(d.name)}</div>
+        <div style="font-size:11px;color:var(--tl);margin-top:2px">Livre scolaire • ${d.type} • ${d.size}</div></div>
+        <button onclick="quickDeleteDoc(${d.id}, event)" style="background:#dc2626;color:#fff;border:none;padding:5px 9px;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px" title="Supprimer">❌</button>
+        <span style="position:relative">${lamiEntryMenu('doc',d.id)}</span><span style="font-size:16px;color:var(--tl)">→</span></div>`;
+    });
+    h+=`</div>`;
+  } else if(LIVRES[realLevel]||LIVRES[level]){
     h+=`<div onclick="openLivre('${(realLevel||'').replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:10px;padding:12px;margin-bottom:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;cursor:pointer;touch-action:manipulation" onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#fffbeb'">
       <span style="font-size:26px">📕</span>
       <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#92400e">Livre scolaire — ${level}</div><div style="font-size:11px;color:#a16207">Document PDF officiel — touchez pour ouvrir</div></div>
@@ -3144,6 +3157,13 @@ function openLivre(level){
     }
   }catch(e){}
   window.open(path,'_blank');
+}
+/* 📕 Ouvre le PREMIER livre scolaire réel du niveau (dossier <Niveau>/livre scolaire/)
+   sinon retombe sur l'ancien chemin codé. La liste complète est visible dans la page du niveau. */
+function openLivreOrLevel(level){
+  const d=getDocs().filter(x=>x.level===level&&x.cat==='livre')[0];
+  if(d){ openDoc(d.id); return; }
+  openLivre(level);
 }
 
 function openDoc(id){

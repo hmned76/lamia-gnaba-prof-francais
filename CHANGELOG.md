@@ -1,5 +1,12 @@
 # Historique des versions — LamiAI
 
+## v1.6.0 — 18 Septembre 2026
+- **📕 Les livres scolaires réels sont visible** : dans Bibliothèque › un niveau, une section **« 📕 Livre scolaire (N) »** liste TOUS les PDF du dossier `<Niveau>/livre scolaire/` — pour **3ème Année : les 2 livres (Sciences + Lettres)** — avec ouverture, ❌ supprimer et ⋯ menu
+- **Bogue serveur corrigé** : le dossier `livre scolaire` n'était plus reconnu comme catégorie (différence d'accent/espaces dans le nommait normalisé) et ses fichiers passaient pour un « module » catégorisé cours ; `_cat_from_folder` compare désormais en normalisé (`livrescolaire` → catégorie `livre`), les livres apparaissent partout (aussi 4ème Sciences/Lettres)
+- **Bogue d'affichage corrigé (introduit v1.5.x)** : une ligne orpheline dans `openLivreOrLevel` cassait tout le script au chargement (l'app vide) — syntaxe réparée, vérifiée `node --check`
+- Les livres sont **exclus de la liste générique** du niveau (plus aucun doublon) ; la carte d'accueil ouvre le premier livre réel (`openLivreOrLevel`)
+- Testé en direct (CDP) : section « Livre scolaire (2) » avec les deux PDF de 3ème Année ✓, aucun doublon ✓
+
 ## v1.5.9 — 18 Septembre 2026
 - **🧭 Le « RETOUR » revient TOUJOURS à l'endroit d'où tu as ouvert le fichier** : en fermant l'éditeur OnlyOffice, l'app utilisait la fiche du document (niveau+module) et sautait vers la page du module — si tu ouvrais un fichier depuis la **Bibliothèque › 3ème Année**, tu retombais « à un autre emplacement ». Corrigé : la vue d'ouverture est **mémorisée** (`openOOModal` capture le `__lamiRefresh` courant) et restaurée à la fermeture (l'ancien routage ne sert que de filet si la vue n'est pas connue)
 - Testé en direct (CDP) : ouverture d'un fichier à module depuis Bibliothèque › 3ème Année → fermeture → retour sur **3ème Année** ✓ (avant : page module)
