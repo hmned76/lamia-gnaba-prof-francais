@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.5.0)
@@ -27,6 +27,7 @@ import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, unquote, parse_qs, quote
 import urllib.request
+import zlib
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = os.path.join(BASE_DIR, "lami-app-static")
@@ -68,6 +69,30 @@ ALLOWED_EXT = ("docx", "xlsx", "pptx", "pdf")
 
 # ===== Bind pour callback OnlyOffice =====
 BIND_PATH = os.path.join(OO_DIR, ".bind.json")
+DOCS_JSON = os.path.join(BASE_DIR, "LamiAI-data", "lamiai_docs.json")
+
+def _load_docs_json():
+    try:
+        with open(DOCS_JSON, 'r', encoding='utf-8') as f:
+            d = json.load(f)
+        return d if isinstance(d, list) else []
+    except Exception:
+        return []
+def _save_docs_json(lst):
+    os.makedirs(os.path.dirname(DOCS_JSON), exist_ok=True)
+    with open(DOCS_JSON, 'w', encoding='utf-8') as f:
+        json.dump(lst, f, ensure_ascii=False, indent=2)
+def _fmt_size(n):
+    if n < 1024: return str(n)+" o"
+    if n < 1048576: return str(round(n/1024))+" KB"
+    return str(round(n/1048576,1))+" MB"
+
+
+def _fmt_date(ts):
+    try:
+        return time.strftime("%Y-%m-%d", time.localtime(ts))
+    except Exception:
+        return ""
 
 # ===== IA locale (Ollama) — gratuit, sans clé =====
 OLLAMA_HOST = os.environ.get("LAMIAI_OLLAMA", "http://127.0.0.1:11434")
@@ -239,6 +264,331 @@ def _fs_safe(s):
     return s[:80]
 
 
+def _norm_name(s):
+    """Nom de dossier normalisé (lettres minuscules, accents retirés, espaces -> _)."""
+    n = str(s or "").lower()
+    for a, b in (("é","e"),("è","e"),("ê","e"),("ë","e"),("à","a"),("â","a"),
+                 ("ô","o"),("î","i"),("ï","i"),("û","u"),("ù","u"),("ç","c")):
+        n = n.replace(a, b)
+    n = re.sub(r"[^a-z0-9]+", "_", n)
+    return n.strip("_")
+
+
+# Correspondance niveau affiché -> dossier réel de la bibliothèque sur disque
+LEVEL_FOLDER = {
+    "1ère Année": "1ère Année",
+    "2ème Année": "2ème Année",
+    "3ème Année": "3ème Année",
+    "3ème Année Sciences": "3ème Année",
+    "3ème Année Scientifique": "3ème Année",
+    "3ème Année Lettres": "3ème Année",
+    "Bac Scientifique": "4ème Année Sciences",
+    "4ème Année Sciences": "4ème Année Sciences",
+    "Bac Lettres": "4ème Année Lettres",
+    "4ème Année Lettres": "4ème Année Lettres",
+    "Non classé": "Non classé",
+}
+
+# Niveaux affichés dans l'app (ordre de la bibliothèque, dossiers réels scannés)
+UI_LEVELS = ["1ère Année", "2ème Année", "3ème Année", "4ème Année Sciences", "4ème Année Lettres", "Non classé"]
+
+
+def _real_level_dir(level):
+    """Chemin du vrai dossier du niveau (là où la prof range ses documents).
+    Retombe sur la bibliothèque interne (LamiAI-data) si aucun dossier réel ne matche."""
+    name = LEVEL_FOLDER.get(level) or level
+    p = os.path.join(BASE_DIR, name)
+    if os.path.isdir(p):
+        return p
+    n = _norm_name(name)
+    try:
+        for d in os.listdir(BASE_DIR):
+            full = os.path.join(BASE_DIR, d)
+            if os.path.isdir(full) and _norm_name(d) == n:
+                return full
+    except Exception:
+        pass
+    return p
+
+
+def _real_subdir(base, name):
+    """Trouve le vrai sous-dossier (ex : 'controle' -> 'contrôle') s'il existe."""
+    if not name:
+        return None
+    n = _norm_name(name)
+    try:
+        for d in os.listdir(base):
+            full = os.path.join(base, d)
+            if os.path.isdir(full) and _norm_name(d) == n:
+                return d
+    except Exception:
+        pass
+    return None
+
+
+CAT_FOLDERS = {
+    "cours": "cours", "cour": "cours", "lecons": "cours", "lecon": "cours", "lessons": "cours",
+    "controle": "controle", "controle:": "controle", "control": "controle", "devoir": "controle", "evaluation": "evaluation",
+    "evaluations": "evaluation", "devoirs": "controle",
+    "exercice": "exercice", "exercices": "exercice", "exo": "exercice", "exos": "exercice",
+    "fiche": "fiche", "fiches": "fiche",
+    "synthese": "synthese", "synthèse": "synthese", "synthèses": "synthese", "resume": "synthese", "résumé": "synthese",
+    "revision": "revision", "révision": "revision", "revisions": "revision", "révisions": "revision",
+    "vocabulaire": "vocabulaire", "voc": "vocabulaire",
+    "livre": "livre", "livres": "livre", "livre scolaire": "livre", "livres scolaires": "livre",
+    "autre": "Autre", "divers": "Autre", "autres": "Autre",
+}
+
+
+def _cat_from_folder(name):
+    """Catégorie d'app à partir d'un nom de sous-dossier réel (ex: 'Contrôle' -> 'controle')."""
+    if not name:
+        return None
+    n = (_norm_name(name) or "").strip()
+    if n in CAT_FOLDERS:
+        return CAT_FOLDERS[n]
+    # cas 'controles'/'contrôle' -> raccourcis tronqués
+    for key, cat in CAT_FOLDERS.items():
+        if n.startswith(key) and len(n) - len(key) <= 3:
+            return cat
+    return None
+
+
+def _scan_signature():
+    """Signature rapide de l'arborescence pour savoir si un re-scan est nécessaire."""
+    parts = []
+    for level in UI_LEVELS:
+        base = _real_level_dir(level)
+        try:
+            if not os.path.isdir(base):
+                continue
+            entries = sorted(os.listdir(base))
+            parts.append(level + ":" + "|".join(entries))
+            for d in entries:
+                dp = os.path.join(base, d)
+                if os.path.isdir(dp):
+                    parts.append(level + "/" + d + ":" + "|".join(sorted(os.listdir(dp))))
+        except Exception:
+            pass
+    return "||||".join(parts)
+
+
+_SCAN_CACHE = {"sig": None, "docs": None, "ts": 0}
+_LAST_SAVE = {"ts": 0, "key": "", "path": ""}
+
+
+def _scan_library():
+    """Scanne les VRAIS dossiers de la bibliothèque et produit la liste complète
+    des documents (niveau, module, catégorie, nom fichier, chemin relatif)."""
+    now = time.time()
+    sig = _scan_signature()
+    if _SCAN_CACHE["docs"] is not None and _SCAN_CACHE["sig"] == sig and now - _SCAN_CACHE["ts"] < 15:
+        return _SCAN_CACHE["docs"]
+
+    docs = []
+    seen = set()
+    seen_levels = set()
+    only_ext = (".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".txt", ".csv", ".jpg", ".jpeg", ".png")
+    # Niveaux affichés dans l'app (ordre de la bibliothèque) — chaque dossier réel n'est scanné qu'une fois
+    for level in UI_LEVELS:
+        real = LEVEL_FOLDER.get(level) or level
+        key = _norm_name(os.path.basename(real)) or real
+        if key in seen_levels:
+            continue
+        seen_levels.add(key)
+        base = _real_level_dir(level)
+        if not os.path.isdir(base):
+            continue
+        subdirs = []
+        try:
+            subdirs = [d for d in sorted(os.listdir(base)) if os.path.isdir(os.path.join(base, d))]
+        except Exception:
+            pass
+        for sub in subdirs:
+            sub_path = os.path.join(base, sub)
+            cat = _cat_from_folder(sub)
+            if cat:
+                # <niveau>/<categorie>/fichiers
+                for f in sorted(os.listdir(sub_path)):
+                    full = os.path.join(sub_path, f)
+                    if not os.path.isfile(full):
+                        continue
+                    ext = os.path.splitext(f)[1].lower()
+                    if ext not in only_ext or f.startswith('_'):
+                        continue
+                    rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
+                    if rel in seen:
+                        continue
+                    seen.add(rel)
+                    docs.append({
+                        "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
+                        "name": f, "type": ext[1:].upper(), "level": level, "mod": "",
+                        "cat": cat, "date": _fmt_date(os.path.getmtime(full)),
+                        "size": _fmt_size(os.path.getsize(full)),
+                        "path": rel, "custom": False, "content": "",
+                    })
+            else:
+                # <niveau>/<module>/... (module réel = sous-dossier non catégoriel)
+                for f in sorted(os.listdir(sub_path)):
+                    full = os.path.join(sub_path, f)
+                    if os.path.isfile(full):
+                        ext = os.path.splitext(f)[1].lower()
+                        if ext not in only_ext or f.startswith('_'):
+                            continue
+                        rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
+                        if rel in seen:
+                            continue
+                        seen.add(rel)
+                        docs.append({
+                            "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
+                            "name": f, "type": ext[1:].upper(), "level": level, "mod": sub,
+                            "cat": "cours", "date": _fmt_date(os.path.getmtime(full)),
+                            "size": _fmt_size(os.path.getsize(full)),
+                            "path": rel, "custom": False, "content": "",
+                        })
+                        continue
+                    # sous-sous-dossier : cherche cat dans le module
+                    c2 = _cat_from_folder(f)
+                    if c2:
+                        # scan récursif (nouvelle structure : module/cours/lecture/... ou module/devoirs/contrôle/...)
+                        for rdp, rdn, rfns in os.walk(full):
+                            rdn[:] = [d for d in rdn if not d.startswith("_")]
+                            for g in sorted(rfns):
+                                gf = os.path.join(rdp, g)
+                                ext = os.path.splitext(g)[1].lower()
+                                if ext not in only_ext or g.startswith("_"):
+                                    continue
+                                rel = os.path.relpath(gf, BASE_DIR).replace(os.sep, "/")
+                                if rel in seen:
+                                    continue
+                                seen.add(rel)
+                                subrel = os.path.relpath(rdp, full)
+                                segs = [s.lower() for s in re.split(r"[\\/]+", subrel)] if subrel != "." else []
+                                cat = c2
+                                sous = ""
+                                if c2 == "cours":
+                                    for s2 in segs:
+                                        ns2 = _norm_name(s2) or s2.lower()
+                                        if ns2 in ("lecture", "langue", "production"):
+                                            sous = ns2
+                                            break
+                                    cat = "cours"
+                                elif c2 == "devoirs":
+                                    if any("synthes" in s2.lower() for s2 in segs):
+                                        cat = "synthese"
+                                    else:
+                                        cat = "controle"
+                                else:
+                                    cat = c2
+                                docs.append({
+                                    "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
+                                    "name": g, "type": ext[1:].upper(), "level": level, "mod": sub,
+                                    "cat": cat, "sub": sous, "date": _fmt_date(os.path.getmtime(gf)),
+                                    "size": _fmt_size(os.path.getsize(gf)),
+                                    "path": rel, "custom": False, "content": "",
+                                })
+        # fichiers directement à la racine du niveau
+        for f in sorted(os.listdir(base)):
+            full = os.path.join(base, f)
+            if not os.path.isfile(full):
+                continue
+            ext = os.path.splitext(f)[1].lower()
+            if ext not in only_ext or f.startswith('_'):
+                continue
+            rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
+            if rel in seen:
+                continue
+            seen.add(rel)
+            docs.append({
+                "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
+                "name": f, "type": ext[1:].upper(), "level": level, "mod": "",
+                "cat": "cours", "date": _fmt_date(os.path.getmtime(full)),
+                "size": _fmt_size(os.path.getsize(full)),
+                "path": rel, "custom": False, "content": "",
+            })
+    _SCAN_CACHE["sig"] = sig
+    _SCAN_CACHE["docs"] = docs
+    _SCAN_CACHE["ts"] = now
+    return docs
+
+
+def _nz(s):
+    """Normalisation pour comparaison : minuscule, seul l'alpha-numérique reste."""
+    return re.sub(r"[^a-z0-9]", "", str(s or "").lower())
+
+
+def _resolve_doc_file(level, cat, name):
+    """Cherche sur le disque le VRAI fichier correspondant à un vieux document sans chemin.
+    Parcourt TOUS les dossiers de la racine (pas seulement le dossier du niveau).
+    Règle : correspondance EXACTE (insensible espaces/_/majuscules) d'abord, sinon préfixe (>= 8).
+    Retourne le chemin relatif ('/'), ou "" si introuvable."""
+    skip = {"lami-app-static", "__pycache__", "node_modules", ".git", "sync", "home", "config"}
+    roots = []
+    ldata = os.path.join(BASE_DIR, "LamiAI-data")
+    try:
+        for d in sorted(os.listdir(BASE_DIR)):
+            full = os.path.join(BASE_DIR, d)
+            if os.path.isdir(full) and d not in skip and full != ldata:
+                roots.append(full)
+    except Exception:
+        pass
+    try:
+        base = _real_level_dir(level)
+        if base and os.path.isdir(base) and base not in roots:
+            roots.append(base)
+    except Exception:
+        pass
+    if os.path.isdir(ldata):
+        roots.append(ldata)
+    if not roots:
+        return ""
+    target = _nz(os.path.splitext(name)[0])
+    if len(target) < 4:
+        return ""
+    ext_doc = os.path.splitext(str(name or ""))[1].lower()
+    ok_ext = (".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".pdf", ".txt", ".csv", ".jpg", ".jpeg", ".png")
+    exact = []
+    pref = []
+    cat_nz = _nz(cat)
+    for root in roots:
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames[:] = [d for d in dirnames if d not in ("oo_store",)]
+            for f in filenames:
+                stem, ext = os.path.splitext(f)
+                if ext.lower() not in ok_ext:
+                    continue
+                cur = _nz(stem)
+                if not cur:
+                    continue
+                rel = os.path.relpath(os.path.join(dirpath, f), BASE_DIR).replace(os.sep, "/")
+                in_ldata = os.path.normpath(root) == os.path.normpath(ldata)
+                if cur == target:
+                    exact.append((rel, in_ldata))
+                elif len(target) >= 8 and min(len(cur), len(target)) >= 8 and (cur.startswith(target) or target.startswith(cur)):
+                    score = min(len(cur), len(target))
+                    pref.append((score, rel, in_ldata, ext, dirpath, root))
+    if exact:
+        real = [r for r, inl in exact if not inl]
+        if real:
+            return real[0]
+        return exact[0][0]
+    if ext_doc:
+        m = [x for x in pref if x[3].lower() == ext_doc]
+        if m:
+            pref = m
+    pref.sort(key=lambda x: (-x[0], x[2]))
+    best = ""
+    for score, rel, inl, extp, dp, rt in pref:
+        if cat_nz and cat_nz not in _nz(os.path.relpath(dp, rt)):
+            continue
+        best = rel
+        if not inl:
+            break
+    if not best and pref:
+        best = pref[0][1]
+    return best if best else ""
+
+
 def _code3(s):
     n = re.sub(r"[\s_']+", "", str(s or "").lower())
     n = re.sub(r"[^a-z0-9]", "", n)
@@ -279,17 +629,22 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---------- Utilitaires ----------
     def _cors(self):
-        # Autoriser uniquement l'origine de l'application (localhost)
         origin = self.headers.get("Origin", "")
-        if origin in ("http://localhost:8080", "http://127.0.0.1:8080", ""):
+        if origin:
             self.send_header("Access-Control-Allow-Origin", origin)
+        else:
+            self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-    def _send_bytes(self, status, body, ctype="application/json; charset=utf-8"):
+    def _send_bytes(self, status, body, ctype="application/json; charset=utf-8", no_cache=False):
         self.send_response(status)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
+        if no_cache:
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
         self._cors()
         self.end_headers()
         try:
@@ -306,10 +661,42 @@ class Handler(BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
 
+    # ---------- DELETE ----------
+    def do_DELETE(self):
+        parsed = urlparse(self.path)
+        path = parsed.path
+        if path.startswith("/api/file/delete"):
+            try:
+                qs = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+                relp = (qs.get("path") or "").lstrip("/")
+                if not relp:
+                    return self._send_json(400, {"error": "parametre path manquant"})
+                base = os.path.realpath(BASE_DIR)
+                full = os.path.realpath(os.path.join(base, relp.replace("/", os.sep)))
+                if not full.startswith(base + os.sep) and full != base:
+                    return self._send_json(403, {"error": "chemin refuse"})
+                if os.path.isfile(full):
+                    os.remove(full)
+                    _SCAN_CACHE["docs"] = None
+                    # retire l'entrée du registre si elle y est
+                    docs_json = _load_docs_json()
+                    n = len(docs_json)
+                    docs_json = [d for d in docs_json if d.get("path") != relp]
+                    if len(docs_json) != n:
+                        _save_docs_json(docs_json)
+                    return self._send_json(200, {"ok": True, "deleted": os.path.basename(full)})
+                return self._send_json(404, {"error": "fichier introuvable"})
+            except Exception as e:
+                return self._send_json(500, {"error": str(e)})
+        return self._send_json(404, {"error": "inconnu"})
+
     # ---------- GET ----------
     def do_GET(self):
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
+
+        if path.startswith("/oo/last-saved"):
+            return self._send_json(200, {"ts": _LAST_SAVE.get("ts", 0), "path": _LAST_SAVE.get("path", "")})
 
         if path.startswith("/oo/list"):
             files = []
@@ -340,7 +727,44 @@ class Handler(BaseHTTPRequestHandler):
             available = any(c["online"] and c["models"] for c in catalog)
             return self._send_json(200, {"available": available, "backend": "ollama", "model": _ai_model(), "providers": catalog})
 
-        # Application statique
+        if path.startswith("/api/library"):
+            # Liste complète des documents scannés depuis les VRAIS dossiers de la bibliothèque
+            try:
+                docs = _scan_library()
+                return self._send_json(200, {"docs": docs})
+            except Exception as e:
+                return self._send_json(500, {"error": str(e)})
+
+        if path.startswith("/api/file"):
+            # Sert le VRAI fichier depuis la bibliothèque (path relatif à BASE_DIR)
+            qs = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+            relp = (qs.get("path") or "").lstrip("/")
+            if not relp:
+                return self._send_json(400, {"error": "parametre path manquant"})
+            base = os.path.realpath(BASE_DIR)
+            full = os.path.realpath(os.path.join(base, relp.replace("/", os.sep)))
+            if not full.startswith(base + os.sep) and full != base:
+                return self._send_json(403, {"error": "chemin refuse"})
+            if os.path.isfile(full):
+                ext = os.path.splitext(full)[1].lower()
+                with open(full, "rb") as f:
+                    data = f.read()
+                return self._send_bytes(200, data, MIME.get(ext, "application/octet-stream"))
+            return self._send_json(404, {"error": "fichier introuvable"})
+
+        if path.startswith("/api/resolve"):
+            # Retrouve le VRAI fichier sur le disque pour un vieux doc sans chemin (aucune copie)
+            try:
+                qs = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+                name = (qs.get("name") or "").strip()
+                if not name:
+                    return self._send_json(400, {"error": "parametre name manquant"})
+                found = _resolve_doc_file(qs.get("level") or "", qs.get("cat") or "", name)
+                return self._send_json(200, {"path": found, "name": os.path.basename(found) if found else ""})
+            except Exception as e:
+                return self._send_json(500, {"error": str(e)})
+
+    # Application statique
         rel = path.lstrip("/")
         if rel == "" or rel.endswith("/"):
             rel = rel + "index.html"
@@ -351,7 +775,8 @@ class Handler(BaseHTTPRequestHandler):
             ext = os.path.splitext(full)[1].lower()
             with open(full, "rb") as f:
                 data = f.read()
-            return self._send_bytes(200, data, MIME.get(ext, "application/octet-stream"))
+            is_html = ext in (".html", ".htm")
+            return self._send_bytes(200, data, MIME.get(ext, "application/octet-stream"), no_cache=is_html)
         return self._send_bytes(404, "404 not found".encode("utf-8"), "text/plain; charset=utf-8")
 
     # ---------- POST ----------
@@ -407,9 +832,26 @@ class Handler(BaseHTTPRequestHandler):
                         a_code = _code3(act)
                         a_folder = _fs_safe(act).lower() or None
 
-                parts = [_fs_safe(level) or "Non classé"]
+                # Dossiers RÉELS : <dossier niveau>/<Nom module exact>/<type>/<activité>/
+                to_rel = (qs.get("to") or "").strip()
+                if to_rel:
+                    base = os.path.realpath(BASE_DIR)
+                    full = os.path.realpath(os.path.join(base, to_rel.lstrip("/")))
+                    if not full.startswith(base + os.sep):
+                        return self._send_json(400, {"error": "chemin invalide"})
+                    os.makedirs(os.path.dirname(full) or base, exist_ok=True)
+                    with open(full, "wb") as f:
+                        f.write(body)
+                    rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
+                    _SCAN_CACHE["docs"] = None
+                    return self._send_json(200, {"ok": True, "path": rel, "file": os.path.basename(full)})
+                try:
+                    lvl_folder = os.path.basename(_real_level_dir(level)) or (_fs_safe(level) or "Non classé")
+                except Exception:
+                    lvl_folder = _fs_safe(level) or "Non classé"
+                parts = [lvl_folder]
                 if module:
-                    parts.append(_fs_safe(module))
+                    parts.append(module.replace("/", "-").strip() or "Module")
                 parts.append(t_folder)
                 if a_folder:
                     parts.append(a_folder)
@@ -435,8 +877,36 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:
                 return self._send_json(500, {"error": str(e)})
 
+        if path.startswith("/oo/rename") and not path.startswith("/oo/rename_old"):
+            # Renommer un fichier du projet immédiatement (doc/path ou travail archivé)
+            try:
+                qs = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+                old_rel = qs.get("from") or ""
+                new_rel = qs.get("to") or ""
+                if not old_rel or not new_rel:
+                    return self._send_json(400, {"error": "from/to requis"})
+                base = os.path.realpath(BASE_DIR)
+                old_full = os.path.realpath(os.path.join(BASE_DIR, old_rel))
+                new_full = os.path.realpath(os.path.join(BASE_DIR, new_rel))
+                if not old_full.startswith(base + os.sep) or not new_full.startswith(base + os.sep):
+                    return self._send_json(400, {"error": "chemin invalide"})
+                if old_full == new_full:
+                    return self._send_json(200, {"ok": True, "path": new_rel})
+                if not os.path.isfile(old_full):
+                    return self._send_json(404, {"error": "fichier source introuvable"})
+                os.makedirs(os.path.dirname(new_full), exist_ok=True)
+                if os.path.exists(new_full):
+                    os.remove(new_full)
+                os.rename(old_full, new_full)
+                _SCAN_CACHE["docs"] = None
+                sys.stderr.write("[LamiAI %s] Rename OK → %s\n" % (time.strftime("%H:%M:%S"), new_rel))
+                return self._send_json(200, {"ok": True, "path": new_rel})
+            except Exception as e:
+                return self._send_json(500, {"error": str(e)})
+
         if path.startswith("/oo/callback"):
             # Retour de sauvegarde du DocumentServer OnlyOffice
+            cb_error = 0
             try:
                 length = int(self.headers.get("Content-Length", 0) or 0)
                 raw = self.rfile.read(length) if length else b"{}"
@@ -444,25 +914,60 @@ class Handler(BaseHTTPRequestHandler):
                 status = body.get("status", 0)
                 key = body.get("key", "")
                 url = body.get("url", "")
+                sys.stderr.write("[LamiAI %s] Callback OO: status=%s key=%s url=%s\n" % (
+                    time.strftime("%H:%M:%S"), status, key[:40], (url or "")[:80]))
                 # status 2 = sauvegarde par l'utilisateur, 6 = sauvegarde + fermeture
                 if status in (2, 6) and key and url:
                     binds = _load_binds()
                     b = binds.get(key, {})
                     archive = b.get("archive")
-                    if archive:
+                    store = b.get("store")
+                    old = b.get("old") or ""
+                    target = archive or store
+                    if target:
                         try:
-                            # L'URL peut contenir des caractères accentués (nom du fichier archivé)
-                            data = urllib.request.urlopen(quote(url, safe=":/?&=#-_.~%"), timeout=30).read()
-                            full = os.path.join(BASE_DIR, archive)
+                            # Télécharger le fichier édité depuis le DocumentServer
+                            req = urllib.request.Request(url)
+                            req.add_header("User-Agent", "LamiAI/1.5")
+                            with urllib.request.urlopen(req, timeout=30) as resp:
+                                data = resp.read()
+                            if archive:
+                                full = os.path.join(BASE_DIR, archive)
+                                real = os.path.realpath(full)
+                                if not real.startswith(os.path.realpath(BASE_DIR) + os.sep):
+                                    full = os.path.join(OO_DIR, os.path.basename(store))
+                            else:
+                                # Pas d'archive : on met à jour le fichier du stockage /oo/<fname>
+                                full = os.path.join(OO_DIR, os.path.basename(store))
                             os.makedirs(os.path.dirname(full), exist_ok=True)
                             with open(full, "wb") as f:
                                 f.write(data)
-                            sys.stderr.write("[LamiAI %s] Callback save OK → %s (%d octets)\n" % (time.strftime("%H:%M:%S"), archive, len(data)))
+                            # Renommage : si le fichier modifié a reçu un nouveau nom,
+                            # l'ancien fichier est retiré pour éviter le doublon.
+                            if old and old != (archive or ""):
+                                old_full = os.path.realpath(os.path.join(BASE_DIR, old))
+                                base_real = os.path.realpath(BASE_DIR)
+                                if old_full.startswith(base_real + os.sep) and os.path.isfile(old_full):
+                                    try:
+                                        os.remove(old_full)
+                                        sys.stderr.write("[LamiAI %s] Callback rename: ancien fichier supprimé → %s\n" % (time.strftime("%H:%M:%S"), old))
+                                    except Exception as rexc:
+                                        sys.stderr.write("[LamiAI %s] Callback rename: suppression ancien échouée (%s)\n" % (time.strftime("%H:%M:%S"), rexc))
+                            _SCAN_CACHE["docs"] = None
+                            _LAST_SAVE["ts"] = time.time()
+                            _LAST_SAVE["key"] = key
+                            _LAST_SAVE["path"] = os.path.relpath(full, BASE_DIR)
+                            sys.stderr.write("[LamiAI %s] Callback save OK → %s (%d octets)\n" % (time.strftime("%H:%M:%S"), os.path.relpath(full, BASE_DIR), len(data)))
                         except Exception as exc:
-                            sys.stderr.write("[LamiAI %s] Callback save error: %s\n" % (time.strftime("%H:%M:%S"), exc))
-            except Exception:
-                pass
-            return self._send_json(200, {"error": 0})
+                            sys.stderr.write("[LamiAI %s] Callback save FAILED (url=%s): %s\n" % (time.strftime("%H:%M:%S"), url[:80], exc))
+                            cb_error = 1
+                    else:
+                        sys.stderr.write("[LamiAI %s] Callback: no archive/store bind for key=%s\n" % (time.strftime("%H:%M:%S"), key[:40]))
+                        cb_error = 1
+            except Exception as exc:
+                sys.stderr.write("[LamiAI %s] Callback error: %s\n" % (time.strftime("%H:%M:%S"), exc))
+                cb_error = 1
+            return self._send_json(200, {"error": cb_error})
 
         if path.startswith("/oo/bind"):
             # Lier une clé OnlyOffice à un chemin d'archivage (pour callback)
@@ -477,9 +982,70 @@ class Handler(BaseHTTPRequestHandler):
                 binds[key] = {
                     "store": body.get("store", ""),
                     "archive": body.get("archive", ""),
+                    "old": body.get("old", ""),
                 }
                 _save_binds(binds)
                 return self._send_json(200, {"ok": True})
+            except Exception as e:
+                return self._send_json(500, {"error": str(e)})
+        if path.startswith("/api/upload"):
+            try:
+                ct = self.headers.get("Content-Type", "")
+                length = int(self.headers.get("Content-Length", 0) or 0)
+                body = self.rfile.read(length) if length else b""
+                qs = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+                level = qs.get("level") or "Non classé"
+                module = qs.get("module") or ""
+                cat = qs.get("cat") or "cours"
+                sub = qs.get("sub") or ""
+                bm = re.search(r'boundary=(.+?)(?:;|$)', ct)
+                if not bm:
+                    return self._send_json(400, {"error": "multipart boundary manquante"})
+                boundary = bm.group(1).encode()
+                field_file = None
+                filename = ""
+                for part in body.split(b"--" + boundary):
+                    if b'Content-Disposition' not in part or b'filename="' not in part:
+                        continue
+                    he = part.find(b"\r\n\r\n")
+                    if he < 0:
+                        continue
+                    m = re.search(r'filename="([^"]*)"', part[:he].decode("utf-8", errors="replace"))
+                    if not m:
+                        continue
+                    filename = m.group(1)
+                    data = part[he+4:]
+                    if data.endswith(b"\r\n"): data = data[:-2]
+                    if data.endswith(b"--"): data = data[:-2]
+                    if data.endswith(b"\r\n"): data = data[:-2]
+                    field_file = data
+                if field_file is None or not filename:
+                    return self._send_json(400, {"error": "fichier manquant"})
+                ext = os.path.splitext(filename)[1].lower().lstrip(".") or "docx"
+                chosen = (qs.get("name") or "").strip()
+                base_src = os.path.splitext(filename)[0] or "document"
+                displayed = chosen or base_src
+                safe_name = _fs_safe(displayed) or "document"
+                dest = _real_level_dir(level)
+                if module:
+                    dest = os.path.join(dest, _real_subdir(dest, module) or _fs_safe(module))
+                if cat:
+                    dest = os.path.join(dest, _real_subdir(dest, cat) or _fs_safe(cat))
+                if sub:
+                    dest = os.path.join(dest, _real_subdir(dest, sub) or _fs_safe(sub))
+                os.makedirs(dest, exist_ok=True)
+                full = os.path.join(dest, safe_name + "." + ext)
+                i = 2
+                while os.path.exists(full):
+                    full = os.path.join(dest, "%s_%d.%s" % (safe_name, i, ext))
+                    i += 1
+                with open(full, "wb") as f: f.write(field_file)
+                _SCAN_CACHE["docs"] = None
+                doc_entry = {"id": int(time.time()*1000)%1000000000, "name": safe_name+"."+ext, "level": level, "mod": module, "cat": cat, "type": sub or cat, "size": _fmt_size(len(field_file)), "date": time.strftime("%Y-%m-%d"), "custom": True, "path": os.path.relpath(full, BASE_DIR).replace(os.sep, "/"), "content": ""}
+                docs_json = _load_docs_json()
+                docs_json.append(doc_entry)
+                _save_docs_json(docs_json)
+                return self._send_json(200, {"ok": True, "doc": doc_entry, "path": doc_entry["path"]})
             except Exception as e:
                 return self._send_json(500, {"error": str(e)})
         if path.startswith("/ai/chat"):
@@ -569,3 +1135,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

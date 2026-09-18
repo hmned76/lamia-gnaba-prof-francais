@@ -4,7 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
-  <title>LamiAI v1.5.1 - Assistant Pédagogique</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src http://localhost:8080 http://127.0.0.1:8080 http://127.0.0.1:11434 http://localhost:* http://127.0.0.1:*; frame-src http://127.0.0.1:* http://localhost:*; object-src 'none';" />
+  <title>LamiAI v1.5.2 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -98,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.5.1 • PWA</div>
+      <div>LamiAI v1.5.2 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -317,6 +318,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
   <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#1e293b;color:#fff;flex-wrap:wrap">
     <span style="font-weight:800;font-size:15px">🅾️ OnlyOffice — Word · Excel · PowerPoint · PDF</span>
     <div id="ooHostStatus" style="font-size:11px;opacity:0.9;flex:1;min-width:180px"></div>
+    <button id="ooRenameBtn" onclick="renameOOTarget()" style="display:none;background:#0d9488;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600">✏️ Renommer</button>
     <button onclick="testOODs()" style="background:#334155;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600">🧪 Tester la connexion</button>
     <button onclick="closeOOModal()" style="background:#dc2626;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600">✖ Fermer</button>
   </div>
@@ -1299,11 +1301,14 @@ function showPage(id){
     levelCounts[lv] = (levelCounts[lv]||0) + 1;
   });
 
+  const docsTotal = Object.values(levelCounts).reduce((a,b)=>a+(b||0),0);
+  const docsTotalTxt = docsTotal ? String(docsTotal).replace(/\B(?=(\d{3})+(?!\d))/g,' ') : '—';
+
   if(id==='home'){
     title='Accueil'; sub='Tableau de bord';
     html=`
     <div class="grid grid-4" style="margin-bottom:20px">
-      <div class="stat"><div style="font-size:28px">📄</div><div style="font-size:26px;font-weight:800;color:var(--p)">180</div><div style="font-size:11px;color:var(--tl)">Documents</div></div>
+      <div class="stat"><div style="font-size:28px">📄</div><div style="font-size:26px;font-weight:800;color:var(--p)">${docsTotalTxt}</div><div style="font-size:11px;color:var(--tl)">Documents</div></div>
       <div class="stat"><div style="font-size:28px">📚</div><div style="font-size:26px;font-weight:800;color:var(--s)">7</div><div style="font-size:11px;color:var(--tl)">Niveaux</div></div>
       <div class="stat"><div style="font-size:28px">📋</div><div style="font-size:26px;font-weight:800;color:var(--a)">25+</div><div style="font-size:11px;color:var(--tl)">Modules</div></div>
       <div class="stat"><div style="font-size:28px">🎓</div><div style="font-size:26px;font-weight:800;color:var(--w)">2026</div><div style="font-size:11px;color:var(--tl)">Année</div></div>
@@ -1761,11 +1766,12 @@ function showDocLevel(level){
     });
     h+=`</div>`;
   });
+  h+=`<div style="margin-top:16px"><button id="upload-btn" class="card" style="cursor:pointer;border-left:4px solid #059669;background:#f0fdf4" onclick="uploadDoc('${realLevel}','','','')">📥 Ajouter des documents à ce niveau</button></div>`;
   document.getElementById('content').innerHTML=h;
   document.getElementById('pageTitle').textContent=level;
-  document.getElementById('pageSub').textContent=`${docs.length} documents`;
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+   document.getElementById('pageSub').textContent=`${docs.length} documents`;
+   window.scrollTo({top:0,behavior:'smooth'});
+ }
 
 function showModule(level,module){
   const docs=getDocs().filter(d=>{
@@ -1894,19 +1900,20 @@ function showDevCat(level,module,catName){
       {name:'Grille d\'évaluation',desc:'Critères et barème',icon:'📊'}
     ]
   };
-  (devTemplates[catName]||[]).forEach(t=>{
-    h+=`<div class="card" style="cursor:pointer;margin-bottom:6px;border-left:3px solid ${catColor}" onclick="createDevTemplate('${catName}','${t.name.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:22px">${t.icon}</span>
-        <div><div style="font-size:13px;font-weight:700">${t.name}</div>
-        <div style="font-size:11px;color:var(--tl)">${t.desc}</div></div>
-        <span style="margin-left:auto;font-size:11px;color:${catColor};font-weight:600">Créer →</span>
-      </div>
-    </div>`;
-  });
-  h+=`</div>`;
+   (devTemplates[catName]||[]).forEach(t=>{
+     h+=`<div class="card" style="cursor:pointer;margin-bottom:6px;border-left:3px solid ${catColor}" onclick="createDevTemplate('${catName}','${t.name.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">
+       <div style="display:flex;align-items:center;gap:10px">
+         <span style="font-size:22px">${t.icon}</span>
+         <div><div style="font-size:13px;font-weight:700">${t.name}</div>
+         <div style="font-size:11px;color:var(--tl)">${t.desc}</div></div>
+         <span style="margin-left:auto;font-size:11px;color:${catColor};font-weight:600">Créer →</span>
+       </div>
+     </div>`;
+   });
+   h+=`</div>`;
+   h+=`<div style="margin-bottom:12px"><button id="upload-btn" class="card" style="cursor:pointer;border-left:4px solid #059669;background:#f0fdf4" onclick="uploadDoc('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','devoirs','${catName}')">📥 Ajouter des documents</button></div>`;
 
-  const allDocsCount = docs.length + lamiDocs.length;
+   const allDocsCount = docs.length + lamiDocs.length;
   if(allDocsCount>0){
     h+=`<div style="margin-bottom:16px">`;
     h+=`<div style="font-size:13px;font-weight:700;color:var(--tl);margin-bottom:8px">📚 Documents existants (${allDocsCount})</div>`;
@@ -2037,19 +2044,20 @@ function showSousCours(level,module,sousCours){
   
   h+=`<div style="margin-bottom:20px">`;
   h+=`<div style="font-size:14px;font-weight:700;color:${scColors[sousCours]};margin-bottom:10px">📝 Créer un document</div>`;
-  (templates[sousCours]||[]).forEach(t=>{
-    h+=`<div class="card" style="cursor:pointer;margin-bottom:6px;border-left:3px solid ${scColors[sousCours]}" onclick="createDocTemplate('${sousCours}','${t.name.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:22px">${t.icon}</span>
-        <div><div style="font-size:13px;font-weight:700">${t.name}</div>
-        <div style="font-size:11px;color:var(--tl)">${t.desc}</div></div>
-        <span style="margin-left:auto;font-size:11px;color:${scColors[sousCours]};font-weight:600">Créer →</span>
-      </div>
-    </div>`;
-  });
-  h+=`</div>`;
+   (templates[sousCours]||[]).forEach(t=>{
+     h+=`<div class="card" style="cursor:pointer;margin-bottom:6px;border-left:3px solid ${scColors[sousCours]}" onclick="createDocTemplate('${sousCours}','${t.name.replace(/'/g,"\\'")}','${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}')">
+       <div style="display:flex;align-items:center;gap:10px">
+         <span style="font-size:22px">${t.icon}</span>
+         <div><div style="font-size:13px;font-weight:700">${t.name}</div>
+         <div style="font-size:11px;color:var(--tl)">${t.desc}</div></div>
+         <span style="margin-left:auto;font-size:11px;color:${scColors[sousCours]};font-weight:600">Créer →</span>
+       </div>
+     </div>`;
+   });
+   h+=`</div>`;
+   h+=`<div style="margin-bottom:12px"><button id="upload-btn" class="card" style="cursor:pointer;border-left:4px solid #059669;background:#f0fdf4" onclick="uploadDoc('${level.replace(/'/g,"\\'")}','${module.replace(/'/g,"\\'")}','cours','${sousCours}')">📥 Ajouter des documents</button></div>`;
 
-  const allDocsCount = docs.length + lamiDocs.length;
+   const allDocsCount = docs.length + lamiDocs.length;
   if(allDocsCount>0){
     h+=`<div style="margin-bottom:16px">`;
     h+=`<div style="font-size:13px;font-weight:700;color:var(--tl);margin-bottom:8px">📚 Documents existants (${allDocsCount})</div>`;
@@ -2767,7 +2775,13 @@ function openDocTemplateOO(level,module,tp,activity,title,html){
     stat.innerHTML='<span style="color:#059669">✅ Prêt. Ouverture de l\'éditeur…</span>';
     document.getElementById('ooEditorHost').innerHTML='';
     openOOEditor(url,'docx',title,key);
-    archiveTarget(level||'Non classé',module||'',tp||'Travail',activity||'','docx',u8).then(path=>{ if(key&&path) bindOOKey(key,path); });
+    archiveTarget(level||'Non classé',module||'',tp||'Travail',activity||'','docx',u8).then(path=>{
+      if(key&&path){
+        bindOOKey(key,path);
+        window.__ooRename={key:key,path:path,store:String(url||'').split('/').pop()||'',name:title||'',level:level||'',mod:module||'',cat:(tp||'').toLowerCase(),kind:'doc',id:''};
+        const rbt=document.getElementById('ooRenameBtn'); if(rbt) rbt.style.display='inline-block';
+      }
+    });
     stat.style.display='none';
   }).catch(err=>{
     const msg=String(err.message||'').includes('fetch')?'Serveur local stoppé — lancez start-server.bat.':err.message;
@@ -3094,8 +3108,17 @@ function openDoc(id){
   openDocInOO(id);
 }
 
+function docCatToType(cat){
+  const c=String(cat||'').toLowerCase();
+  if(c==='cours') return 'Cours';
+  if(c==='exercice') return 'Exercice';
+  if(c==='controle'||c==='evaluation'||c==='évaluation') return 'Contrôle';
+  if(c==='synthese'||c==='synthèse') return 'Synthèse';
+  if(c==='fiche') return 'Fiche';
+  return 'Travail';
+}
 function openDocInOO(id){
-  const doc=DOCS.find(d=>String(d.id)===String(id));
+  const doc=getDocs().find(d=>String(d.id)===String(id));
   if(!doc) return;
   const savedName=localStorage.getItem('lami-doc-name-'+id);
   const displayName=savedName||doc.name;
@@ -3118,16 +3141,53 @@ function openDocInOO(id){
   stat.style.display='block';
   stat.innerHTML='<span style="color:#6d28d9">⏳ Ouverture de '+ext.toUpperCase()+'…</span>';
   let u8;
+  const tryReal=doc.path&&!localStorage.getItem('lami-doc-'+id);
+  if(tryReal){
+    fetch('/api/file?path='+encodeURIComponent(doc.path))
+      .then(r=>{ if(!r.ok) throw new Error('stockage '+r.status); return r.arrayBuffer(); })
+      .then(buf=>{
+        u8=new Uint8Array(buf);
+        openOOModalWith(u8,ext,title,displayName,key,doc,stat);
+      })
+      .catch(err=>{
+        stat.innerHTML='<span style="color:#dc2626">❌ Fichier introuvable ('+err.message+')</span>';
+      });
+    return;
+  }
   try{
     if(ext==='xlsx') u8=buildXlsxFile(title,blocks);
     else if(ext==='pptx') u8=buildPptxFile(title,blocks);
     else if(ext==='pdf') u8=buildPdfFile(title,blocks);
     else u8=buildDocxFile(title,blocks);
   }catch(e){ stat.innerHTML='<span style="color:#dc2626">Erreur génération : '+e.message+'</span>'; return; }
+  openOOModalWith(u8,ext,title,displayName,key,doc,stat);
+}
+function openOOModalWith(u8,ext,title,displayName,key,doc,stat){
+  stat.innerHTML='<span style="color:#059669">✅ Fichier chargé. Ouverture de l\'éditeur…</span>';
   saveToOO(u8,ext,title.replace(/[^a-z0-9]/gi,'_')+'.'+ext).then(url=>{
     stat.innerHTML='<span style="color:#059669">✅ Prêt. Ouverture de l\'éditeur…</span>';
     document.getElementById('ooEditorHost').innerHTML='';
     openOOEditor(url,ext,displayName,key);
+    const storeName=String(url||'').split('/').pop()||'';
+    if(doc && doc.path){
+      window.__ooRename={key:key,path:doc.path,store:storeName,name:displayName,level:doc.level||'',mod:doc.mod||'',cat:doc.cat||'',kind:'doc',id:doc.id||''};
+      const rb=document.getElementById('ooRenameBtn'); if(rb) rb.style.display='inline-block';
+      bindOOKey(key, doc.path, storeName);
+      const h=document.getElementById('ooHostStatus');
+      if(h) h.innerHTML+='<div style="font-size:10.5px;opacity:.9;font-weight:600">💾 Vos modifications seront enregistrées dans le fichier d\'origine (« '+escH(displayName)+' »).</div>';
+    } else {
+      window.__ooRename=null;
+      const rb2=document.getElementById('ooRenameBtn'); if(rb2) rb2.style.display='none';
+      archiveTarget(doc.level||'Non classé',doc.mod||'',docCatToType(doc.cat),doc.type||'',ext,u8).then(path=>{
+        if(key&&path){
+          bindOOKey(key,path,storeName);
+          window.__ooRename={key:key,path:path,store:storeName,name:displayName,level:doc.level||'',mod:doc.mod||'',cat:doc.cat||'',kind:'doc',id:doc.id||''};
+          const rb3=document.getElementById('ooRenameBtn'); if(rb3) rb3.style.display='inline-block';
+          const h2=document.getElementById('ooHostStatus');
+          if(h2) h2.innerHTML+='<div style="font-size:10.5px;opacity:.9;font-weight:600">💾 Enregistré dans le projet. Vous pouvez renommer avec le bouton ✏️.</div>';
+        }
+      });
+    }
     stat.style.display='none';
   }).catch(err=>{
     const msg=String(err.message||'').includes('fetch')?'Serveur local stoppé — lancez start-server.bat.':err.message;
@@ -3165,14 +3225,72 @@ function isDocDeleted(id){
 }
 
 function getDocs(){
-  return DOCS.filter(d=>!isDocDeleted(d.id));
+  let base=[];
+  const library=LIBRARY_DOCS||[];
+  library.forEach(d=>{ if(!isDocDeleted(d.id)) base.push(d); });
+  DOCS.forEach(d=>{
+    const dup=(d.path&&base.some(b=>b.path&&b.path.toLowerCase()===d.path.toLowerCase()))||base.some(b=>b.name===d.name&&b.level===d.level&&b.cat===d.cat);
+    if(!dup && !isDocDeleted(d.id)) base.push(d);
+  });
+  try{
+    const custom = JSON.parse(localStorage.getItem('lami-doc-registry')||'[]');
+    if(Array.isArray(custom)) custom.forEach(d=>{
+      if(isDocDeleted(d.id)) return;
+      const dup=(d.path&&base.some(b=>b.path&&b.path.toLowerCase()===d.path.toLowerCase()))||base.some(b=>b.name===d.name&&b.level===d.level&&b.cat===d.cat);
+      if(!dup) base.push(d);
+    });
+  }catch(e){}
+  return base;
+}
+function loadLibrary(){
+  return fetch('/api/library').then(r=>{ if(!r.ok) throw new Error('library '+r.status); return r.json(); })
+    .then(j=>{ LIBRARY_DOCS=j.docs||[]; return LIBRARY_DOCS; })
+    .catch(()=>{ LIBRARY_DOCS=[]; return LIBRARY_DOCS; });
+}
+let LIBRARY_DOCS=null;
+
+function uploadDoc(level, module, cat, sub){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf,.docx,.doc,.xlsx,.pptx,.txt,.png,.jpg,.jpeg';
+  input.onchange = async function(){
+    const file = input.files[0];
+    if(!file) return;
+    const btn = document.getElementById('upload-btn');
+    if(btn) btn.textContent = '📥 '+file.name;
+    const fname = (file.name || '').trim();
+    const base0 = fname.replace(/\.[^.\/]+$/i,'') || fname;
+    const chosen = prompt('Nom du document (vous pouvez le renommer) :', base0);
+    const finalName = (chosen===null?'':String(chosen).trim()) || base0;
+    const qs = new URLSearchParams({level:level||'', module:module||'', cat:cat||'', sub:sub||'', name:finalName});
+    const fd = new FormData();
+    fd.append('file', file);
+    let r;
+    try{ r = await fetch('/api/upload?'+qs.toString(), {method:'POST', body:fd}); }catch(err){ alert('Serveur injoignable : '+err.message); return; }
+    const j = await r.json();
+    if(!r.ok || !j.ok){ alert('Erreur : '+(j.error||'inconnu')); return; }
+    let reg = [];
+    try{ reg = JSON.parse(localStorage.getItem('lami-doc-registry')||'[]'); }catch(e){}
+    if(!Array.isArray(reg)) reg = [];
+    reg.push(j.doc);
+    localStorage.setItem('lami-doc-registry', JSON.stringify(reg));
+    if(btn) btn.textContent = '✅ ajouté';
+    setTimeout(()=>{ if(btn) btn.textContent = '📥 Ajouter des documents'; }, 2000);
+    if(typeof showSousCours==='function' && sub) showSousCours(level, module, sub);
+    else if(typeof showDevCat==='function') showDevCat(level, module, cat);
+    else if(typeof showModule==='function') showModule(level, module);
+    else if(typeof showDocLevel==='function') showDocLevel(level);
+    else showPage('docs');
+  };
+  input.click();
 }
 
 function deleteDoc(){
   if(!currentDocId)return;
-  const doc=DOCS.find(d=>String(d.id)===String(currentDocId))||{name:'ce document'};
+  const doc=getDocs().find(d=>String(d.id)===String(currentDocId))||{name:'ce document'};
   const name=doc.name;
   if(!confirm('🗑️ Êtes-vous sûr de vouloir supprimer définitivement « '+name+' » ?\n\nCette action supprimera le document de votre base (fichier + listes) et est irréversible.\n\nCliquez sur OK pour confirmer ou Annuler pour garder le document.'))return;
+  try{ if(doc && doc.path) fetch('/api/file/delete?path='+encodeURIComponent(doc.path),{method:'DELETE'}); }catch(e){}
   // Suppression locale
   localStorage.removeItem('lami-doc-'+currentDocId);
   localStorage.setItem('lami-deleted-'+currentDocId,'1');
@@ -3513,7 +3631,7 @@ function aiProviderChanged(){
   refreshAIModels();
 }
 function checkAIStatus(){
-  fetch('/ai/status').then(r=>r.json()).then(j=>{
+  fetchWithRetry('/ai/status',{retries:3,timeout:8000}).then(r=>r.json()).then(j=>{
     AI_PROVIDERS=Array.isArray(j.providers)?j.providers:[];
     if(!AI_PROVIDERS.length && Array.isArray(j.models)) AI_PROVIDERS=[{id:'ollama',label:'Ollama (local)',models:j.models,online:!!j.available}];
     AI_OLLAMA={available:!!j.available, models:((AI_PROVIDERS.find(p=>p.id==='ollama')||{}).models)||j.models||[], checked:true};
@@ -3576,7 +3694,7 @@ function aiLLM(msg){
   const lid=aiLoading();
   const sel=document.getElementById('aiModelSel');
   const model=(sel&&sel.value)?sel.value:'';
-  fetch('/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:AI_HIST.slice(-8),context:aiContext(),model:model,provider:AI_PROVIDER})})
+  fetchWithRetry('/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:AI_HIST.slice(-8),context:aiContext(),model:model,provider:AI_PROVIDER}),retries:3,timeout:60000})
   .then(r=>r.json()).then(j=>{
     const el=document.getElementById(lid); if(el) el.remove();
     if(j&&j.ok&&j.reply){
@@ -3627,7 +3745,13 @@ function saveAIAnswerById(rid,btn){
   saveToOO(u8,'docx',title.replace(/[^a-z0-9]/gi,'_')+'.docx').then(url=>{
     document.getElementById('ooEditorHost').innerHTML='';
     openOOEditor(url,'docx',title,key);
-    archiveTarget(level,mod,tp,'','docx',u8).then(path=>{ if(key&&path) bindOOKey(key,path); });
+    archiveTarget(level,mod,tp,'','docx',u8).then(path=>{
+      if(key&&path){
+        bindOOKey(key,path);
+        window.__ooRename={key:key,path:path,store:String(url||'').split('/').pop()||'',name:title||'',level:level||'',mod:mod||'',cat:(tp||'').toLowerCase(),kind:'work',id:w.id};
+        const rbt=document.getElementById('ooRenameBtn'); if(rbt) rbt.style.display='inline-block';
+      }
+    });
     stat.style.display='none';
     if(btn) btn.textContent='✅ Enregistré — document créé';
   }).catch(err=>{
@@ -3978,35 +4102,62 @@ function closeOOModal(){
   if(host) host.innerHTML='';
   document.getElementById('ooModal').style.display='none';
   const f=document.getElementById('ooFloatClose'); if(f) f.style.display='none';
+  const rb=document.getElementById('ooRenameBtn'); if(rb) rb.style.display='none';
+  const ctx=window.__ooRename;
+  window.__ooRename=null;
+  loadLibrary().then(()=>{
+    if(typeof renderLamiWorkList==='function') renderLamiWorkList();
+    if(!ctx) return;
+    const level=ctx.level||'', module=ctx.mod||'', cat=ctx.cat||'';
+    if(module&&cat&&typeof showModuleCat==='function') showModuleCat(level,module,cat);
+    else if(module&&typeof showModule==='function') showModule(level,module);
+    else if(typeof showDocLevel==='function') showDocLevel(level);
+    else showPage('docs');
+  });
 }
 function testOODs(){
   const stat=document.getElementById('ooDsStatus');
-  const u=ooDsUrl();
+  const hosts=[ooDsUrl(),'http://localhost','http://127.0.0.1'].filter((v,i,a)=>v&&a.indexOf(v)===i);
   stat.innerHTML='<span style="color:#6d28d9">🧪 Test de connexion…</span>';
-  const s=document.createElement('script');
-  s.src=u+'/web-apps/apps/api/documents/api.js';
-  s.onload=()=>{ stat.innerHTML='<span style="color:#059669">✅ OnlyOffice DocumentServer répond sur '+u+'</span>'; };
-  s.onerror=()=>{ stat.innerHTML='<span style="color:#dc2626">❌ Aucun DocumentServer sur '+u+'. Lancez <b>onlyoffice-install.bat</b> (ou <b>onlyoffice-start.bat</b>) puis actualisez.</span>'; };
-  document.head.appendChild(s);
+  (function tryLoad(i){
+    if(i>=hosts.length){
+      stat.innerHTML='<span style="color:#dc2626">❌ Aucun DocumentServer sur '+hosts.join(' ni ')+'. Lancez <b>onlyoffice-install.bat</b> puis actualisez.</span>';
+      return;
+    }
+    const u=hosts[i];
+    const s=document.createElement('script');
+    s.src=u+'/web-apps/apps/api/documents/api.js';
+    s.onload=()=>{ stat.innerHTML='<span style="color:#059669">✅ OnlyOffice DocumentServer répond sur '+u+'</span>'; };
+    s.onerror=()=>tryLoad(i+1);
+    document.head.appendChild(s);
+  })(0);
 }
 function openOOEditor(url,ext,title,key){
   const stat=document.getElementById('ooDsStatus');
   document.getElementById('ooEditorHost').innerHTML='';
   if(typeof DocsAPI==='undefined'){
-    const s=document.createElement('script');
-    s.src=ooDsUrl()+'/web-apps/apps/api/documents/api.js';
-    s.onload=()=>openOOEditor(url,ext,title,key);
-    s.onerror=()=>{ if(stat) stat.innerHTML='<span style="color:#dc2626">❌ Impossible de joindre OnlyOffice. Vérifiez le serveur.</span>'; };
-    document.head.appendChild(s);
+    const hosts=[ooDsUrl(),'http://localhost','http://127.0.0.1'].filter((v,i,a)=>v&&a.indexOf(v)===i);
+    (function tryLoad(i){
+      if(i>=hosts.length){
+        if(stat) stat.innerHTML='<span style="color:#dc2626">❌ Impossible de joindre OnlyOffice (essayé '+hosts.join(', ')+'). Vérifiez que DocumentServer tourne.</span>';
+        return;
+      }
+      const s=document.createElement('script');
+      s.src=hosts[i]+'/web-apps/apps/api/documents/api.js';
+      s.onload=()=>openOOEditor(url,ext,title,key);
+      s.onerror=()=>tryLoad(i+1);
+      document.head.appendChild(s);
+    })(0);
     return;
   }
   try{
     key=key||('lami-'+Date.now());
+    const cbBase=String(url||'').replace(/\/oo\/[^/]*$/,'');
     const config={
       document:{fileType:ext,fileVersion:1,key:key,title:title,url:url,permissions:{edit:true,download:true,print:true}},
       documentType:ooDocType(ext),
       height:'100%',width:'100%',
-      editorConfig:{mode:'edit',lang:'fr',user:{id:'lamia',name:'Prof. Lamia Gnaba'},callbackUrl:'http://127.0.0.1'+(location.port?(':'+location.port):'')+'/oo/callback'},
+      editorConfig:{mode:'edit',lang:'fr',user:{id:'lamia',name:'Prof. Lamia Gnaba'},callbackUrl:(cbBase||'http://127.0.0.1'+(location.port?(':'+location.port):''))+'/oo/callback'},
       events:{
         onDocumentReady:function(){
           window.__ooDocReady=(window.__ooDocReady||0)+1;
@@ -4054,7 +4205,10 @@ function saveCurrentToOO(ext){
   saveToOO(u8,ext,title+'.'+ext).then(url=>{
     stat.innerHTML='<span style="color:#059669">✅ Fichier envoyé. Ouverture de l\'éditeur OnlyOffice…</span>';
     document.getElementById('ooEditorHost').innerHTML='';
-    openOOEditor(url,ext,titleRaw);
+    const key='lami-cur-'+Date.now();
+    const storeName=String(url||'').split('/').pop()||'';
+    bindOOKey(key,'',storeName);
+    openOOEditor(url,ext,titleRaw,key);
   }).catch(err=>{
     const msg=String(err.message||'').includes('fetch')?'Serveur local stoppé — lancez start-server.bat.':err.message;
     stat.innerHTML='<span style="color:#dc2626">❌ Envoi impossible : '+msg+'</span>';
@@ -4090,8 +4244,68 @@ function archiveOOWork(id,u8,ext,act){
   const w=lamiWorkMeta(id);
   return archiveTarget(w.level||'Non classé',w.mod||'',w.tp||'Travail',act||'',ext,u8);
 }
-function bindOOKey(key,archive){
-  return fetch('/oo/bind',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,archive:archive||''})}).catch(()=>{});
+function bindOOKey(key,archive,store,old){
+  return fetch('/oo/bind',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,archive:archive||'',store:store||'',old:old||''})}).catch(()=>{});
+}
+function fsSafeName(s){
+  s=String(s||'').trim();
+  s=s.replace(/[<>:"/\\|?*]/g,'_').replace(/[\x00-\x1f]/g,'').replace(/\s+/g,'_');
+  s=s.replace(/[._\s]+$/,'');
+  return s.slice(0,80);
+}
+function renameOOTarget(){
+  const t=window.__ooRename;
+  if(!t) return;
+  const oldBase=t.name.replace(/\.[^.]+$/,'')||t.name;
+  const newName=(prompt('✏️ Nouveau nom du fichier (modifications enregistrées sous ce nom) :\n'+t.path,oldBase)||'').trim();
+  if(!newName) return;
+  const ext=(String(t.path).match(/\.[A-Za-z0-9]+$/)||[''])[0].toLowerCase();
+  let clean=fsSafeName(newName);
+  if(!clean) return;
+  if(ext && clean.toLowerCase().endsWith(ext)) clean=clean.slice(0,-ext.length);
+  const dir=String(t.path).replace(/[^/]*$/,'');
+  const relPath=dir+clean+ext;
+  const rb=document.getElementById('ooRenameBtn');
+  const h=document.getElementById('ooHostStatus');
+  bindOOKey(t.key,relPath,t.store,t.path);
+  fetch('/oo/rename?from='+encodeURIComponent(t.path)+'&to='+encodeURIComponent(relPath),{method:'POST'})
+    .then(r=>r.json())
+    .then(j=>{
+      const ok=j&&j.ok;
+      t.path=relPath;
+      t.name=clean+ext;
+      if(t.kind==='work'&&t.id){
+        localStorage.setItem('lami-work-name-'+t.id, t.name);
+        localStorage.setItem('lami-work-path-'+t.id, relPath);
+        try{
+          const works=getLamiWorks();
+          const w=works.find(x=>String(x.id)===String(t.id));
+          if(w){ w.name=t.name; saveLamiRegistry(works); }
+        }catch(e){}
+        if(typeof renderLamiWorkList==='function') renderLamiWorkList();
+      } else if(t.id){
+        localStorage.setItem('lami-doc-name-'+t.id, t.name);
+        try{
+          const reg=JSON.parse(localStorage.getItem('lami-doc-registry')||'[]');
+          const d=reg.find(x=>String(x.id)===String(t.id));
+          if(d){ d.name=t.name; if(d.path) d.path=relPath; localStorage.setItem('lami-doc-registry',JSON.stringify(reg)); }
+        }catch(e){}
+      }
+      if(typeof loadLibrary==='function') loadLibrary().then(()=>{
+        const lv=t.level||'', md=t.mod||'', ca=t.cat||'';
+        if(md&&ca&&typeof showModuleCat==='function') showModuleCat(lv,md,ca);
+        else if(md&&typeof showModule==='function') showModule(lv,md);
+        else if(typeof showDocLevel==='function') showDocLevel(lv);
+        else if(typeof renderDocs==='function') renderDocs();
+      });
+      if(rb) rb.style.display='none';
+      if(h) h.innerHTML+='<div style="font-size:10.5px;opacity:.9;font-weight:600">✏️ Fichier renommé : <b>'+escH(relPath)+'</b>'+((ok)?'':' <i>(enregistrement différé)</i>')+'</div>';
+    })
+    .catch(()=>{
+      t.path=relPath; t.name=clean+ext;
+      if(rb) rb.style.display='none';
+      if(h) h.innerHTML+='<div style="font-size:10.5px;opacity:.9;font-weight:600">✏️ Renommage lié : <b>'+escH(relPath)+'</b> (appliqué à la sauvegarde)</div>';
+    });
 }
 function openWorkOO(id,ext){
   const w=lamiWorkMeta(id);
@@ -4099,11 +4313,7 @@ function openWorkOO(id,ext){
   const act=(sel&&sel.value)?sel.value:(localStorage.getItem('lami-work-act-'+id)||'');
   if(act) localStorage.setItem('lami-work-act-'+id,act);
   localStorage.setItem('lami-work-ootype-'+id,ext);
-  let content=localStorage.getItem('lami-work-'+id)||'';
-  if(!content || !String(content).replace(/<[^>]*>/g,' ').trim()) content='<p>'+w.name+'</p>';
-  let blocks=htmlBlocks(content);
   const title=(w.name||('travail')).replace(/[^a-z0-9\u00C0-\u017F ]/gi,'').slice(0,60);
-  if(!blocks.length) blocks.push({x:title||'Document',t:'h1'});
   openOOModal();
   document.getElementById('ooHostStatus').innerHTML='<b>🎓 '+escH(w.name)+'</b> · OnlyOffice '+ext.toUpperCase();
   document.getElementById('ooTypeBtns').style.display='none';
@@ -4111,6 +4321,40 @@ function openWorkOO(id,ext){
   const stat=document.getElementById('ooDsStatus');
   stat.style.display='block';
   stat.innerHTML='<span style="color:#6d28d9">⏳ Ouverture de '+ext.toUpperCase()+'…</span>';
+  const existingPath=localStorage.getItem('lami-work-path-'+id);
+  if(existingPath){
+    fetch('/api/file?path='+encodeURIComponent(existingPath))
+      .then(r=>{ if(!r.ok) throw new Error('fichier introuvable'); return r.arrayBuffer(); })
+      .then(buf=>{
+        const u8=new Uint8Array(buf);
+        const storeName=existingPath.split('/').pop();
+        const key='lami-'+id+'-'+Date.now();
+        window.__ooRename={key:key,path:existingPath,store:storeName,name:w.name,level:w.level||'',mod:w.mod||'',cat:w.tp||'',kind:'work',id:id};
+        const rb=document.getElementById('ooRenameBtn'); if(rb) rb.style.display='inline-block';
+        bindOOKey(key,existingPath,storeName);
+        saveToOO(u8,ext,title.replace(/[^a-z0-9]/gi,'_')+'.'+ext).then(url=>{
+          stat.innerHTML='<span style="color:#059669">✅ Prêt. Ouverture de l\'éditeur…</span>';
+          document.getElementById('ooEditorHost').innerHTML='';
+          const sn=String(url||'').split('/').pop()||'';
+          bindOOKey(key,existingPath,sn);
+          openOOEditor(url,ext,title,key);
+          const h=document.getElementById('ooHostStatus');
+          if(h) h.innerHTML+='<div style="font-size:10.5px;opacity:.9;font-weight:600">💾 Modifications enregistrées dans le fichier existant.</div>';
+          stat.style.display='none';
+        }).catch(err=>{
+          stat.innerHTML='<span style="color:#dc2626">❌ '+String(err.message||'')+'</span>';
+        });
+      })
+      .catch(()=>{
+        localStorage.removeItem('lami-work-path-'+id);
+        openWorkOO(id,ext);
+      });
+    return;
+  }
+  let content=localStorage.getItem('lami-work-'+id)||'';
+  if(!content || !String(content).replace(/<[^>]*>/g,' ').trim()) content='<p>'+w.name+'</p>';
+  let blocks=htmlBlocks(content);
+  if(!blocks.length) blocks.push({x:title||'Document',t:'h1'});
   let u8;
   try{
     if(ext==='docx')u8=buildDocxFile(title,blocks);
@@ -4122,8 +4366,23 @@ function openWorkOO(id,ext){
     stat.innerHTML='<span style="color:#059669">✅ Prêt. Ouverture de l\'éditeur…</span>';
     document.getElementById('ooEditorHost').innerHTML='';
     const key='lami-'+id+'-'+Date.now();
-    openOOEditor(url,ext,title,key);
-    archiveOOWork(id,u8,ext,act).then(path=>{ if(key&&path) bindOOKey(key,path); });
+    const storeName=String(url||'').split('/').pop()||'';
+    archiveOOWork(id,u8,ext,act).then(path=>{
+      if(path){
+        localStorage.setItem('lami-work-path-'+id, path);
+        window.__ooRename={key:key,path:path,store:storeName,name:w.name,level:w.level||'',mod:w.mod||'',cat:w.tp||'',kind:'work',id:id};
+        const rb=document.getElementById('ooRenameBtn'); if(rb) rb.style.display='inline-block';
+        bindOOKey(key,path,storeName);
+        const h=document.getElementById('ooHostStatus');
+        if(h) h.innerHTML+='<div style="font-size:10.5px;opacity:.9;font-weight:600">💾 Enregistré dans le projet. Vous pouvez renommer avec le bouton ✏️.</div>';
+      } else {
+        bindOOKey(key,'',storeName);
+      }
+      openOOEditor(url,ext,title,key);
+    }).catch(()=>{
+      bindOOKey(key,'',storeName);
+      openOOEditor(url,ext,title,key);
+    });
     stat.style.display='none';
   }).catch(err=>{
     const msg=String(err.message||'').includes('fetch')?'Serveur local stoppé — lancez start-server.bat.':err.message;
@@ -4915,17 +5174,11 @@ function getGithubToken(){return localStorage.getItem(GITHUB_TOKEN_KEY)||''}
 function setGithubToken(t){localStorage.setItem(GITHUB_TOKEN_KEY,t)}
 
 async function githubAPI(method,path,body){
-  const token=getGithubToken();
-  const url='https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+path;
-  const opts={method,headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'}};
-  if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(url,opts);
-  if(!r.ok)throw new Error('GitHub API error: '+r.status+' '+await r.text());
-  return r.json();
+  return githubAPIWithRetry(method,path,body);
 }
 
 async function getFileSHA(path){
-  try{const r=await githubAPI('GET','contents/'+path);return r.sha}catch(e){return null}
+  try{const r=await githubAPIWithRetry('GET','contents/'+path);return r.sha}catch(e){return null}
 }
 
 async function uploadFile(path,content,message){
@@ -5077,7 +5330,7 @@ setInterval(()=>{
 },300000);
 
 // Init
-showPage('home');
+loadLibrary().then(()=>{ showPage('home'); });
 
 let currentEditorId=null;
 function openLamiEditor(id){
@@ -5676,12 +5929,13 @@ function deleteCurrentEditorDoc(){
 
 function quickDeleteDoc(id, event){
   if(event) event.stopPropagation();
-  const doc=DOCS.find(d=>String(d.id)===String(id));
+  const doc=getDocs().find(d=>String(d.id)===String(id));
   const name=doc?doc.name:'ce document';
   if(!confirm('🗑️ Supprimer définitivement « '+name+' » ?\n\nOK pour confirmer / Annuler pour garder.')) return;
   localStorage.setItem('lami-deleted-'+id,'1');
   localStorage.removeItem('lami-doc-'+id);
   localStorage.removeItem('lami-doc-name-'+id);
+  try{ if(doc && doc.path) fetch('/api/file/delete?path='+encodeURIComponent(doc.path),{method:'DELETE'}); }catch(e){}
   try{
     const syncHosts=['localhost:8181','127.0.0.1:8181', location.hostname+':8181'];
     syncHosts.forEach(host=>{
@@ -5706,6 +5960,117 @@ function quickDeleteLami(id, event){
 
 // Override openLamiWork to use OnlyOffice (l'ancien éditeur interne est remplacé)
 openLamiWork=function(id){ ooChooser(id); };
+
+// ===== GARDIEN DE CONNEXION PERMANENT (tous les services) =====
+// fetch robuste : timeout + retry exponentiel + fallback
+function fetchWithRetry(url, opts={}){
+  const {retries=2, timeout=10000, retryDelay=800, ...fetchOpts}=opts;
+  const run=(attempt)=>new Promise((resolve,reject)=>{
+    const controller=new AbortController();
+    const t=setTimeout(()=>controller.abort(), timeout);
+    fetch(url,{...fetchOpts, signal:controller.signal}).then(r=>{ clearTimeout(t); resolve(r); }).catch(e=>{
+      clearTimeout(t);
+      if(attempt<retries){
+        setTimeout(()=>run(attempt+1).then(resolve).catch(reject), retryDelay*(attempt+1));
+      }else{ reject(e); }
+    });
+  });
+  return run(0);
+}
+
+// Résoudre l'URL de base : en Android Capacitor, http://localhost:8080 est remplacé par le serveur configuré
+function resolveLocalUrl(path){
+  if(path.startsWith('http')) return path;
+  // En Capacitor, le runtime peut injecter le serveur.url ; sinon on garde les chemins relatifs
+  return path;
+}
+
+// Heartbeat serveur local toutes les 20s
+let LAMI_SERVER_ONLINE=true;
+let LAMI_SERVER_CHECKING=false;
+function heartbeatServer(){
+  if(LAMI_SERVER_CHECKING) return;
+  LAMI_SERVER_CHECKING=true;
+  fetchWithRetry('/ai/status',{retries:1,timeout:5000}).then(r=>r.json()).then(()=>{
+    LAMI_SERVER_ONLINE=true; LAMI_SERVER_CHECKING=false;
+  }).catch(()=>{
+    LAMI_SERVER_ONLINE=false; LAMI_SERVER_CHECKING=false;
+  });
+}
+setInterval(heartbeatServer,20000);
+
+// Surveillance OnlyOffice toutes les 15s
+let OO_SERVER_ONLINE=false;
+async function heartbeatOO(){
+  const hosts=[(typeof ooDsUrl==='function')?ooDsUrl():'http://localhost','http://localhost','http://127.0.0.1'].filter((v,i,a)=>v&&a.indexOf(v)===i);
+  for(const host of hosts){
+    try{
+      await fetchWithRetry(host+'/web-apps/apps/api/documents/api.js',{method:'GET',retries:1,timeout:4000});
+      OO_SERVER_ONLINE=true; const s=document.getElementById('ooDsStatus'); if(s) s.innerHTML='🟢 DocumentServer OnlyOffice actif ('+host+').';
+      return;
+    }catch(e){}
+  }
+  OO_SERVER_ONLINE=false;
+}
+setInterval(heartbeatOO,15000);
+
+// Surveillance connectivité générale
+function updateConnectivityUI(){
+  const el=document.getElementById('lamiConnectivityPill');
+  if(!el) return;
+  const ok=navigator.onLine && LAMI_SERVER_ONLINE;
+  el.innerHTML=ok?'✅ Connecté au serveur LamiAI':'⚠️ Déconnecté — vérifiez le réseau/PC';
+  el.style.color=ok?'#047857':'#b91c1c';
+}
+window.addEventListener('online',updateConnectivityUI);
+window.addEventListener('offline',updateConnectivityUI);
+setInterval(updateConnectivityUI,10000);
+
+// Retry automatique GitHub : sur erreur réseau, on garde le token et on réessaie
+async function githubAPIWithRetry(method,path,body,retries=2){
+  const token=getGithubToken();
+  const url='https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+path;
+  const opts={method,headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'}};
+  if(body) opts.body=JSON.stringify(body);
+  for(let i=0;i<=retries;i++){
+    try{
+      const r=await fetchWithRetry(url,{...opts,timeout:20000,retries:1});
+      if(!r.ok) throw new Error('GitHub API error: '+r.status);
+      return await r.json();
+    }catch(e){
+      if(i===retries) throw e;
+      await new Promise(r=>setTimeout(r,1500*(i+1)));
+    }
+  }
+}
+
+// Auto-sync GitHub toutes les 3 minutes si token présent, avec retry silencieux
+setInterval(()=>{
+  if(getGithubToken()){
+    syncToGitHub().catch(()=>{});
+  }
+},180000);
+
+// Empêcher la mise en veille du navigateur par keep-alive audio (silencieux)
+(function keepAlive(){
+  try{
+    const ctx=(window.AudioContext||window.webkitAudioContext)?new (window.AudioContext||window.webkitAudioContext)():null;
+    if(!ctx) return;
+    setInterval(()=>{
+      if(ctx.state==='suspended') ctx.resume();
+      const osc=ctx.createOscillator(); const gain=ctx.createGain();
+      gain.gain.value=0; osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime+0.001);
+    },30000);
+  }catch(e){}
+})();
+
+// Gardien : empêcher la fermeture accidentelle avec travail non sauvegardé
+window.addEventListener('beforeunload',(e)=>{
+  if(currentEditorId && document.getElementById('lamiEditorContent')){
+    e.preventDefault(); e.returnValue='';
+  }
+});
 
 </script>
 </body>

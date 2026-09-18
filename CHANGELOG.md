@@ -1,5 +1,10 @@
 # Historique des versions — LamiAI
 
+## v1.5.2 — 15 Septembre 2026
+- **Ajout de documents** : bouton « 📥 Ajouter des documents » dans chaque niveau / module / cours / lecture (et devoirs) de l'onglet Documents ; choisit un fichier → il est copié dans `LamiAI-data/<Niveau>/<Module>/<cat>/<sub>/` et enregistré dans la bibliothèque (visible partout : liste, recherche IA, navigation)
+- **Endpoint d'upload** `POST /api/upload` dans `serve_all.py` (multipart, zero dépendance) : sauvegarde le fichier physique + inscrit l'entrée dans `LamiAI-data/lamiai_docs.json`
+- `getDocs()` étendu : fusionne les documents embarqués + les documents ajoutés (stockés dans `localStorage`)
+
 ## v1.5.1 — 12 Septembre 2026
 - **Réponses affichées proprement** : le Markdown de l'IA (`#`, `**`, `*`, `-`) est transformé en vraie mise en forme (titres, gras, listes à puces) au lieu d'afficher les symboles
 - **Lecture vocale propre** : 🔊 ne lit plus les symboles (`#`, `*`, `-`) — le texte est nettoyé avant d'être prononcé

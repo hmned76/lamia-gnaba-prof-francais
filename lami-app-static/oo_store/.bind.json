@@ -1,0 +1,818 @@
+{
+  "lami-doc-492721748-1789492734558": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec.docx"
+  },
+  "lami-tpl-1789492851658": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/production/1e_Rencontres_crs_pro.docx"
+  },
+  "lami-doc-129-1789492859669": {
+    "store": "",
+    "archive": "Non_classé/Général/cours/docx/nc_Général_crs_doc_3.docx"
+  },
+  "lami-doc-129-1789492871689": {
+    "store": "",
+    "archive": "Non_classé/Général/cours/docx/nc_Général_crs_doc_4.docx"
+  },
+  "lami-doc-129-1789492908329": {
+    "store": "",
+    "archive": "Non_classé/Général/cours/docx/nc_Général_crs_doc_5.docx"
+  },
+  "lami-doc-129-1789492999131": {
+    "store": "",
+    "archive": "Non_classé/Général/cours/docx/nc_Général_crs_doc_6.docx"
+  },
+  "lami-tpl-1789493115233": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/production/1e_Rencontres_crs_pro_2.docx"
+  },
+  "diag-key-9": {
+    "store": "1789494789_diag_final.txt",
+    "archive": "2ème Année/_diag_final.txt"
+  },
+  "lami-tpl-1789499679612": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_2.docx"
+  },
+  "lami-tpl-1789499993836": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_3.docx"
+  },
+  "lami-doc-499844961-1789501875834": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_4.docx"
+  },
+  "lami-doc-502043366-1789502115014": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_5.docx"
+  },
+  "lami-doc-500839118-1789502760967": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_6.docx"
+  },
+  "lami-doc-502043366-1789502788830": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_7.docx"
+  },
+  "lami-doc-500839118-1789502794224": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_8.docx"
+  },
+  "lami-doc-500839118-1789502826989": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_9.docx"
+  },
+  "lami-doc-500839118-1789502860182": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_10.docx"
+  },
+  "lami-doc-500839118-1789502969065": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec.docx"
+  },
+  "lami-doc-25-1789505598474": {
+    "store": "",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc.docx"
+  },
+  "lami-doc-25-1789505638943": {
+    "store": "",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_2.docx"
+  },
+  "lami-doc-25-1789505657389": {
+    "store": "",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_3.docx"
+  },
+  "lami-doc-170-1789505683531": {
+    "store": "",
+    "archive": "1ère_Année/Général/cours/docx/1e_Général_crs_doc.docx"
+  },
+  "lami-doc-25-1789505737543": {
+    "store": "",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_4.docx"
+  },
+  "lami-doc-25-1789506042299": {
+    "store": "",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_5.docx"
+  },
+  "testkey_1789506952067": {
+    "store": "oo_store_test.docx",
+    "archive": "2ème Année/cours/Mon_test_rename_renomme.png",
+    "old": "2ème Année/cours/Mon_test_rename.png"
+  },
+  "lami-doc-25-1789507042009": {
+    "store": "1789507042_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_6.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789507065238": {
+    "store": "1789507065_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_7.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789507100608": {
+    "store": "1789507100_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_8.docx",
+    "old": ""
+  },
+  "lami-doc-43-1789507107463": {
+    "store": "1789507107_devoir_1s10_mod4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_9.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789507161972": {
+    "store": "1789507161_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_10.docx",
+    "old": ""
+  },
+  "lami-doc-722526608-1789507404449": {
+    "store": "1789507404_2Lettres_1docx.docx",
+    "archive": "2ème Année/cours/2Lettres 1.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789507482888": {
+    "store": "1789507482_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_11.docx",
+    "old": ""
+  },
+  "lami-tpl-1789507780288": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec_2.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789507799821": {
+    "store": "1789507799_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_12.docx",
+    "old": ""
+  },
+  "lami-doc-170-1789507814729": {
+    "store": "1789507814_texte_1_re_ann_e_mod_5docx.docx",
+    "archive": "1ère_Année/Général/cours/docx/1e_Général_crs_doc_2.docx",
+    "old": ""
+  },
+  "lami-doc-785787153-1789507833442": {
+    "store": "1789507833_03Versionadaptee1eresecpdf.pdf",
+    "archive": "Non classé/Sameh_Ben_Amor/03-Version-adaptee-1ere-sec.pdf",
+    "old": ""
+  },
+  "lami-doc-722526608-1789508135854": {
+    "store": "1789508135_2Lettres_1docx.docx",
+    "archive": "2ème Année/cours/2Lettres 1.docx",
+    "old": ""
+  },
+  "lami-test_1789508138385-1789508138415": {
+    "store": "1789508138_Travail_test1789508138385.docx",
+    "archive": "Non_classé/travail/nc_trv.docx",
+    "old": ""
+  },
+  "lami-doc-71222618-1789508202960": {
+    "store": "1789508203_Devoir_de_Contr_le_N1__Fran_ais__Bac_Economie__Gestion_20162.docx",
+    "archive": "Non classé/contrôle/Devoir_de_Contrôle_N°1_-_Français_-_Bac_Economie_&_Gestion.docx",
+    "old": "Non classé/contrôle/Devoir de Contrôle N°1 - Français - Bac Economie & Gestion (2016-2017) Mr Megbli-converti.docx"
+  },
+  "lami-doc-71222618-1789508245595": {
+    "store": "1789508245_Devoir_de_Contr_le_N1__Fran_ais__Bac_Economie__Gestion_20162.docx",
+    "archive": "Non classé/contrôle/Devoir_de_Contrôle_N°1_-_Français_-_Bac_Economie_&_Gestion.docx",
+    "old": "Non classé/contrôle/Devoir de Contrôle N°1 - Français - Bac Economie & Gestion (2016-2017) Mr Megbli-converti.docx"
+  },
+  "lami-doc-25-1789508283582": {
+    "store": "1789508283_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_13.docx",
+    "old": ""
+  },
+  "lami-wtest_1789508994974-1000": {
+    "store": "2e_Test_crs.docx",
+    "archive": "2ème_Année/Test/cours/Mon_beau_nouveau_nom.docx.docx",
+    "old": "2ème_Année/Test/cours/2e_Test_crs.docx"
+  },
+  "lami-wtest_1789509058768-1000": {
+    "store": "2e_Test_crs.docx",
+    "archive": "2ème_Année/Test/cours/Mon_beau_nouveau_nom.docx",
+    "old": "2ème_Année/Test/cours/2e_Test_crs.docx"
+  },
+  "lami-w13-1789509266573": {
+    "store": "1789509266_Recherche_internet__synthese.docx",
+    "archive": "4ème_Année_Lettres/synthese/documents/4eL_synthese_rec.docx",
+    "old": ""
+  },
+  "lami-doc-744865765-1789509286249": {
+    "store": "1789509286_EXCERCICEdocx.docx",
+    "archive": "2ème Année/exercice/EXCERCICE1.docx",
+    "old": "2ème Année/exercice/EXCERCICE.docx"
+  },
+  "lami-doc-725623888-1789509315290": {
+    "store": "1789509315_Exercice_figure_de_style_2_me_Enregistr__automatiquementdocx.docx",
+    "archive": "2ème Année/exercice/Exercice_figure_de_style._2ème.docx",
+    "old": "2ème Année/exercice/Exercice figure de style. 2ème (Enregistré automatiquement).docx"
+  },
+  "lami-doc-735568055-1789509363136": {
+    "store": "1789509363_Exercicefiguredestyle2_medocx.docx",
+    "archive": "2ème Année/exercice/Exercice_figure_de_style._2ème.docx",
+    "old": "2ème Année/exercice/Exercice_figure_de_style._2ème.docx"
+  },
+  "lami-doc-735568055-1789509392799": {
+    "store": "1789509392_Exercicefiguredestyle2_medocx.docx",
+    "archive": "2ème Année/exercice/Exercice_figure_de_style_2ème.docx",
+    "old": "2ème Année/exercice/Exercice_figure_de_style._2ème.docx"
+  },
+  "lami-doc-92-1789509422172": {
+    "store": "1789509422_Exercice_figure_de_style_2_me_Enregistr__automatiquementdocx.docx",
+    "archive": "2ème_Année/Figures_de_Style/exercice/docx/Exercice_figure_de_style._2ème.docx",
+    "old": "2ème_Année/Figures_de_Style/exercice/docx/2e_Figures_de_Style_ex_doc.docx"
+  },
+  "lami-doc-790627699-1789509904753": {
+    "store": "Correction du devoir de synthèse III.docx",
+    "archive": "2ème Année/contrôle/nom_modifie_par_test.docx",
+    "old": "2ème Année/contrôle/Correction du devoir de synthèse III.docx"
+  },
+  "lami-doc-791203939-1789544276010": {
+    "store": "1789544276_08Versionadaptee2eLettres1392021pdf.pdf",
+    "archive": "Non classé/Sameh_Ben_Amor/08-Version-adaptee-2e-Lettres-13-9-2021.pdf",
+    "old": ""
+  },
+  "lami-doc-769133354-1789546294321": {
+    "store": "1789546294_1DC3yannikHdocx.docx",
+    "archive": "Non classé/Sameh_Ben_Amor/1-DC3-yannik-H.docx",
+    "old": ""
+  },
+  "lami-doc-757658116-1789546400518": {
+    "store": "1789546400_DC12Sc320172018Jesuisrentr_eaulyc_edocx.docx",
+    "archive": "2ème Année/contrôle/DC1-2Sc-3-2017-2018-Je-suis-rentrèe-au-lycée.docx",
+    "old": ""
+  },
+  "lami-doc-781558527-1789557472661": {
+    "store": "1789557472_3_scMytheMandelaDevoir20212022docx.docx",
+    "archive": "Non classé/Sameh_Ben_Amor/3è-sc-Mythe-Mandela-Devoir-2021-2022.docx",
+    "old": "Non classé/Sameh_Ben_Amor/3è-sc-Mythe-Mandela-Devoir-2021-2022.docx"
+  },
+  "lami-doc-791473866-1789557493779": {
+    "store": "1789557493_Devcont14_lettrestexte1docx.docx",
+    "archive": "Non classé/Sameh_Ben_Amor/Dev-cont--4è-lettres-texte-1.docx",
+    "old": "Non classé/Sameh_Ben_Amor/Dev-cont-1-4è-lettres-texte-1.docx"
+  },
+  "lami-doc-25-1789558049427": {
+    "store": "1789558049_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_14.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789558320365": {
+    "store": "1789558320_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_15.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789558758865": {
+    "store": "1789558758_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_16.docx",
+    "old": ""
+  },
+  "lami-doc-710447773-1789569584229": {
+    "store": "1789569584_DevlaguerreAmineMaaloof_1docx.docx",
+    "archive": "4ème Année Sciences/Guerre et paix/Dev-la-guerre-Amine-Maaloof1.docx",
+    "old": "4ème Année Sciences/Guerre et paix/Dev-la-guerre-Amine-Maaloof (1).docx"
+  },
+  "lami-doc-25-1789569631305": {
+    "store": "1789569631_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s11_mod.docx",
+    "old": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_17.docx"
+  },
+  "lami-doc-25-1789569668931": {
+    "store": "1789569668_dev1s11moddocx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/1e_Contrôle_ctr_doc_17.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789570783940": {
+    "store": "1789570783_dev1s11moddocx.docx",
+    "archive": "",
+    "old": ""
+  },
+  "lami-doc-25-1789570819653": {
+    "store": "1789570819_dev1s11moddocx.docx",
+    "archive": "",
+    "old": ""
+  },
+  "lami-doc-25-1789573007608": {
+    "store": "1789573007_dev1s11moddocx.docx",
+    "archive": "",
+    "old": ""
+  },
+  "lami-doc-25-1789573024886": {
+    "store": "1789573024_dev1s11moddocx.docx",
+    "archive": "",
+    "old": ""
+  },
+  "lami-doc-25-1789573044031": {
+    "store": "1789573044_dev1s11moddocx.docx",
+    "archive": "",
+    "old": ""
+  },
+  "lami-doc-43-1789573148715": {
+    "store": "1789573148_devoir_1s10_mod4docx.docx",
+    "archive": "",
+    "old": ""
+  },
+  "lami-doc-25-1789573545023": {
+    "store": "1789573545_dev_1s11_mod_4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s11_mod.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789573618192": {
+    "store": "1789573618_dev1s11moddocx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s11.docx",
+    "old": "1ère_Année/Contrôle/controle/docx/dev_1s11_mod.docx"
+  },
+  "lami-doc-25-1789573696086": {
+    "store": "1789573696_dev1s11docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s11.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789575215129": {
+    "store": "1789575216_dev_1s11_mod_4docx.docx",
+    "archive": "trav lamia/doc lamia/dev 1s11 mod 4.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789576570546": {
+    "store": "1789576572_dev1s11docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s1.docx",
+    "old": "1ère_Année/Contrôle/controle/docx/dev_1s11.docx"
+  },
+  "lami-doc-25-1789576642487": {
+    "store": "1789576644_dev1s1docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s5.docx",
+    "old": "1ère_Année/Contrôle/controle/docx/dev_1s1.docx"
+  },
+  "lami-doc-25-1789576691831": {
+    "store": "1789576693_dev1s5docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s5.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789580371611": {
+    "store": "1789580374_dev1s5docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s4.docx",
+    "old": "1ère_Année/Contrôle/controle/docx/dev_1s5.docx"
+  },
+  "lami-doc-25-1789580420867": {
+    "store": "1789580422_dev1s4docx.docx",
+    "archive": "1ère_Année/Contrôle/controle/docx/dev_1s4.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789581106686": {
+    "store": "1789581107_dev1s4docx.docx",
+    "archive": "trav lamia/doc lamia/dev_1s4.docx",
+    "old": ""
+  },
+  "lami-doc-25-1789581149763": {
+    "store": "1789581150_dev1s4docx.docx",
+    "archive": "trav lamia/doc lamia/dev_1s3.docx",
+    "old": "trav lamia/doc lamia/dev_1s4.docx"
+  },
+  "lami-doc-25-1789581202096": {
+    "store": "1789581202_dev1s3docx.docx",
+    "archive": "trav lamia/doc lamia/dev_1s3.docx",
+    "old": ""
+  },
+  "lami-doc-170-1789582927955": {
+    "store": "1789582928_texte_1_re_ann_e_mod_5docx.docx",
+    "archive": "trav lamia/doc lamia/texte_1ère_année_mod_sauvons.docx",
+    "old": "trav lamia/doc lamia/texte 1ère année mod 5.docx"
+  },
+  "lami-doc-499970535-1789584070352": {
+    "store": "1789584070_21f_vrier1944doc.docx",
+    "archive": "LamiAI-data/1ère_Année/Rencontres/cours/Lecture/21-février-1944.doc",
+    "old": ""
+  },
+  "lami-doc-500839118-1789584103730": {
+    "store": "1789584103_1DC3yannikH22docx.docx",
+    "archive": "LamiAI-data/1ère_Année/Rencontres/cours/Lecture/2em_image.docx",
+    "old": "LamiAI-data/1ère_Année/Rencontres/cours/Lecture/1-DC3-yannik-H22_3.docx"
+  },
+  "lami-doc-499970535-1789584142410": {
+    "store": "1789584142_21f_vrier1944doc.docx",
+    "archive": "LamiAI-data/1ère_Année/Rencontres/cours/Lecture/4em_science_histoire.doc",
+    "old": "LamiAI-data/1ère_Année/Rencontres/cours/Lecture/21-février-1944.doc"
+  },
+  "lami-doc-500906687-1789584202897": {
+    "store": "1789584202_3_meoppositionconcession2019doc.docx",
+    "archive": "LamiAI-data/1ère_Année/Rencontres/cours/Lecture/2ème-opposition-langue.doc",
+    "old": "LamiAI-data/1ère_Année/Rencontres/cours/Lecture/3ème-opposition-concession-2019.doc"
+  },
+  "lami-doc-502043366-1789584259824": {
+    "store": "1789584259_2DevoirsSauvonslaplan_teterredocx.docx",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1er-Devoirs-Sauvons-la-planète-terre.docx",
+    "old": "1ère_Année/Rencontres/cours/lecture/2-Devoirs-Sauvons-la-planète-terre.docx"
+  },
+  "lami-doc-502749840-1789584300536": {
+    "store": "1789584300_BacBlancTechpour2018doc.docx",
+    "archive": "1ère_Année/Rencontres/cours/lecture/Bac-module-science.doc",
+    "old": "1ère_Année/Rencontres/cours/lecture/Bac-Blanc-Tech.-pour-2018.doc"
+  },
+  "lami-doc-25-1789584385633": {
+    "store": "1789584386_dev1s3docx.docx",
+    "archive": "trav lamia/doc lamia/dev_1er_consommation.docx",
+    "old": "trav lamia/doc lamia/dev_1s3.docx"
+  },
+  "lami-doc-43-1789584423367": {
+    "store": "1789584424_devoir_1s10_mod4docx.docx",
+    "archive": "trav lamia/doc lamia/devoir_1s_consommation.docx",
+    "old": "trav lamia/doc lamia/devoir 1s10 mod4.docx"
+  },
+  "lami-doc-50-1789584486721": {
+    "store": "1789584487_DEVOIR_DE_CONTROLE_N_1_francais_mr_Tittypdf.pdf",
+    "archive": "1ère anné 2026/DEVOIR_DE_CONTROLE_1er_rencontre.pdf",
+    "old": "1ère anné 2026/DEVOIR DE CONTROLE N° 1 francais mr Titty.pdf"
+  },
+  "lami-doc-63-1789584566360": {
+    "store": "1789584567_Devoirdecontr_le3pourla1_reA2docx.docx",
+    "archive": "Non classé/Sameh_Ben_Amor/Devoir-de-contrôle-3-pour-la-1ère_sauvons_terre.docx",
+    "old": "Non classé/Sameh_Ben_Amor/Devoir-de-contrôle-3-pour-la-1ère-A-2.docx"
+  },
+  "lami-doc-86-1789584639872": {
+    "store": "1789584640__valuation_4_medocx.docx",
+    "archive": "Non classé/Sameh_Ben_Amor/évaluation-4ème.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789646432521": {
+    "store": "1789646432_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère_Année/Rencontres/documents/répartition/1e_Rencontres_cou_rpa.docx",
+    "old": ""
+  },
+  "lami-tpl-1789646848853": {
+    "store": "",
+    "archive": "1ère_Année/Rencontres/cours/lecture/1e_Rencontres_crs_lec.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789647662846": {
+    "store": "1789647662_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère_Année/Rencontres/documents/répartition/1e_Rencontres_cou_rpa.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789647677782": {
+    "store": "1789647677_Planification_du_devoir___Rencontres.docx",
+    "archive": "1ère_Année/Rencontres/documents/plan-devoir/1e_Rencontres_cou_pla.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789647998738": {
+    "store": "1789647998_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "2ème_Année/Pages_d'amour/documents/répartition/2e_Pages_d'amour_cou_rpa.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648241404": {
+    "store": "1789648241_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/répartition/2e_Pages_d'amour_cou_rpa.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648259830": {
+    "store": "1789648259_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/1e_Rencontres_cou_rpa_2.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648284792": {
+    "store": "1789648284_Planification_du_devoir___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/plan-devoir/1e_Rencontres_cou_pla.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648304248": {
+    "store": "1789648304_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/répartition/2e_Pages_d'amour_cou_rpa_2.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648312563": {
+    "store": "1789648312_Planification_du_devoir___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/plan-devoir/2e_Pages_d'amour_cou_pla.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648326866": {
+    "store": "1789648326_Planification_du_devoir___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/plan-devoir/2e_Pages_d'amour_cou_pla_2.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648339084": {
+    "store": "1789648339_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/répartition/2e_Pages_d'amour_cou_rpa_3.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648360028": {
+    "store": "1789648360_R_partition_p_dagogique___R_cits_de_voyage.docx",
+    "archive": "3ème Année Sciences/Récits de voyage/documents/répartition/nc_Récits_de_voyage_cou_rpa.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648371532": {
+    "store": "1789648371_Planification_du_devoir___R_cits_de_voyage.docx",
+    "archive": "3ème Année Sciences/Récits de voyage/documents/plan-devoir/nc_Récits_de_voyage_cou_pla.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648390470": {
+    "store": "1789648390_R_partition_p_dagogique___Souvenirs_et_nostalgie.docx",
+    "archive": "4ème Année Sciences/Souvenirs et nostalgie/documents/répartition/4eS_Souvenirs_et_nostalgie_cou_rpa.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648403368": {
+    "store": "1789648403_Planification_du_devoir___Souvenirs_et_nostalgie.docx",
+    "archive": "4ème Année Sciences/Souvenirs et nostalgie/documents/plan-devoir/4eS_Souvenirs_et_nostalgie_cou_pla.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648421190": {
+    "store": "1789648421_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/1e_Rencontres_cou_rpa_3.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648442880": {
+    "store": "1789648442_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/1e_Rencontres_cou_rpa_4.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648491914": {
+    "store": "1789648491_R_partition_p_dagogique___Sc_nes_de_la_vie_en_France.docx",
+    "archive": "1ère Année/Scènes de la vie en France/documents/répartition/1e_Scènes_de_la_vie_en_France_cou_rpa.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789648505574": {
+    "store": "1789648505_Planification_du_devoir___Sc_nes_de_la_vie_en_France.docx",
+    "archive": "1ère Année/Scènes de la vie en France/documents/plan-devoir/1e_Scènes_de_la_vie_en_France_cou_pla.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789678411799": {
+    "store": "1789678411_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/1e_Rencontres_cou_rpa_5.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789678431419": {
+    "store": "1789678431_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/1e_Rencontres_cou_rpa_6.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789679152319": {
+    "store": "1789679152_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "Non classé/travail/nc_trv.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789679223883": {
+    "store": "1789679223_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "Non classé/travail/nc_trv.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789679426011": {
+    "store": "1789679426_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "Non classé/travail/nc_trv.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789679538468": {
+    "store": "1789679538_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/répartition/Répartition_pédagogique_—_Pages_d'amour.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680027261": {
+    "store": "1789680027_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/répartition/Répartition_pédagogique_—_Pages_d'amour.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680099548": {
+    "store": "1789680099_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680125913": {
+    "store": "1789680125_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680195255": {
+    "store": "1789680195_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680206867": {
+    "store": "1789680206_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680222902": {
+    "store": "1789680222_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680227913": {
+    "store": "1789680227_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680234232": {
+    "store": "1789680234_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680248737": {
+    "store": "1789680248_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680318195": {
+    "store": "1789680318_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680326709": {
+    "store": "1789680326_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680332086": {
+    "store": "1789680332_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680460382": {
+    "store": "1789680460_R_partition_p_dagogique___Femme_et_soci_t_.docx",
+    "archive": "2ème Année/Femme et société/documents/répartition/Répartition_pédagogique_—_Femme_et_société.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680477888": {
+    "store": "1789680477_R_partition_p_dagogique___Femme_et_soci_t_.docx",
+    "archive": "2ème Année/Femme et société/documents/répartition/Répartition_pédagogique_—_Femme_et_société.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680621192": {
+    "store": "1789680621_R_partition_p_dagogique___R_cits_de_voyage.docx",
+    "archive": "3ème Année/Récits de voyage/documents/répartition/Répartition_pédagogique_—_Récits_de_voyage.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680635104": {
+    "store": "1789680635_Planification_du_devoir___R_cits_de_voyage.docx",
+    "archive": "3ème Année/Récits de voyage/documents/planification/Planification_du_devoir_—_Récits_de_voyage.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680654954": {
+    "store": "1789680654_R_partition_p_dagogique___Droit___la_diff_rence.docx",
+    "archive": "3ème Année/Droit à la différence/documents/répartition/Répartition_pédagogique_—_Droit_à_la_différence.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680668809": {
+    "store": "1789680668_R_partition_p_dagogique___Mythes_d_hier_Mythes_d_aujourd_hui.docx",
+    "archive": "3ème Année/Mythes d'hier Mythes d'aujourd'hui/documents/répartition/Répartition_pédagogique_—_Mythes_d'hier_Mythes_d'aujourd'hui.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680856891": {
+    "store": "1789680856_R_partition_p_dagogique___Droit___la_diff_rence.docx",
+    "archive": "3ème Année/Droit à la différence/documents/répartition/Répartition_pédagogique_—_Droit_à_la_différence.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789680882517": {
+    "store": "1789680882_R_partition_p_dagogique___Pages_d_amour.docx",
+    "archive": "2ème Année/Pages d'amour/documents/répartition/Répartition_pédagogique_—_Pages_d'amour.docx",
+    "old": ""
+  },
+  "lami-mdoc-A1": {
+    "store": "test_poll.docx",
+    "archive": "2ème Année/Pages d'amour/documents/répartition/Répartition_pédagogique_—_Pages_d'amour.docx",
+    "old": ""
+  },
+  "lami-new-1789681285628": {
+    "store": "1789681285_test_creation_lamia.docx",
+    "archive": "4ème Année Sciences/Guerre et paix/devoirs/test-creation-lamia.docx",
+    "old": ""
+  },
+  "lami-new-1789681898070": {
+    "store": "1789681898_devoir_1s7_de_lamia.docx",
+    "archive": "2ème Année/Général/cours/devoir 1s7 de lamia.docx",
+    "old": ""
+  },
+  "lami-new-1789681936505": {
+    "store": "1789681936_1er_rencontre_cours.docx",
+    "archive": "1ère Année/Rencontres/cours/1er rencontre cours.docx",
+    "old": ""
+  },
+  "lami-doc-766494038-1789681956324": {
+    "store": "1789681956_1er_rencontre_coursdocx.docx",
+    "archive": "1ère Année/Rencontres/cours/1er rencontre cours.docx",
+    "old": ""
+  },
+  "lami-new-1789682185347": {
+    "store": "1789682185_3e_ann_.docx",
+    "archive": "3ème Année/Portraits comiques/cours/3e anné.docx",
+    "old": ""
+  },
+  "lami-new-1789682215686": {
+    "store": "1789682215_3e_le_ppuvoir.docx",
+    "archive": "3ème Année/Le pouvoir de l'image/cours/3e le ppuvoir.docx",
+    "old": ""
+  },
+  "lami-new-1789682283449": {
+    "store": "1789682283_le_ppouvoir.docx",
+    "archive": "3ème Année/Le pouvoir de l'image/cours/le ppouvoir.docx",
+    "old": ""
+  },
+  "lami-new-1789682314853": {
+    "store": "1789682314_portrait.docx",
+    "archive": "3ème Année/Portraits comiques/cours/portrait.docx",
+    "old": ""
+  },
+  "lami-new-1789682330403": {
+    "store": "1789682330_333.docx",
+    "archive": "3ème Année/Le pouvoir de l'image/cours/333.docx",
+    "old": ""
+  },
+  "lami-new-1789682343251": {
+    "store": "1789682343_474.docx",
+    "archive": "3ème Année/Écrits autobiographiques/cours/474.docx",
+    "old": ""
+  },
+  "lami-new-1789682365419": {
+    "store": "1789682365_fv.docx",
+    "archive": "4ème Année Sciences/Souvenirs et nostalgie/cours/fv.docx",
+    "old": ""
+  },
+  "lami-new-1789682377351": {
+    "store": "1789682377_gf.docx",
+    "archive": "4ème Année Sciences/Souvenirs et nostalgie/devoirs/gf.docx",
+    "old": ""
+  },
+  "lami-new-1789682390123": {
+    "store": "1789682390_rt.docx",
+    "archive": "4ème Année Sciences/Histoires d'amour/cours/rt.docx",
+    "old": ""
+  },
+  "lami-new-1789682401504": {
+    "store": "1789682401_yu.docx",
+    "archive": "4ème Année Sciences/Histoires d'amour/devoirs/yu.docx",
+    "old": ""
+  },
+  "lami-new-1789682423927": {
+    "store": "1789682423_qw.docx",
+    "archive": "4ème Année Sciences/Liberté j'écris ton nom/cours/qw.docx",
+    "old": ""
+  },
+  "lami-new-1789682437231": {
+    "store": "1789682437_rtds.docx",
+    "archive": "4ème Année Sciences/Liberté j'écris ton nom/devoirs/rtds.docx",
+    "old": ""
+  },
+  "lami-new-1789682449903": {
+    "store": "1789682449_jj_.docx",
+    "archive": "4ème Année Sciences/Guerre et paix/cours/jj;.docx",
+    "old": ""
+  },
+  "lami-new-1789682468301": {
+    "store": "1789682468_424.docx",
+    "archive": "4ème Année Sciences/L'homme et la science/cours/424.docx",
+    "old": ""
+  },
+  "lami-new-1789682504536": {
+    "store": "1789682504_423.docx",
+    "archive": "4ème Année Sciences/L'homme et la science/devoirs/423.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789682551312": {
+    "store": "1789682551_R_partition_p_dagogique___Souvenirs_et_nostalgie.docx",
+    "archive": "4ème Année Sciences/Souvenirs et nostalgie/documents/répartition/Répartition_pédagogique_—_Souvenirs_et_nostalgie.docx",
+    "old": ""
+  },
+  "lami-new-1789683186128": {
+    "store": "1789683186_ctrl_final_lamia.docx",
+    "archive": "3ème Année Sciences/Général/cours/ctrl-final-lamia.docx",
+    "old": ""
+  },
+  "lami-new-1789683542981": {
+    "store": "1789683543_475.docx",
+    "archive": "1ère Année/Rencontres/cours/475.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789683556561": {
+    "store": "1789683556_Planification_du_devoir___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/planification/Planification_du_devoir_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789683572531": {
+    "store": "1789683572_R_partition_p_dagogique___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/répartition/Répartition_pédagogique_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-mdoc-1789683576845": {
+    "store": "1789683576_Planification_du_devoir___Rencontres.docx",
+    "archive": "1ère Année/Rencontres/documents/planification/Planification_du_devoir_—_Rencontres.docx",
+    "old": ""
+  },
+  "lami-doc-738559780-1789686222577": {
+    "store": "1789686222_3e_le_ppuvoirdocx.docx",
+    "archive": "3ème Année/Le pouvoir de l'image/cours/3e le ppuvoir.docx",
+    "old": ""
+  },
+  "lami-doc-765231328-1789686241876": {
+    "store": "1789686241_3e_ann_docx.docx",
+    "archive": "3ème Année/Portraits comiques/cours/3e anné.docx",
+    "old": ""
+  },
+  "lami-doc-732977386-1789686260260": {
+    "store": "1789686260_portraitdocx.docx",
+    "archive": "3ème Année/Portraits comiques/cours/portrait.docx",
+    "old": ""
+  },
+  "lami-doc-749966021-1789686282104": {
+    "store": "1789686282_BATRANU2017diffusionpdf.pdf",
+    "archive": "3ème Année/cours/BATRANU_2017_diffusion.pdf",
+    "old": ""
+  },
+  "lami-doc-154-1789687771079": {
+    "store": "1789687771_r_vision_bac_scdocx.docx",
+    "archive": "3ème Année/cours/révision bac sc.docx",
+    "old": ""
+  }
+}
