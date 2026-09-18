@@ -1,5 +1,9 @@
 # Historique des versions — LamiAI
 
+## v1.5.9 — 18 Septembre 2026
+- **🧭 Le « RETOUR » revient TOUJOURS à l'endroit d'où tu as ouvert le fichier** : en fermant l'éditeur OnlyOffice, l'app utilisait la fiche du document (niveau+module) et sautait vers la page du module — si tu ouvrais un fichier depuis la **Bibliothèque › 3ème Année**, tu retombais « à un autre emplacement ». Corrigé : la vue d'ouverture est **mémorisée** (`openOOModal` capture le `__lamiRefresh` courant) et restaurée à la fermeture (l'ancien routage ne sert que de filet si la vue n'est pas connue)
+- Testé en direct (CDP) : ouverture d'un fichier à module depuis Bibliothèque › 3ème Année → fermeture → retour sur **3ème Année** ✓ (avant : page module)
+
 ## v1.5.8 — 18 Septembre 2026
 - **📱 Le téléphone peut se connecter au PC en WiFi** : le serveur écoute désormais sur **tous les adaptateurs** (`--host 0.0.0.0` dans `serveur-guardien.bat`) au lieu de 127.0.0.1 seulement — l'APK pointe vers `http://192.168.100.29:8080` et travaille **directement sur les fichiers du PC** (continuité téléphone→PC immédiate). Règle pare-feu « LamiAI 8080 » ajoutée (réseau privé)
 - **☁️ Colonne GitHub automatique** : `sync-pc.bat` (démarrage automatique Windows) fait `pull + push` GitHub **toutes les 60 s** → chaque PC (et le principal) reste synchronisé sans coupure ; le git-pull ajoute les fichiers partout et le scanner les voit aussitôt

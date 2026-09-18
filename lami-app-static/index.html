@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src http://localhost:8080 http://127.0.0.1:8080 http://127.0.0.1:11434 http://localhost:* http://127.0.0.1:*; frame-src http://127.0.0.1:* http://localhost:*; object-src 'none';" />
-  <title>LamiAI v1.5.8 - Assistant Pédagogique</title>
+  <title>LamiAI v1.5.9 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.5.8 • PWA</div>
+      <div>LamiAI v1.5.9 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -4269,6 +4269,9 @@ function saveToOO(u8,ext,name){
     .then(j=>j.url);
 }
 function openOOModal(){
+  // 🧭 MEMO DU RETOUR : la vue D'OU on a ouvert le fichier (bibliothèque 3ème Année,
+  // page module, etc.) — restaurée à la fermeture au lieu de sauter ailleurs.
+  window.__lamiOpenBack=(typeof window.__lamiRefresh==='function')?window.__lamiRefresh:null;
   document.getElementById('ooModal').style.display='flex';
   document.getElementById('ooHostStatus').innerHTML='<b>OnlyOffice (DocumentServer)</b> : '+ooDsUrl()+' — testez la connexion avant d\'ouvrir un document.';
   document.getElementById('ooDsStatus').innerHTML='';
@@ -4311,9 +4314,11 @@ function closeOOModal(){
   const rb=document.getElementById('ooRenameBtn'); if(rb) rb.style.display='none';
   const ctx=window.__ooRename;
   window.__ooRename=null;
+  const back=window.__lamiOpenBack; window.__lamiOpenBack=null;
   loadLibrary().then(()=>{
     if(typeof renderLamiWorkList==='function') renderLamiWorkList();
-    if(!ctx) return;
+    // 🧭 Priorité : retourner à la vue D'OU le fichier a été ouvert
+    if(back){ try{ back(); }catch(_e){} return; }
     const level=ctx.level||'', module=ctx.mod||'', cat=ctx.cat||'';
     if(module&&cat&&typeof showModuleCat==='function') showModuleCat(level,module,cat);
     else if(module&&typeof showModule==='function') showModule(level,module);
