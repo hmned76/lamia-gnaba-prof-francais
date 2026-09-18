@@ -4,6 +4,7 @@
 - **📄 OnlyOffice s'ouvre maintenant sur le téléphone** : l'app cherchait le DocumentServer sur « localhost » (= le téléphone lui-même → page vide). Corrigé dans `ooDsUrl()` : quand l'app est ouverte depuis le PC via Tailscale (`100.104.240.32`) ou tout autre hôte non local, OnlyOffice pointe **automatiquement sur l'hôte du PC** (port 80) — plus rien à configurer sur le téléphone
 - **CSP étendu** : `script-src`/`frame-src` acceptent `http://100.104.240.32:*` et `lamiai:*` (l'iframe OnlyOffice pouvait être barrée par le filtre de sécurité)
 - **Chaîne téléphone → PC vérifiée EN TEST RÉEL** : document créé sur le téléphone (4G, Tailscale) → sauvegardé **directement dans le dossier du module sur le PC** (`3ème Année/Le pouvoir de l'image/cours/…docx`) ✓ ; APK v1.6.2 reconstruit et redelivré sur le téléphone (transfert par câble USB/MTP)
+- **Robustesse du démarrage** : le garde-fou et la colonne GitHub se lancent désormais **en fenêtre invisible** (`LamiAI-Demarrage-Invisible.vbs` / `LamiAI-Sync-Invisible.vbs` dans Startup) — plus aucune fenêtre noire à fermer par erreur (cause récurrente du serveur arrêté)
 - Rappel infra : règle pare-feu 8080 (tous profils), serveur via `serveur-guardien.bat` + raccourcisses bureau `lamiai:8080` et Tailscale
 
 ## v1.6.1 — 18 Septembre 2026 (app + APK)
