@@ -1,5 +1,11 @@
 # Historique des versions — LamiAI
 
+## v1.5.6 — 18 Septembre 2026
+- **🛠 L'enregistrement IA respecte la roulette** : « 💾 Enregistrer la réponse dans OnlyOffice » rangeait le document dans « Non classé » (il passait par `LAST_CLASS` et ignorait la roulette). Corrigé : la cible (niveau + module + Cours/Devoir) est prioritaire et le fichier atterrit dans `<Niveau>/<Module>/cours|devoirs/<nom>.docx`
+- **🔍 Bouton « Rechercher » direct dans la roulette** : pas besoin de taper une question — la recherche part immédiatement avec la cible choisie (niveau + module + cours/devoir)
+- **🌍 Nouveau sélecteur « Programme »** dans la roulette : **🇹🇳 Tunisien** (recherche dans TA bibliothèque, programme tunisien) ou **🌍 International** (recherche sur internet avec la cible choisie) — mémorisé, affiché dans le badge
+- Testé en direct (CDP) : bouton ✓, sélecteur programme ✓, recherche directe `3ème Année / cours / Récits de voyage` ✓
+
 ## v1.5.5 — 18 Septembre 2026
 - **🎡 Roulette dans l'Assistant IA** : une barre « Cible » à 3 étages en cascade
   1. **Niveau scolaire** (les 6 niveaux réels)

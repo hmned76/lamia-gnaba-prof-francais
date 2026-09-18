@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src http://localhost:8080 http://127.0.0.1:8080 http://127.0.0.1:11434 http://localhost:* http://127.0.0.1:*; frame-src http://127.0.0.1:* http://localhost:*; object-src 'none';" />
-  <title>LamiAI v1.5.5 - Assistant Pédagogique</title>
+  <title>LamiAI v1.5.6 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.5.5 • PWA</div>
+      <div>LamiAI v1.5.6 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -1448,6 +1448,9 @@ function showPage(id){
         <select id="rlModule" onchange="rlPick('mod',this.value)" style="padding:5px 8px;border-radius:10px;border:1px solid var(--b);font-size:11px;font-weight:600;background:#fff;color:var(--s)"><option value="">— Module (selon niveau) —</option></select>
         <select id="rlKind" onchange="rlPick('kind',this.value)" style="padding:5px 8px;border-radius:10px;border:1px solid var(--b);font-size:11px;font-weight:600;background:#fff;color:var(--a)">
           <option value="">— Cours / Devoir —</option><option value="cours">📘 Cours</option><option value="devoir">📋 Devoir</option></select>
+        <select id="rlProg" onchange="rlPick('prog',this.value)" title="Programme de la recherche" style="padding:5px 8px;border-radius:10px;border:1px solid var(--b);font-size:11px;font-weight:600;background:#fff;color:var(--s)">
+          <option value="tn">🇹🇳 Tunisien</option><option value="intl">🌍 International</option></select>
+        <button type="button" onclick="rlSearch()" title="Rechercher immédiatement avec la cible choisie" style="padding:5px 12px;border-radius:10px;border:none;background:var(--p);color:#fff;cursor:pointer;font-size:11px;font-weight:700">🔍 Rechercher</button>
         <button type="button" onclick="rlClear()" title="Effacer la sélection" style="padding:4px 9px;border-radius:10px;border:1px solid var(--b);background:#fff;cursor:pointer;font-size:11px;font-weight:800;color:var(--d)">↺</button>
         <span id="rlBadge" style="display:none;font-size:10px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;padding:2px 8px;border-radius:12px"></span>
       </div>
@@ -3445,7 +3448,7 @@ function _lvlNorm(l){ return LAMI_LEVEL_ALIAS[String(l||'')]||l; }
 /* 🎡 ROULETTE ASSISTANT IA : Niveau → Module (selon le niveau) → Cours/Devoir.
    Sélection mémorisée (localStorage) ; guide la RECHERCHE de l'assistant et la
    DESTINATION de l'enregistrement automatique des travaux IA. */
-const LAMI_ROULETTE={level:'',mod:'',kind:''};
+const LAMI_ROULETTE={level:'',mod:'',kind:'',prog:'tn'};
 function _rlLevelOpts(){ return LAMI_LEVEL_ORDER.slice(); }
 function _rlModOpts(){
   if(!LAMI_ROULETTE.level) return [];
@@ -3459,13 +3462,14 @@ function _rlModOpts(){
 function rlPick(k,v){
   if(k==='level'){ LAMI_ROULETTE.level=v; LAMI_ROULETTE.mod=''; }
   else if(k==='mod'){ LAMI_ROULETTE.mod=v; }
+  else if(k==='prog'){ LAMI_ROULETTE.prog=v; }
   else { LAMI_ROULETTE.kind=v; }
   rlRender();
 }
 function rlClear(){ LAMI_ROULETTE.level=''; LAMI_ROULETTE.mod=''; LAMI_ROULETTE.kind=''; rlRender(); }
 function rlInit(){
   try{ const s=JSON.parse(localStorage.getItem('lami-roulette')||'null');
-    if(s&&typeof s==='object'){ LAMI_ROULETTE.level=_lvlNorm(s.level||''); LAMI_ROULETTE.mod=''; LAMI_ROULETTE.kind=s.kind||''; }
+    if(s&&typeof s==='object'){ LAMI_ROULETTE.level=_lvlNorm(s.level||''); LAMI_ROULETTE.mod=''; LAMI_ROULETTE.kind=s.kind||''; LAMI_ROULETTE.prog=(s.prog==='intl'?'intl':'tn'); }
   }catch(e){}
   rlRender();
 }
@@ -3483,9 +3487,30 @@ function rlRender(){
   if(b){
     const has=LAMI_ROULETTE.level||LAMI_ROULETTE.kind;
     b.style.display=has?'inline-flex':'none';
-    b.innerHTML=(LAMI_ROULETTE.level?'🎓 '+LAMI_ROULETTE.level:'')+(LAMI_ROULETTE.mod?' › 📚 '+LAMI_ROULETTE.mod:'')+(LAMI_ROULETTE.kind?' › '+(LAMI_ROULETTE.kind==='cours'?'📘 Cours':'📋 Devoir'):'');
+    b.innerHTML=(LAMI_ROULETTE.level?'🎓 '+LAMI_ROULETTE.level:'')+(LAMI_ROULETTE.mod?' › 📚 '+LAMI_ROULETTE.mod:'')+(LAMI_ROULETTE.kind?' › '+(LAMI_ROULETTE.kind==='cours'?'📘 Cours':'📋 Devoir'):'')+(LAMI_ROULETTE.prog==='intl'?' › 🌍 International':' › 🇹🇳 Tunisien');
   }
+  const selProg=document.getElementById('rlProg');
+  if(selProg) selProg.value=LAMI_ROULETTE.prog;
   try{ localStorage.setItem('lami-roulette',JSON.stringify(LAMI_ROULETTE)); }catch(e2){}
+}
+/* 🔍 Bouton Rechercher direct : lance la recherche immédiatement avec la cible
+   choisie (niveau + module + cours/devoir + programme) — sans taper de question. */
+function rlSearch(){
+  if(!LAMI_ROULETTE.level){ aiAsk('🎡 <b>Choisis d\'abord le niveau dans la roulette</b>, puis clique 🔍 Rechercher.'); return; }
+  if(AI_MODE!=='search'){ AI_MODE='search'; try{ refreshAIModeUI(); }catch(e){} }
+  const cat=LAMI_ROULETTE.kind==='devoir'?'controle':(LAMI_ROULETTE.kind==='cours'?'cours':'');
+  const modLabel=cat?(CAT_LABEL[cat]||''):'';
+  const base=[LAMI_ROULETTE.mod,modLabel,LAMI_ROULETTE.level].filter(Boolean).join(' ');
+  if(LAMI_ROULETTE.prog==='intl'){
+    // 🌍 International : recherche sur internet avec la cible choisie
+    aiAsk('🌍 <b>Recherche internationale</b> : '+escH(base)+'…');
+    webSearch([base||'contenu pédagogique '+LAMI_ROULETTE.level],base);
+    return;
+  }
+  // 🇹🇳 Tunisien : dans ta bibliothèque (programme tunisien)
+  AIQ=null;
+  AIQ={level:LAMI_ROULETTE.level,cat:cat,mod:(LAMI_ROULETTE.mod||''),asked:''};
+  doSearch();
 }
 function renderLamiWorkList(){
   const el=document.getElementById('lamiWorkList');
@@ -3848,9 +3873,11 @@ function saveAIAnswerById(rid,btn){
   if(!d){ if(btn) btn.textContent='💾 Réponse indisponible'; return; }
   if(btn){ btn.disabled=true; btn.textContent='⏳ Création du document…'; }
   const title=(d.user||'Réponse IA').replace(/[<>&]/g,'').replace(/\s+/g,' ').trim().slice(0,45)||'Réponse IA';
-  const level=LAST_CLASS.level||'Non classé';
-  const mod=LAST_CLASS.mod||'Conversations IA';
-  const tp=LAST_CLASS.cat?(CAT_LABEL[LAST_CLASS.cat]||LAST_CLASS.cat):'Travail';
+  // 🎡 La roulette de l'Assistant fixe la destination (niveau + module + cours/devoir)
+  const rl=(typeof LAMI_ROULETTE!=='undefined'&&LAMI_ROULETTE.level)?LAMI_ROULETTE:null;
+  const level=rl?rl.level:(LAST_CLASS.level||'Non classé');
+  const mod=rl?(rl.mod||'Conversations IA'):(LAST_CLASS.mod||'Conversations IA');
+  const tp=rl?(rl.kind==='devoir'?'Devoir':'Cours'):(LAST_CLASS.cat?(CAT_LABEL[LAST_CLASS.cat]||LAST_CLASS.cat):'Travail');
   const key='lami-ai-'+Date.now();
   let u8;
   try{
@@ -3877,7 +3904,10 @@ function saveAIAnswerById(rid,btn){
   saveToOO(u8,'docx',title.replace(/[^a-z0-9]/gi,'_')+'.docx').then(url=>{
     _setOOHost('')
     openOOEditor(url,'docx',title,key);
-    archiveTarget(level,mod,tp,'','docx',u8).then(path=>{
+    // Destination exacte avec la roulette : <Niveau>/<Module>/cours|devoirs/<nom>.docx
+    let to='';
+    if(rl){ const sub=(rl.kind==='devoir'?'devoirs':'cours'); to=level+(mod?('/'+mod):'')+'/'+sub+'/'+fsSafeName(title)+'.docx'; }
+    archiveTarget(level,mod,tp,'','docx',u8,to).then(path=>{
       if(key&&path){
         bindOOKey(key,path);
         window.__ooRename={key:key,path:path,store:String(url||'').split('/').pop()||'',name:title||'',level:level||'',mod:mod||'',cat:(tp||'').toLowerCase(),kind:'work',id:w.id};
