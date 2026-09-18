@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src http://localhost:8080 http://127.0.0.1:8080 http://127.0.0.1:11434 http://localhost:* http://127.0.0.1:*; frame-src http://127.0.0.1:* http://localhost:*; object-src 'none';" />
-  <title>LamiAI v1.5.2 - Assistant Pédagogique</title>
+  <title>LamiAI v1.5.4 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.5.2 • PWA</div>
+      <div>LamiAI v1.5.4 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -1556,8 +1556,8 @@ function showPage(id){
       h+=`<div class="card" style="cursor:pointer;margin-bottom:6px;border-left:3px solid ${scColors[sousCours]};background:#f0fdf4" onclick="openLamiWork('${w.id}')"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🤖</span><div><div style="font-size:13px;font-weight:700">${w.name}</div><div style="font-size:11px;color:var(--tl)">${w.tp} — Travail</div></div><span style="margin-left:auto;font-size:11px;color:${scColors[sousCours]}">Ouvrir →</span></div></div>`;
     });
     docs.forEach(d=>{const c=d.cat||'Autre';if(!cats[c])cats[c]=[];cats[c].push(d)});
-      const catNames={cours:'📘 Cours',exercice:'✏️ Exercices',controle:'📋 Contrôles',synthese:'📝 Synthèses',fiche:'📄 Fiches',revision:'🔄 Révisions',evaluation:'📊 Évaluations',vocabulaire:'📖 Vocabulaire',Autre:'📁 Autre'};
-      const catColors={cours:'#3b82f6',exercice:'#059669',controle:'#dc2626',synthese:'#f59e0b',fiche:'#8b5cf6',revision:'#0891b2',evaluation:'#ec4899',vocabulaire:'#6366f1',Autre:'#6b7280'};
+      const catNames={cours:'📘 Cours',exercice:'✏️ Exercices',controle:'📋 Contrôles',synthese:'📝 Synthèses',fiche:'📄 Fiches',revision:'🔄 Révisions',evaluation:'📊 Évaluations',vocabulaire:'📖 Vocabulaire',documents:'📐 Documents officiels',Autre:'📁 Autre'};
+      const catColors={cours:'#3b82f6',exercice:'#059669',controle:'#dc2626',synthese:'#f59e0b',fiche:'#8b5cf6',revision:'#0891b2',evaluation:'#ec4899',vocabulaire:'#6366f1',documents:'#7c3aed',Autre:'#6b7280'};
       html=`<div style="font-size:12px;color:var(--tl);margin-bottom:12px">${docs.length} document${docs.length>1?'s':''}</div>`;
       if(docs.length===0){
         html+=`<div class="card"><p style="color:var(--tl)">Aucun document pour ce niveau. Modules à configurer.</p></div>`;
@@ -1763,8 +1763,8 @@ function showDocLevel(level){
   const col=colors[level]||'#6b7280';
   const cats={};
   docs.forEach(d=>{const c=d.cat||'Autre';if(!cats[c])cats[c]=[];cats[c].push(d)});
-  const catNames={cours:'📘 Cours',exercice:'✏️ Exercices',controle:'📋 Contrôles',synthese:'📝 Synthèses',fiche:'📄 Fiches',revision:'🔄 Révisions',evaluation:'📊 Évaluations',vocabulaire:'📖 Vocabulaire',Autre:'📁 Autre'};
-  const catColors={cours:'#3b82f6',exercice:'#059669',controle:'#dc2626',synthese:'#f59e0b',fiche:'#8b5cf6',revision:'#0891b2',evaluation:'#ec4899',vocabulaire:'#6366f1',Autre:'#6b7280'};
+  const catNames={cours:'📘 Cours',exercice:'✏️ Exercices',controle:'📋 Contrôles',synthese:'📝 Synthèses',fiche:'📄 Fiches',revision:'🔄 Révisions',evaluation:'📊 Évaluations',vocabulaire:'📖 Vocabulaire',documents:'📐 Documents officiels',Autre:'📁 Autre'};
+  const catColors={cours:'#3b82f6',exercice:'#059669',controle:'#dc2626',synthese:'#f59e0b',fiche:'#8b5cf6',revision:'#0891b2',evaluation:'#ec4899',vocabulaire:'#6366f1',documents:'#7c3aed',Autre:'#6b7280'};
   let h=`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="cursor:pointer;color:var(--p);font-weight:600;font-size:14px" onclick="showPage('docs')">← Retour</span><span style="color:var(--tl)">›</span><span style="font-weight:600;color:${col}">${level}</span></div>`;
   if(LIVRES[realLevel]||LIVRES[level]){
     h+=`<div onclick="openLivre('${(realLevel||'').replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:10px;padding:12px;margin-bottom:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;cursor:pointer;touch-action:manipulation" onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#fffbeb'">
@@ -2024,7 +2024,12 @@ function _docsForCat(level,module,catKinds,sous){
   const kinds=catKinds.map(k=>String(k).toLowerCase());
   const lvlEq=x=>String(x.level||'').toLowerCase()===String(level||'').toLowerCase();
   const kindEq=x=>kinds.includes(String(x.cat||'').toLowerCase());
-  const modEq=x=>{ if(x.mod===module)return true; const mn=String(module||'').toLowerCase().split(' ')[0]; return String(x.name||'').toLowerCase().includes(mn)||String(x.mod||'').toLowerCase().includes(mn); };
+  // Correspondance STRICTE du module (normalisé sans accents/casse) — AUCUN repli flou :
+  // l'ancien code matchait le 1er mot du module sur le NOM DU FICHIER (« Le pouvoir… » → 'le'
+  // matchait tout), d'où les compteurs faux et les doublons affichés.
+  const nz=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  const target=nz(module);
+  const modEq=x=>target==='' ? true : nz(x.mod)===target;
   // AUCUN repli : on montre UNIQUEMENT les fichiers réels du module (plus de duplication)
   let docs=getDocs().filter(d=>lvlEq(d)&&kindEq(d)&&modEq(d)&&(!sous||String(d.sub||'').toLowerCase()===String(sous||'').toLowerCase()));
   if(!docs.length) docs=[];

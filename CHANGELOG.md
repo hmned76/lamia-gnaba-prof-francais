@@ -1,5 +1,22 @@
 # Historique des versions — LamiAI
 
+## v1.5.4 — 18 Septembre 2026
+- **Nettoyage du disque (audit P3)** — rien supprimé, tout déplacé vers `_copies_anciennes/audit-2026-09-18/` :
+  - dossiers niveaux fantômes `1ère_Année`, `2ème_Année`, `4ème_Année_Lettres`, `Non_classé`, `LamiAI-data/1ère_Année`, `home/Poésie`
+  - ancienne structure `cours/langue|lecture|production` + `devoirs/contrôle|synthèse` supprimée des modules (les 3 fichiers qu'elles contenaient remontés dans `cours/`)
+  - module cassé `3ème Année/recit` fusionné dans `Récits de voyage`
+  - documents officiels : schéma abandonné `plan-devoir` + copies codées `1e_…_cou_rpa_2..6.docx`, `Test-FX.docx` → refuge ; **1 seul fichier stable par module** (`Répartition_pédagogique_—_<module>.docx` / `Planification_du_devoir_—_<module>.docx`)
+  - poubelles de la racine : fichiers `0`, `SCROLL`, dossier `1ère anné 2026`, `__pycache__`
+  - `Non classé` : 6 scripts de téléchargement déplacés hors du niveau, module vide `contrôle` trié dans `devoirs/`
+- Résultat vérifié : **812/812 fichiers = disque ↔ app, 0 invisible, 0 fantôme** ; docs officiels 10/10 propres
+
+## v1.5.3 — 18 Septembre 2026
+- **App = disque (audit C1 corrigé)** : le scanner de `serve_all.py` n'ignore plus les sous-dossiers inconnus — `<module>/documents/` (Répartition + Planification) et `Non classé/Sameh_Ben_Amor/<sous-dossiers>` sont scannés (récursif) : **+340 fichiers visibles** (829/829 à l'époque du test, 0 invisible, 0 fantôme)
+- **Scan récursif** des catégories de niveau (`cours`, `devoirs`, `livre scolaire` y compris leurs sous-dossiers)
+- **Signature de cache basée sur le contenu réel des fichiers** (chemin+taille+mtime) : plus de cache périmé quand on ajoute un fichier dans un module
+- **Compteurs exacts (audit C2 corrigé)** : `_docsForCat` compare le module strictement (normalisé sans accents) — le repli flou qui matchait le 1er mot du module sur le nom des fichiers (« Le pouvoir de l'image » → « le ») est supprimé
+- Nouvelle catégorie visible : **« 📐 Documents officiels »** (violet) dans les listes de niveaux/modules
+
 ## v1.5.2 — 15 Septembre 2026
 - **Ajout de documents** : bouton « 📥 Ajouter des documents » dans chaque niveau / module / cours / lecture (et devoirs) de l'onglet Documents ; choisit un fichier → il est copié dans `LamiAI-data/<Niveau>/<Module>/<cat>/<sub>/` et enregistré dans la bibliothèque (visible partout : liste, recherche IA, navigation)
 - **Endpoint d'upload** `POST /api/upload` dans `serve_all.py` (multipart, zero dépendance) : sauvegarde le fichier physique + inscrit l'entrée dans `LamiAI-data/lamiai_docs.json`

@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.5.0)
+serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.5.4)
 =======================================================================
 - Sert l'application (lami-app-static) sur http://localhost:8080
 - Stocke les fichiers générés par l'app pour l'éditeur OnlyOffice :
@@ -355,26 +355,86 @@ def _cat_from_folder(name):
 
 
 def _scan_signature():
-    """Signature rapide de l'arborescence pour savoir si un re-scan est nécessaire."""
+    """Signature du contenu réel des fichiers (chemin, taille, mtime) pour savoir
+    si un re-scan est nécessaire — récursive, donc un fichier ajouté n'importe où
+    (ex : module/cours, module/documents/…) déclenche un re-scan."""
     parts = []
     for level in UI_LEVELS:
         base = _real_level_dir(level)
         try:
             if not os.path.isdir(base):
                 continue
-            entries = sorted(os.listdir(base))
-            parts.append(level + ":" + "|".join(entries))
-            for d in entries:
-                dp = os.path.join(base, d)
-                if os.path.isdir(dp):
-                    parts.append(level + "/" + d + ":" + "|".join(sorted(os.listdir(dp))))
+            for rdp, rdn, rfns in os.walk(base):
+                rdn[:] = [d for d in rdn if not d.startswith("_")]
+                for g in sorted(rfns):
+                    if g.startswith("_"):
+                        continue
+                    gp = os.path.join(rdp, g)
+                    try:
+                        st = os.stat(gp)
+                    except Exception:
+                        continue
+                    parts.append("%s:%d:%d" % (os.path.relpath(gp, BASE_DIR), st.st_size, int(st.st_mtime)))
         except Exception:
             pass
-    return "||||".join(parts)
+    return "||||".join(sorted(parts))
 
 
 _SCAN_CACHE = {"sig": None, "docs": None, "ts": 0}
 _LAST_SAVE = {"ts": 0, "key": "", "path": ""}
+
+
+_DOC_EXTS = (".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".txt", ".csv", ".jpg", ".jpeg", ".png")
+
+
+def _add_doc(docs, seen, full, level, mod, cat, sous=""):
+    """Ajoute UN fichier réel à la bibliothèque (récursif, avec infos module/catégorie/sous-catégorie)."""
+    try:
+        f = os.path.basename(full)
+        ext = os.path.splitext(f)[1].lower()
+        if ext not in _DOC_EXTS or f.startswith("_"):
+            return
+        rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
+        if rel in seen:
+            return
+        seen.add(rel)
+        d = {
+            "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
+            "name": f, "type": ext[1:].upper(), "level": level, "mod": mod,
+            "cat": cat, "date": _fmt_date(os.path.getmtime(full)),
+            "size": _fmt_size(os.path.getsize(full)),
+            "path": rel, "custom": False, "content": "",
+        }
+        if sous:
+            d["sub"] = sous
+        docs.append(d)
+    except Exception:
+        pass
+
+
+def _scan_module_subfolder(docs, seen, full, level, mod, cat, sous_first=False):
+    """Scan récursif d'un sous-dossier de module (catégorie connue, documents officiels
+    ou dossier inconnu) — RIEN n'est ignoré : app = disque."""
+    for rdp, rdn, rfns in os.walk(full):
+        rdn[:] = [d for d in rdn if not d.startswith("_")]
+        subrel = os.path.relpath(rdp, full)
+        segs = [] if subrel == "." else re.split(r"[\\/]+", subrel)
+        c, sous = cat, ""
+        if cat == "cours":
+            for s2 in segs:
+                ns2 = _norm_name(s2) or s2.lower()
+                if ns2 in ("lecture", "langue", "production"):
+                    sous = ns2
+                    break
+        elif cat == "controle":
+            if any("synthes" in (_norm_name(s2) or s2.lower()) for s2 in segs):
+                c = "synthese"
+        if sous_first and not sous:
+            for s2 in segs:
+                sous = _norm_name(s2) or s2.lower()
+                break
+        for g in sorted(rfns):
+            _add_doc(docs, seen, os.path.join(rdp, g), level, mod, c, sous)
 
 
 def _scan_library():
@@ -388,7 +448,6 @@ def _scan_library():
     docs = []
     seen = set()
     seen_levels = set()
-    only_ext = (".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".txt", ".csv", ".jpg", ".jpeg", ".png")
     # Niveaux affichés dans l'app (ordre de la bibliothèque) — chaque dossier réel n'est scanné qu'une fois
     for level in UI_LEVELS:
         real = LEVEL_FOLDER.get(level) or level
@@ -408,104 +467,59 @@ def _scan_library():
             sub_path = os.path.join(base, sub)
             cat = _cat_from_folder(sub)
             if cat:
-                # <niveau>/<categorie>/fichiers
-                for f in sorted(os.listdir(sub_path)):
-                    full = os.path.join(sub_path, f)
-                    if not os.path.isfile(full):
-                        continue
-                    ext = os.path.splitext(f)[1].lower()
-                    if ext not in only_ext or f.startswith('_'):
-                        continue
-                    rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
-                    if rel in seen:
-                        continue
-                    seen.add(rel)
-                    docs.append({
-                        "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
-                        "name": f, "type": ext[1:].upper(), "level": level, "mod": "",
-                        "cat": cat, "date": _fmt_date(os.path.getmtime(full)),
-                        "size": _fmt_size(os.path.getsize(full)),
-                        "path": rel, "custom": False, "content": "",
-                    })
+                # <niveau>/<categorie>/... — scan RÉCURSIF (sous-dossiers inclus)
+                for rdp, rdn, rfns in os.walk(sub_path):
+                    rdn[:] = [d for d in rdn if not d.startswith("_")]
+                    subrel = os.path.relpath(rdp, sub_path)
+                    segs = [] if subrel == "." else re.split(r"[\\/]+", subrel)
+                    c, sous = cat, ""
+                    if cat == "cours":
+                        for s2 in segs:
+                            ns2 = _norm_name(s2) or s2.lower()
+                            if ns2 in ("lecture", "langue", "production"):
+                                sous = ns2
+                                break
+                    elif cat == "controle":
+                        if any("synthes" in (_norm_name(s2) or s2.lower()) for s2 in segs):
+                            c = "synthese"
+                    for g in sorted(rfns):
+                        _add_doc(docs, seen, os.path.join(rdp, g), level, "", c, sous)
             else:
                 # <niveau>/<module>/... (module réel = sous-dossier non catégoriel)
                 for f in sorted(os.listdir(sub_path)):
                     full = os.path.join(sub_path, f)
                     if os.path.isfile(full):
-                        ext = os.path.splitext(f)[1].lower()
-                        if ext not in only_ext or f.startswith('_'):
-                            continue
-                        rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
-                        if rel in seen:
-                            continue
-                        seen.add(rel)
-                        docs.append({
-                            "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
-                            "name": f, "type": ext[1:].upper(), "level": level, "mod": sub,
-                            "cat": "cours", "date": _fmt_date(os.path.getmtime(full)),
-                            "size": _fmt_size(os.path.getsize(full)),
-                            "path": rel, "custom": False, "content": "",
-                        })
+                        _add_doc(docs, seen, full, level, sub, "cours")
                         continue
-                    # sous-sous-dossier : cherche cat dans le module
                     c2 = _cat_from_folder(f)
                     if c2:
-                        # scan récursif (nouvelle structure : module/cours/lecture/... ou module/devoirs/contrôle/...)
+                        # sous-catégorie connue du module (cours/, devoirs/, …)
+                        _scan_module_subfolder(docs, seen, full, level, sub, c2)
+                    elif (_norm_name(f) or "").lower() in ("documents", "document"):
+                        # documents officiels (répartition / planification) — étaient invisibles
                         for rdp, rdn, rfns in os.walk(full):
                             rdn[:] = [d for d in rdn if not d.startswith("_")]
+                            subrel = os.path.relpath(rdp, full)
+                            segs = [] if subrel == "." else re.split(r"[\\/]+", subrel)
+                            kind = ""
+                            for s2 in segs:
+                                ns2 = _norm_name(s2) or s2.lower()
+                                if "repartition" in ns2:
+                                    kind = "repartition"; break
+                                if "planification" in ns2 or "plandevoir" in ns2 or "plan" in ns2:
+                                    kind = "planification"; break
                             for g in sorted(rfns):
-                                gf = os.path.join(rdp, g)
-                                ext = os.path.splitext(g)[1].lower()
-                                if ext not in only_ext or g.startswith("_"):
-                                    continue
-                                rel = os.path.relpath(gf, BASE_DIR).replace(os.sep, "/")
-                                if rel in seen:
-                                    continue
-                                seen.add(rel)
-                                subrel = os.path.relpath(rdp, full)
-                                segs = [s.lower() for s in re.split(r"[\\/]+", subrel)] if subrel != "." else []
-                                cat = c2
-                                sous = ""
-                                if c2 == "cours":
-                                    for s2 in segs:
-                                        ns2 = _norm_name(s2) or s2.lower()
-                                        if ns2 in ("lecture", "langue", "production"):
-                                            sous = ns2
-                                            break
-                                    cat = "cours"
-                                elif c2 == "devoirs":
-                                    if any("synthes" in s2.lower() for s2 in segs):
-                                        cat = "synthese"
-                                    else:
-                                        cat = "controle"
-                                else:
-                                    cat = c2
-                                docs.append({
-                                    "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
-                                    "name": g, "type": ext[1:].upper(), "level": level, "mod": sub,
-                                    "cat": cat, "sub": sous, "date": _fmt_date(os.path.getmtime(gf)),
-                                    "size": _fmt_size(os.path.getsize(gf)),
-                                    "path": rel, "custom": False, "content": "",
-                                })
+                                _add_doc(docs, seen, os.path.join(rdp, g), level, sub, "documents", kind)
+                    else:
+                        # sous-dossier inconnu (ex : 3e_sciences, TRAVAIL ET BIEN ÊTRE…)
+                        # → scanné quand même (app = disque) — c'était le défaut C1
+                        _scan_module_subfolder(docs, seen, full, level, sub, "cours", sous_first=True)
         # fichiers directement à la racine du niveau
         for f in sorted(os.listdir(base)):
             full = os.path.join(base, f)
             if not os.path.isfile(full):
                 continue
-            ext = os.path.splitext(f)[1].lower()
-            if ext not in only_ext or f.startswith('_'):
-                continue
-            rel = os.path.relpath(full, BASE_DIR).replace(os.sep, "/")
-            if rel in seen:
-                continue
-            seen.add(rel)
-            docs.append({
-                "id": int("7" + str(zlib.crc32(rel.encode("utf-8")) % 99999999)) if rel else 0,
-                "name": f, "type": ext[1:].upper(), "level": level, "mod": "",
-                "cat": "cours", "date": _fmt_date(os.path.getmtime(full)),
-                "size": _fmt_size(os.path.getsize(full)),
-                "path": rel, "custom": False, "content": "",
-            })
+            _add_doc(docs, seen, full, level, "", "cours")
     _SCAN_CACHE["sig"] = sig
     _SCAN_CACHE["docs"] = docs
     _SCAN_CACHE["ts"] = now
@@ -625,7 +639,7 @@ MIME = {
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "LamiAI_serve/1.5.0"
+    server_version = "LamiAI_serve/1.5.4"
 
     # ---------- Utilitaires ----------
     def _cors(self):
@@ -1119,7 +1133,7 @@ def main():
     args = ap.parse_args()
     os.makedirs(OO_DIR, exist_ok=True)
     print("=" * 56)
-    print(" LamiAI v1.5.0 — serveur local + stockage OnlyOffice")
+    print(" LamiAI v1.5.4 — serveur local + stockage OnlyOffice")
     print(" Application : http://localhost:%d" % args.port)
     print(" Stockage OO : http://localhost:%d/oo/list" % args.port)
     print(" Archive     : http://localhost:%d/oo/archive" % args.port)
