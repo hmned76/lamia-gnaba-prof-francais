@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.6.0)
+serve_all.py — Serveur unique LamiAI + stockage OnlyOffice (v1.6.1)
 =======================================================================
 - Sert l'application (lami-app-static) sur http://localhost:8080
 - Stocke les fichiers générés par l'app pour l'éditeur OnlyOffice :
@@ -645,7 +645,7 @@ MIME = {
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "LamiAI_serve/1.6.0"
+    server_version = "LamiAI_serve/1.6.1"
 
     # ---------- Utilitaires ----------
     def _cors(self):
@@ -1139,7 +1139,7 @@ def main():
     args = ap.parse_args()
     os.makedirs(OO_DIR, exist_ok=True)
     print("=" * 56)
-    print(" LamiAI v1.6.0 — serveur local + stockage OnlyOffice")
+    print(" LamiAI v1.6.1 — serveur local + stockage OnlyOffice")
     print(" Application : http://localhost:%d" % args.port)
     print(" Stockage OO : http://localhost:%d/oo/list" % args.port)
     print(" Archive     : http://localhost:%d/oo/archive" % args.port)

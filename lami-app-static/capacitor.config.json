@@ -3,9 +3,9 @@
   "appName": "LamiAI",
   "webDir": "www",
   "server": {
-    "url": "http://localhost:8080",
+    "url": "http://192.168.100.29:8080",
     "cleartext": true,
-    "allowNavigation": ["localhost", "127.0.0.1", "*.github.com", "api.github.com", "fonts.googleapis.com", "fonts.gstatic.com"],
+    "allowNavigation": ["localhost", "127.0.0.1", "192.168.100.29", "100.104.240.32", "lamiai", "*.github.com", "api.github.com", "fonts.googleapis.com", "fonts.gstatic.com"],
     "androidScheme": "http"
   },
   "android": {

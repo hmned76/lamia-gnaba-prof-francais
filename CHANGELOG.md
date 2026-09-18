@@ -1,5 +1,11 @@
 # Historique des versions — LamiAI
 
+## v1.6.1 — 18 Septembre 2026 (app + APK)
+- **🛡Correctif critique du « bibliothèque vide »** : le filtre de sécurité (CSP) du PC n'acceptait que `localhost/127.0.0.1` — les pages ouvertes via le nouveau nom **`http://lamiai:8080`** ou l'IP Tailscale `100.104.240.32:8080` avaient toutes les/API bloquées → bibliothèque vide Bill. CSP mis à jour : `'self'` + `lamiai:8080` + IP Tailscale (connect + frame)
+- **📱 APK v1.6.1 (versionCode 3)** reconstruit : le WebView ouvre désormais **directement le PC** (`http://192.168.100.29:8080` au lieu de `localhost` qui restait vide sur le téléphone) ; navigation autorisée pour `192.168.100.29`, `100.104.240.32` (Tailscale) et `lamiai` ; versionName 1.6.1 ; APK publié en téléchargement sur le serveur : `/apk/LamiAI-v1.6.1.apk` (installation possible directement sur le téléphone via WiFi, sans câble)
+- **Versions unifiées** : serveur `1.6.1` / app `1.6.1` / APK `1.6.1`
+- Testé en direct : depuis `http://lamiai:8080` la bibliothèque charge **812 documents** ✓ ; APK vérifié (zip : contient le bon `capacitor.config.json` + le code v1.6.1) ✓
+
 ## v1.6.0 — 18 Septembre 2026
 - **📕 Les livres scolaires réels sont visible** : dans Bibliothèque › un niveau, une section **« 📕 Livre scolaire (N) »** liste TOUS les PDF du dossier `<Niveau>/livre scolaire/` — pour **3ème Année : les 2 livres (Sciences + Lettres)** — avec ouverture, ❌ supprimer et ⋯ menu
 - **Bogue serveur corrigé** : le dossier `livre scolaire` n'était plus reconnu comme catégorie (différence d'accent/espaces dans le nommait normalisé) et ses fichiers passaient pour un « module » catégorisé cours ; `_cat_from_folder` compare désormais en normalisé (`livrescolaire` → catégorie `livre`), les livres apparaissent partout (aussi 4ème Sciences/Lettres)
