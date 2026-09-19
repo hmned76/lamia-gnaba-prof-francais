@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* http://100.104.240.32:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http://localhost:* http://127.0.0.1:* http://lamiai:* http://100.104.240.32:*; frame-src 'self' http://127.0.0.1:* http://localhost:* http://lamiai:* http://100.104.240.32:*; object-src 'none';" />
-  <title>LamiAI v1.6.3 - Assistant Pédagogique</title>
+  <title>LamiAI v1.6.4 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.6.3 • PWA</div>
+      <div>LamiAI v1.6.4 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -3371,6 +3371,17 @@ function loadLibrary(){
    en garde sa copie. Un POST /api/state les mousse sur le serveur, un GET les récupère-t-les
    (compare la date du mets au jour, la plus récente gagne). */
 const LAMI_STATE_TS_KEY='lami-state-ts';
+/* 💪 Parsing blindé de l'emploi du temps : si le contenu est corrompu (test pollué,
+   sync depuis un autre appareil…) on RÉPARE la case au lieu de planter la page. */
+function _emploiParse(){
+  try{
+    const v=_emploiParse();
+    return Array.isArray(v)?v:[];
+  }catch(e){
+    try{ localStorage.setItem('lami-emploi','[]'); }catch(e2){}
+    return [];
+  }
+}
 function _lamiStateData(){ return {
   ts:Date.now(),
   emploi:localStorage.getItem('lami-emploi')||'',
@@ -4946,7 +4957,7 @@ function getNotesData(){ return JSON.parse(localStorage.getItem('lami-notes')||'
 function totalEleves(){ const e=getEleves(); return Object.values(e).reduce((a,l)=>a+l.length,0); }
 function getClassesReleve(){
   const set=new Set();
-  const data=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
+  const data=_emploiParse();
   const days=['lun','mar','mer','jeu','ven','sam'];
   data.forEach(r=>days.forEach(d=>{ const v=r[d]||''; if(v&&v!=='—'&&v!=='Repas') set.add(v.replace(' ✕','')); }));
   Object.keys(getEleves()).forEach(c=>set.add(c));
@@ -5130,7 +5141,7 @@ function loadEmploi(){
   const body=document.getElementById('emploiBody');
   const stats=document.getElementById('emploiStats');
   if(!body) return;
-  let data=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
+  let data=_emploiParse();
   if(data.length===0){
     data=[
       {heure:'08:00 - 09:00',lun:'—',mar:'—',mer:'—',jeu:'—',ven:'—',sam:'—'},
@@ -5272,7 +5283,7 @@ setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },
 }
 
 function editEmploiCell(heure,jour){
-  const current=localStorage.getItem('lami-emploi')?JSON.parse(localStorage.getItem('lami-emploi')).find(r=>r.heure===heure)?.[jour]:'';
+  const current=localStorage.getItem('lami-emploi')?_emploiParse().find(r=>r.heure===heure)?.[jour]:'';
   // Créer un modal custom pour la sélection classe
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
@@ -5380,7 +5391,7 @@ function editEmploiCell(heure,jour){
     }
     // Si on vide la case, on efface directement sans créer de nouveau créneau
     if(val==='—'){
-      let data=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
+      let data=_emploiParse();
       let existing=data.find(r=>r.heure===heure);
       if(existing){existing[jour]='—';}
       data=data.filter(r=>['lun','mar','mer','jeu','ven','sam'].some(d=>r[d] && r[d]!=='—'));
@@ -5410,7 +5421,7 @@ setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },
       const fin=addDuration(heureSel, duree);
       displayHeure=`${heureSel} - ${fin}`;
     }
-    let data=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
+    let data=_emploiParse();
     // Vérification chevauchement et case déjà remplie
     function parseHeure(h){
       const m=h.match(/(\d{1,2}):(\d{2})/);
@@ -5552,7 +5563,7 @@ function deleteEmploi(){
     if(confirm("Vider TOUT l'emploi du temps ?")){ localStorage.setItem('lami-emploi','[]'); loadEmploi(); alert('✅ Emploi du temps réinitialisé (grille vierge).'); }
     return;
   }
-  let data=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
+  let data=_emploiParse();
   const nb=data.length;
   data=data.filter(r=>r.heure!==heure);
   if(data.length===nb){ alert('⚠️ Créneau "'+heure+'" introuvable.'); return; }
@@ -5563,7 +5574,7 @@ setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },
 }
 
 function exportEmploi(){
-  let data=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
+  let data=_emploiParse();
   if(data.length===0){alert('Aucun emploi du temps à exporter.');return;}
   const days=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const keys=['lun','mar','mer','jeu','ven','sam'];
@@ -5586,7 +5597,7 @@ function resetEmploi(){
 }
 
 function printEmploi(){
-  let data=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
+  let data=_emploiParse();
   const days=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const keys=['lun','mar','mer','jeu','ven','sam'];
   const colors={'1ère':'#3b82f6','2ème':'#059669','3e':'#8b5cf6','Bac':'#dc2626','Repas':'#f59e0b'};
