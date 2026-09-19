@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* http://100.104.240.32:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http://localhost:* http://127.0.0.1:* http://lamiai:* http://100.104.240.32:*; frame-src 'self' http://127.0.0.1:* http://localhost:* http://lamiai:* http://100.104.240.32:*; object-src 'none';" />
-  <title>LamiAI v1.6.2 - Assistant Pédagogique</title>
+  <title>LamiAI v1.6.3 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.6.2 • PWA</div>
+      <div>LamiAI v1.6.3 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -3351,9 +3351,54 @@ function getDocs(){
 }
 function loadLibrary(){
   return fetch('/api/library').then(r=>{ if(!r.ok) throw new Error('library '+r.status); return r.json(); })
-    .then(j=>{ LIBRARY_DOCS=j.docs||[]; return LIBRARY_DOCS; })
-    .catch(()=>{ /* ERREUR : on GARDE la dernière liste connue (pas de disparition de fichiers) */ return LIBRARY_DOCS||[]; });
+    .then(j=>{ LIBRARY_DOCS=j.docs||[];
+      // 📴 Cache hors-ligne : on garde un instantané complet pour APPEL ÉTEINT du PC
+      try{ localStorage.setItem('lami-lib-cache',JSON.stringify({ts:Date.now(),docs:LIBRARY_DOCS})); }catch(e){}
+      return LIBRARY_DOCS; })
+    .catch(()=>{ /* PC éteint OU serveur KO : on garde la dernière liste,
+      sinon on retombe sur le CACHE HORS-LIGNE (lami-lib-cache) — la liste reste VISIBLE */ 
+      if(!LIBRARY_DOCS||!LIBRARY_DOCS.length){
+        try{
+          const sc=JSON.parse(localStorage.getItem('lami-lib-cache')||'null');
+          if(sc&&sc.docs&&sc.docs.length){ LIBRARY_DOCS=sc.docs; window.__lamiOffline=true; }
+        }catch(e){}
+      }
+      return LIBRARY_DOCS||[]; });
 }
+
+/* 🔄 SYNC DES PRÉFÉRENCES (emploi du temps, notes, réglages) entre le GUIDE DU TELEPHONE
+   et le PC : ces données vivent dans localStorage du navigateur/webview — chaque appareil
+   en garde sa copie. Un POST /api/state les mousse sur le serveur, un GET les récupère-t-les
+   (compare la date du mets au jour, la plus récente gagne). */
+const LAMI_STATE_TS_KEY='lami-state-ts';
+function _lamiStateData(){ return {
+  ts:Date.now(),
+  emploi:localStorage.getItem('lami-emploi')||'',
+  notes:localStorage.getItem('lami-notes')||'',
+  settings:(function(){const s={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('lami-setting-'))s[k]=localStorage.getItem(k);}return s;})(),
+  roulette:localStorage.getItem('lami-roulette')||''
+};}
+function lamiPushState(){
+  try{ const d=_lamiStateData(); localStorage.setItem(LAMI_STATE_TS_KEY,String(d.ts));
+    fetch('/api/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).catch(()=>{});
+  }catch(e){}
+}
+function lamiPullState(){
+  try{
+    fetch('/api/state',{timeout:5000}).then(r=>r.json()).then(j=>{
+      if(!j||!j.ts) return;
+      const mine=Number(localStorage.getItem(LAMI_STATE_TS_KEY)||'0');
+      if(Number(j.ts)<=mine) return;                 // le téléphone est plus récent : on garde
+      if(j.emploi!=null&&String(j.emploi).length) localStorage.setItem('lami-emploi',j.emploi);
+      if(j.notes!=null&&String(j.notes).length) localStorage.setItem('lami-notes',j.notes);
+      (j.settings||{}).length!==undefined;
+      Object.keys(j.settings||{}).forEach(function(k){ localStorage.setItem(k,j.settings[k]); });
+      if(j.roulette){ try{ const r=JSON.parse(j.roulette); if(r){ LAMI_ROULETTE.level=r.level||''; LAMI_ROULETTE.mod=r.mod||''; LAMI_ROULETTE.kind=r.kind||''; LAMI_ROULETTE.prog=r.prog||'tn'; } }catch(e){} }
+      localStorage.setItem(LAMI_STATE_TS_KEY,String(j.ts));
+    }).catch(()=>{});
+  }catch(e){}
+}
+setTimeout(lamiPullState, 1500);
 
 function uploadDoc(level, module, cat, sub){
   const input = document.createElement('input');
@@ -5099,6 +5144,7 @@ function loadEmploi(){
       {heure:'17:00 - 18:00',lun:'—',mar:'—',mer:'—',jeu:'—',ven:'—',sam:'—'},
     ];
     localStorage.setItem('lami-emploi',JSON.stringify(data));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },60);
   }
   const days=['lun','mar','mer','jeu','ven','sam'];
   const colors={'1ère':'#3b82f6','2ème':'#059669','3e':'#8b5cf6','Bac':'#dc2626','4ème':'#f59e0b','—':'transparent'};
@@ -5339,6 +5385,7 @@ function editEmploiCell(heure,jour){
       if(existing){existing[jour]='—';}
       data=data.filter(r=>['lun','mar','mer','jeu','ven','sam'].some(d=>r[d] && r[d]!=='—'));
       localStorage.setItem('lami-emploi',JSON.stringify(data));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },60);
       overlay.remove();
       loadEmploi();
       alert('✅ Case vidée.');
@@ -5420,6 +5467,7 @@ function editEmploiCell(heure,jour){
           }
           data.sort((a,b)=>a.heure.localeCompare(b.heure));
           localStorage.setItem('lami-emploi',JSON.stringify(data));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },60);
           try{ const classes=JSON.parse(localStorage.getItem('lami-classes')||'[]'); if(val!=='—' && classes.indexOf(val)===-1) { classes.push(val); localStorage.setItem('lami-classes', JSON.stringify(classes)); } }catch(e){}
           overlay.remove();
           loadEmploi();
@@ -5473,6 +5521,7 @@ function editEmploiCell(heure,jour){
       if(existing){existing[jour]=val||'—'; if(quinzaine && val!=='—' && !existing[jour].includes('✕')) existing[jour]=val+' ✕';}
     }
     localStorage.setItem('lami-emploi',JSON.stringify(data));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },60);
     try{
       const classes=JSON.parse(localStorage.getItem('lami-classes')||'[]');
       if(val!=='—' && !classes.includes(val)) { classes.push(val); localStorage.setItem('lami-classes', JSON.stringify(classes)); }
@@ -5508,6 +5557,7 @@ function deleteEmploi(){
   data=data.filter(r=>r.heure!==heure);
   if(data.length===nb){ alert('⚠️ Créneau "'+heure+'" introuvable.'); return; }
   localStorage.setItem('lami-emploi',JSON.stringify(data));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },60);
   alert('✅ Ligne supprimée.');
   loadEmploi();
 }

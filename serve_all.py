@@ -747,6 +747,31 @@ class Handler(BaseHTTPRequestHandler):
             available = any(c["online"] and c["models"] for c in catalog)
             return self._send_json(200, {"available": available, "backend": "ollama", "model": _ai_model(), "providers": catalog})
 
+        if path.startswith("/api/state"):
+            # Sync des préférences (emploi, notes, réglages) entre téléphone et PC.
+            # GET : renvoie le dernier état connu (JSON). POST : l'enregistre.
+            try:
+                st = os.path.join(BASE_DIR, "sync", "appstate.json")
+                if self.command == "GET":
+                    if os.path.isfile(st):
+                        with open(st, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                    else:
+                        data = {}
+                    return self._send_json(200, data)
+                length = int(self.headers.get("Content-Length", 0) or 0)
+                raw = self.rfile.read(length) if length else b"{}"
+                try:
+                    data = json.loads(raw.decode("utf-8", errors="replace") or b"{}")
+                except Exception:
+                    return self._send_json(400, {"error": "corps invalide"})
+                os.makedirs(os.path.dirname(st), exist_ok=True)
+                with open(st, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False)
+                return self._send_json(200, {"ok": True, "ts": data.get("ts", 0)})
+            except Exception as e:
+                return self._send_json(500, {"error": str(e)})
+
         if path.startswith("/api/library"):
             # Liste complète des documents scannés depuis les VRAIS dossiers de la bibliothèque
             try:
@@ -803,6 +828,22 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urlparse(self.path)
         path = parsed.path
+        if path.startswith("/api/state"):
+            # Sync des préférences (emploi, notes, réglages, roulette) télé ↔ PC
+            try:
+                length = int(self.headers.get("Content-Length", 0) or 0)
+                raw = self.rfile.read(length) if length else b"{}"
+                try:
+                    data = json.loads(raw.decode("utf-8", errors="replace") or b"{}")
+                except Exception:
+                    return self._send_json(400, {"error": "corps invalide"})
+                os.makedirs(os.path.join(BASE_DIR, "sync"), exist_ok=True)
+                st = os.path.join(BASE_DIR, "sync", "appstate.json")
+                with open(st, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False)
+                return self._send_json(200, {"ok": True, "ts": data.get("ts", 0)})
+            except Exception as e:
+                return self._send_json(500, {"error": str(e)})
         if path.startswith("/oo/save"):
             try:
                 length = int(self.headers.get("Content-Length", 0) or 0)
