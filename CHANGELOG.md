@@ -1,5 +1,17 @@
 ﻿# Historique des versions — LamiAI
 
+## v1.6.7 / v1.6.6 — 19 Septembre 2026 (relevé de notes sync)
+- **📊 Le relevé est synchronisé avec l'emploi** : les classes viennent automatiquement de l'emploi du temps (vérifié en direct : « 3e Sc 1, 3e Sc 2, Bac Let 2, Bac Sc 2 » issus du téléphone)
+- **Élèves + notes + année ajoutés à l'état sync** (eleves/
+otes/nnee) + hooks auto-push (notes ×2, élèves ×2)
+- Protection « l'appareil le plus fourni gagne » + la sync n'importe que du JSON valide (donnée polluée bloquée)
+- 🛠 v1.6.7 : parsing blindé du relevé (_elevesParse/_notesParse) — la page ne casse plus si une donnée est corrompue + nettoyage auto au chargement
+
+## v1.6.5 — 19 Septembre 2026 (emploi + protections sync)
+- _emploiParse() lecture pure (ne modifie plus le stockage) ; l'emploi s'écrit et reste ✓
+- lamiPullState() ne surcharge plus un emploi local plus fourni (anti-écrasement)
+- testé CDP : rows=9, 08h="3e Sc 5" ✓
+
 ## v1.6.4 — 19 Septembre 2026 (correctif emploi du temps)
 - **🛠 Bug « Ajouter une classe » ne fait rien** : une donnée corrompue dans lami-emploi (test pollué) faisait planter JSON.parse AVANT l'ouverture du modal → ni « ➕ Ajouter une classe » ni le clic sur une case ne réagissait
 - **Correctif** : helper **_emploiParse()** (parsing blindé + auto-réparation '[]' si corrompu) utilisé aux 10 lectures de l'emploi

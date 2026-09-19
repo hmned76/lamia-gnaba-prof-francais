@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#1e40af" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* http://100.104.240.32:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http://localhost:* http://127.0.0.1:* http://lamiai:* http://100.104.240.32:*; frame-src 'self' http://127.0.0.1:* http://localhost:* http://lamiai:* http://100.104.240.32:*; object-src 'none';" />
-  <title>LamiAI v1.6.4 - Assistant Pédagogique</title>
+  <title>LamiAI v1.6.7 - Assistant Pédagogique</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 :root{--p:#1e40af;--pl:#3b82f6;--s:#059669;--a:#7c3aed;--w:#f59e0b;--d:#dc2626;--bg:#f0f4f8;--c:#fff;--t:#1f2937;--tl:#6b7280;--b:#e5e7eb;}
@@ -99,7 +99,7 @@ input[type=text],input[type=text],select{padding:10px 14px;border-radius:8px;bor
       <a href="#" onclick="showPage('oo')" class="nav-item" data-page="oo">🅾️ OnlyOffice</a>
     </div>
     <div class="sid-foot">
-      <div>LamiAI v1.6.4 • PWA</div>
+      <div>LamiAI v1.6.7 • PWA</div>
       <div>PC + Android synchronisés</div>
     </div>
   </nav>
@@ -3375,12 +3375,9 @@ const LAMI_STATE_TS_KEY='lami-state-ts';
    sync depuis un autre appareil…) on RÉPARE la case au lieu de planter la page. */
 function _emploiParse(){
   try{
-    const v=_emploiParse();
+    const v=JSON.parse(localStorage.getItem('lami-emploi')||'[]');
     return Array.isArray(v)?v:[];
-  }catch(e){
-    try{ localStorage.setItem('lami-emploi','[]'); }catch(e2){}
-    return [];
-  }
+  }catch(e){ return []; }
 }
 function _lamiStateData(){ return {
   ts:Date.now(),
@@ -3400,8 +3397,13 @@ function lamiPullState(){
       if(!j||!j.ts) return;
       const mine=Number(localStorage.getItem(LAMI_STATE_TS_KEY)||'0');
       if(Number(j.ts)<=mine) return;                 // le téléphone est plus récent : on garde
-      if(j.emploi!=null&&String(j.emploi).length) localStorage.setItem('lami-emploi',j.emploi);
-      if(j.notes!=null&&String(j.notes).length) localStorage.setItem('lami-notes',j.notes);
+      // ⚖️ L'EMPOI : on n'écrase pas un emploi LOCAL plus fourni que ce que le serveur a (protection anti-conflit)
+      const jEmp=String(j.emploi||'');
+      const mineEmp=String(localStorage.getItem('lami-emploi')||'');
+      if(jEmp.length && jEmp.length>mineEmp.length) localStorage.setItem('lami-emploi',jEmp);
+      if(String(j.notes||'').length>String(localStorage.getItem('lami-notes')||'').length){ try{ const nn=JSON.parse(j.notes); if(nn&&typeof nn==='object') localStorage.setItem('lami-notes',String(j.notes)); }catch(e0){} }
+      if(String(j.eleves||'').length>String(localStorage.getItem('lami-eleves')||'').length){ try{ const ee=JSON.parse(j.eleves); if(ee&&typeof ee==='object') localStorage.setItem('lami-eleves',String(j.eleves)); }catch(e0){} }
+      if(String(j.annee||'').length&&!localStorage.getItem('lami-annee')) localStorage.setItem('lami-annee',String(j.annee));
       (j.settings||{}).length!==undefined;
       Object.keys(j.settings||{}).forEach(function(k){ localStorage.setItem(k,j.settings[k]); });
       if(j.roulette){ try{ const r=JSON.parse(j.roulette); if(r){ LAMI_ROULETTE.level=r.level||''; LAMI_ROULETTE.mod=r.mod||''; LAMI_ROULETTE.kind=r.kind||''; LAMI_ROULETTE.prog=r.prog||'tn'; } }catch(e){} }
@@ -3409,6 +3411,8 @@ function lamiPullState(){
     }).catch(()=>{});
   }catch(e){}
 }
+try{ const cur=localStorage.getItem('lami-notes')||''; if(cur.indexOf('test')===0||!JSON.parse(cur||'{}')){} }catch(errx){ localStorage.setItem('lami-notes','{}'); }
+try{ const cur2=localStorage.getItem('lami-eleves')||''; JSON.parse(cur2||'{}'); }catch(erry){ localStorage.setItem('lami-eleves','{}'); }
 setTimeout(lamiPullState, 1500);
 
 function uploadDoc(level, module, cat, sub){
@@ -4952,8 +4956,10 @@ function verifAnnee(){
     localStorage.setItem('lami-annee',courante);
   }
 }
-function getEleves(){ return JSON.parse(localStorage.getItem('lami-eleves')||'{}'); }
-function getNotesData(){ return JSON.parse(localStorage.getItem('lami-notes')||'{}'); }
+function _elevesParse(){ try{ const v=JSON.parse(localStorage.getItem('lami-eleves')||'{}'); return (v&&typeof v==='object'&&!Array.isArray(v))?v:{}; }catch(e){ return {}; } }
+function getEleves(){ return _elevesParse(); }
+function _notesParse(){ try{ const v=JSON.parse(localStorage.getItem('lami-notes')||'{}'); return (v&&typeof v==='object'&&!Array.isArray(v))?v:{}; }catch(e){ return {}; } }
+function getNotesData(){ return _notesParse(); }
 function totalEleves(){ const e=getEleves(); return Object.values(e).reduce((a,l)=>a+l.length,0); }
 function getClassesReleve(){
   const set=new Set();
@@ -5047,6 +5053,7 @@ function releveNoteInput(el,cls,name){
   if(!nd[cls][name][tr]) nd[cls][name][tr]={};
   nd[cls][name][tr][el.dataset.note]=(el.value===''?null:parseFloat(el.value));
   localStorage.setItem('lami-notes',JSON.stringify(nd));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },900);
 }
 function addEleve(cls){
   cls=decodeURIComponent(cls);
@@ -5057,6 +5064,7 @@ function addEleve(cls){
     if(e[cls].includes(name.trim())){ alert('⚠️ Cet élève existe déjà dans '+cls+'.'); return; }
     e[cls].push(name.trim());
     localStorage.setItem('lami-eleves',JSON.stringify(e));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },900);
     loadReleve();
   }
 }
@@ -5067,9 +5075,11 @@ function delEleve(cls,name){
   e[cls]=(e[cls]||[]).filter(n=>n!==name);
   if(e[cls].length===0) delete e[cls];
   localStorage.setItem('lami-eleves',JSON.stringify(e));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },900);
   const nd=getNotesData();
   if(nd[cls]){ delete nd[cls][name]; if(Object.keys(nd[cls]).length===0) delete nd[cls]; }
   localStorage.setItem('lami-notes',JSON.stringify(nd));
+setTimeout(function(){ if(typeof lamiPushState==='function') lamiPushState(); },900);
   loadReleve();
 }
 function printReleve(cls){
