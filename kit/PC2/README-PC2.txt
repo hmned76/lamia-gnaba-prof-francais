@@ -1,55 +1,35 @@
-========================================================
+﻿================================================================
  LamiAI - Le 2EME PC se connecte a la MEME base
- (PC de la Professeure = serveur : bibliotheque, emploi,
-  relevé de notes, fichiers, assistant IA - tout est partage)
+================================================================
+
+IL Y A DEUX METHODES :
+
 ========================================================
+ METHODE A (la plus simple - PC a la maison, meme wifi)
+========================================================
+1. Sur le PC devant toi, ouvre le navigateur (Edge/Chrome)
+2. Va a l'adresse :  http://192.168.100.29:8080
+   -> L'app LamiAI s'ouvre, connectee a la MEME base.
+   -> Aucune installation, c'est tout !
+3. (Optionnel) Pour avoir un raccourci sur le Bureau :
+   double-clique sur "Creer-Raccourci-LamiAI.bat"
 
-Bonjour ! Ce PC vient de s'ajouter au systeme LamiAI.
-Il n'installe RIEN sur ce PC : il se CONNECTE au serveur
-qui tourne sur le PC principal (la Prof). C'est exactement
-ce que fait deja le telephone (meme base, meme travail).
+========================================================
+ METHODE B (partout : ecole, 4G, autre pays) - Tailscale
+========================================================
+1. Telecharger : https://tailscale.com/download  (Windows)
+2. Installer et SE CONNECTER avec le compteur de la Prof
+   (compte Google de la Prof) pour rejoindre le mem reseau.
+3. Puis double-clique sur "Ouvrir-LamiAI.bat".
 
-C'est meme travail = les 2 PC voient et modifient le MEME
-contenu (aucune copie en double).
-
---------------------------------------------------------
- ETAPE 1 - Installer Tailscale (une seule fois, 3 min)
---------------------------------------------------------
-1. Telecharger : https://tailscale.com/download
-   (version Windows)
-2. Installer (double-clic, par defaut c'est bon).
-3. Ouvrir Tailscale et se CONNECTER :
-   -> au point 3 il faut utiliser le MEME compte que le PC
-      de la Prof (ex: le compte Google de la Prof) pour
-      rejoindre le meme reseau prive. Sinon demander a la
-      Prof de partager son reseau Tailscale avec vous.
-4. Verifier que le point vert "Connect" est actif (ip 100.x).
-   Le PC de la Prof est joignable a l'adresse : 100.104.240.32
-
---------------------------------------------------------
- ETAPE 2 - Ouvrir LamiAI (a chaque utilisation)
---------------------------------------------------------
-- Double-clique sur "Ouvrir-LamiAI.bat" (dans ce dossier)
-- L'application s'ouvre dans le navigateur, connectee a la
-  MEME base que tous les autres appareils. C'est tout !
-
-  Astuce : tu peux copier Ouvrir-LamiAI.bat sur le Bureau
-  pour l'avoir sous la main (clic droit -> Envoyer vers -> Bureau).
-
---------------------------------------------------------
- SI CE PC EST AUSSI SUR LE MEME WIFI QUE LA PROF
---------------------------------------------------------
-Tu peux aussi utiliser l'adresse locale (plus rapide) :
-   http://192.168.100.29:8080
-Mais l'option Tailscale (ci-dessus) fonctionne PARTOUT
-(WiFi, ecole, 4G...) et reste celle recommandee.
-
---------------------------------------------------------
- REMARQUE IMPORTANTE
---------------------------------------------------------
-- Le serveur (PC de la Prof) doit etre ALLUME pour que ce PC
-  se connecte. L'app est enregistree automatiquement sur le
-  PC principal (travail sauvegarde la-bas).
-- Si le PC principal est ETEINT, le mode hors-ligne total
-  (Phase D) arrivera plus tard : chaque PC pourra travailler
-  et tout se resynchronisera automatiquement.
+========================================================
+ IMPORTANT
+========================================================
+- Le PC de la Prof doit etre ALLUME (le serveur y tourne).
+- Adresse PC de la Prof : 192.168.100.29 (maison) ou
+  100.104.240.32 (Tailscale, partout).
+- Aucun des fichiers LamiAI n'est installe sur ce PC :
+  ce PC se CONNECTE seulement. Travail sauvegarde sur le
+  PC de la Prof + GitHub.
+- Le mode hors-ligne total (PC de la Prof eteint) arrivera
+  plus tard (Phase D).
