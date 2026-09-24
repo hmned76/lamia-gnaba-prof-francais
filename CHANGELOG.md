@@ -1,4 +1,7 @@
-﻿# Historique des versions — LamiAI
+
+## v1.6.8 - 2026-09-24
+- Correctif OnlyOffice : CSP autorise le DocumentServer (port 80) quand l'app est ouverte via l'adresse LAN 192.168.100.29 (logiciel Windows PC2 + autres appareils WiFi).
+# Historique des versions — LamiAI
 
 ## v1.6.7 / v1.6.6 — 19 Septembre 2026 (relevé de notes sync)
 - **📊 Le relevé est synchronisé avec l'emploi** : les classes viennent automatiquement de l'emploi du temps (vérifié en direct : « 3e Sc 1, 3e Sc 2, Bac Let 2, Bac Sc 2 » issus du téléphone)
