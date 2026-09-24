@@ -1,4 +1,4 @@
-# Installateurs OnlyOffice — trop volumineux pour Git/GitHub
+﻿# Installateurs OnlyOffice — trop volumineux pour Git/GitHub
 /onlyoffice-documentserver.exe
 /onlyoffice-documentserver-prerequisites.exe
 *.exe
@@ -22,3 +22,10 @@ venv/
 *.log
 Thumbs.db
 desktop.ini
+
+# Logiciel Windows electron (binaires lourds - pas sur GitHub, distribue via clé USB/partage)
+lami-desktop/node_modules/
+lami-desktop/dist/
+lami-desktop/lami-package/
+lami-desktop/*.log
+kit/PC2/Logiciel-Windows/
