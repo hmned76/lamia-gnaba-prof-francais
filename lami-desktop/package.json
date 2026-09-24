@@ -1,0 +1,46 @@
+{
+  "name": "lamiai-desktop",
+  "version": "1.0.0",
+  "description": "LamiAI - Logiciel de la Professeure Lamia (meme base que PC Prof et telephon)",
+  "author": "Lamia Gnaba",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis portable"
+  },
+  "build": {
+    "appId": "tn.lamia.lamiaiapp",
+    "productName": "LamiAI",
+    "compression": "normal",
+    "directories": {
+      "output": "lami-package"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "LamiAI"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  }
+}
