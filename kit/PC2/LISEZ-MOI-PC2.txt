@@ -1,0 +1,15 @@
+; LamiAI - Launcher .exe pour le 2EME PC (connectable partout via Tailscale)
+; A copier sur le PC2 (cle USB) et double-cliquer. Aucune installation.
+;
+; Ce qu'il fait :
+;  - Verifie si le serveur de la Prof (100.104.240.32:8080) est joignable
+;  - Ouvre LamiAI dans une fenetre "application" (Edge ou Chrome)
+;  - Si le PC de la Prof est eteint / Tailscale pas connecte : message explicatif
+;
+; IMPORTANT SUR LE PC2 (premiere fois, 3 min) :
+;  1. Installer Tailscale  ->  https://tailscale.com/download
+;  2. Se connecter avec le MEME compte que le PC de la Prof
+;  3. Lancer LamiAI-Sur-Ce-PC.exe
+;
+; Le PC de la Prof doit etre ALLUME (c'est lui le serveur : bibliotheque,
+; emploi, releve, fichiers, IA...). Ce PC-ci se connecte seulement a la meme base.
